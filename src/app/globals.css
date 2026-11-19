@@ -1,0 +1,313 @@
+@import "tailwindcss";
+
+/*
+ * Public website design system. This is the only copy: the Laravel Blade frontend it was ported from has been
+ * removed, and the admin panel has its own styles (backend/resources/css/admin.css).
+ */
+/* Brand tokens sampled from the Tech Alphonic logo. Admin colour settings override --brand-* at runtime. */
+@theme {
+    /* Primary = logo teal (deepened for readable white text); the logo orange is now a small accent only. */
+    --color-brand: var(--brand-primary, #167B8B);
+    --color-brand-600: #12697A;
+    --color-brand-700: #0F5966;
+    --color-brand-50: #EBF6F8;
+    --color-brand-100: #D2EDF1;
+    --color-coral: var(--brand-accent-2, #FE5C36);
+    --color-coral-50: #FFF3EF;
+    --color-sky: #F2F9FA;
+    --color-teal: var(--brand-secondary, #53AFBE);
+    --color-teal-600: #3C93A2;
+    --color-teal-700: #2F7784;
+    --color-teal-50: #EEF8FA;
+    --color-teal-100: #D9EFF3;
+    --color-teal-200: #A9DCE4;
+    --color-amber: var(--brand-accent, #FEB449);
+    --color-amber-600: #E79A2C;
+    --color-amber-50: #FFF8EC;
+    --color-steel: #6B7280;
+    --color-ink: #13262E;
+    --color-ink-900: #172C35;
+    --color-ink-800: #1E3640;
+    --color-ink-700: #29434E;
+    --color-ink-600: #45606A;
+    --color-ink-500: #66797F;
+    --color-mist: #F5F6F8;
+    --color-cloud: #F8FAFB;
+    --color-line: #E8EAEE;
+
+    /* Dark surfaces: near-black tinted by the brand colour, so admin colour changes carry through. */
+    --color-night: color-mix(in oklab, var(--color-brand) 14%, #03090B);
+    --color-night-900: color-mix(in oklab, var(--color-brand) 17%, #050D10);
+    --color-night-800: color-mix(in oklab, var(--color-brand) 22%, #08141A);
+    --color-night-700: color-mix(in oklab, var(--color-brand) 28%, #0E1E25);
+
+    --font-sans: var(--font-jakarta), "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-display: var(--font-bricolage), "Bricolage Grotesque", var(--font-jakarta), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+    --radius-card: 1.25rem;
+    --shadow-xs: 0 1px 2px rgb(16 24 40 / 0.05);
+    --shadow-card: 0 1px 2px rgb(16 24 40 / 0.04), 0 4px 16px -6px rgb(16 24 40 / 0.08);
+    --shadow-lift: 0 2px 6px rgb(16 24 40 / 0.04), 0 24px 56px -20px rgb(16 24 40 / 0.22);
+    --shadow-glow: 0 10px 28px -10px rgb(22 123 139 / 0.55);
+
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+    --animate-float: float 8s ease-in-out infinite;
+    --animate-marquee: marquee 45s linear infinite;
+    --animate-marquee-reverse: marquee-reverse 55s linear infinite;
+    --animate-pulse-soft: pulse-soft 3s ease-in-out infinite;
+    --animate-drift: drift 18s ease-in-out infinite alternate;
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+    }
+    @keyframes marquee {
+        from { transform: translateX(0); }
+        to { transform: translateX(-50%); }
+    }
+    @keyframes marquee-reverse {
+        from { transform: translateX(-50%); }
+        to { transform: translateX(0); }
+    }
+    @keyframes pulse-soft {
+        0%, 100% { opacity: .55; }
+        50% { opacity: 1; }
+    }
+    @keyframes drift {
+        0% { transform: translate3d(0, 0, 0) scale(1); }
+        50% { transform: translate3d(4%, -6%, 0) scale(1.08); }
+        100% { transform: translate3d(-5%, 4%, 0) scale(0.96); }
+    }
+}
+
+@layer base {
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body { @apply bg-white font-sans text-[0.975rem] text-ink-600 antialiased; text-rendering: optimizeLegibility; font-feature-settings: "ss01", "cv11"; }
+    h1, h2, h3, h4 { @apply font-display text-ink; letter-spacing: -0.025em; text-wrap: balance; }
+    p { text-wrap: pretty; }
+    :focus-visible { @apply outline-2 outline-offset-2 outline-brand; }
+    [x-cloak] { display: none !important; }
+    ::selection { @apply bg-brand text-white; }
+    img, video { max-width: 100%; height: auto; }
+}
+
+@layer components {
+    .container-x { @apply mx-auto w-full max-w-[1240px] px-5 sm:px-6 lg:px-8; }
+    .section { @apply py-20 sm:py-24 lg:py-32; }
+    .section-sm { @apply py-14 sm:py-16; }
+
+    /* Eyebrow: small label with a brand dash — calmer than a pill badge. */
+    .eyebrow { @apply inline-flex items-center gap-2.5 text-[0.75rem] font-bold uppercase tracking-[0.18em] text-brand-600; }
+    .eyebrow::before { content: ""; @apply h-[2px] w-6 rounded-full bg-gradient-to-r from-brand via-teal to-amber; }
+    .eyebrow-dark { @apply text-teal-200; }
+    .badge-pill { @apply inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold; }
+
+    .h-display { @apply font-display font-bold leading-[1.08]; font-size: clamp(2rem, 1.15rem + 2.2vw, 3.25rem); letter-spacing: -0.035em; }
+    .h-section { @apply font-display font-bold leading-[1.06]; font-size: clamp(2rem, 1.3rem + 2.2vw, 3.25rem); letter-spacing: -0.04em; }
+    .h-mega { @apply font-display font-bold leading-[0.95]; font-size: clamp(3rem, 1.4rem + 6vw, 7rem); letter-spacing: -0.05em; }
+    .lead { @apply text-[1.075rem] leading-relaxed text-ink-500 sm:text-lg; }
+
+    /* Gradient keyword ([[word]] in admin headings) — drifts slowly. */
+    .text-gradient {
+        background-image: linear-gradient(95deg, var(--color-brand, #167B8B) 0%, #2E9FB1 25%, #FE5C36 50%, #FEB449 75%, var(--color-brand, #167B8B) 100%) !important;
+        background-size: 200% auto !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        background-clip: text !important;
+        color: transparent !important;
+        animation: gradient-pan 6s ease-in-out infinite alternate !important;
+        display: inline-block;
+    }
+    /* Ghost text (faded fill). A true -webkit-text-stroke shows the variable font's overlapping contours. */
+    .text-outline { color: var(--stroke, rgb(255 255 255 / 0.28)); }
+
+    .btn {
+        @apply relative isolate inline-flex min-h-11 items-center justify-center gap-2 overflow-hidden rounded-full px-5 py-2.5 text-[0.9rem] font-semibold whitespace-nowrap transition duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60;
+    }
+    /* Use together with .btn, e.g. class="btn btn-primary" (Tailwind v4 cannot @apply component classes). */
+    .btn-primary { @apply bg-brand text-white hover:-translate-y-px hover:bg-brand-600; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.22), var(--shadow-glow); }
+    /* Light sweep across primary buttons on hover */
+    .btn-primary::after { content: ""; @apply pointer-events-none absolute inset-0 -z-10; background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.3) 50%, transparent 70%); transform: translateX(-120%); transition: transform 0.75s var(--ease-out-expo); }
+    .btn-primary:hover::after { transform: translateX(120%); }
+    .btn-dark { @apply bg-ink text-white hover:-translate-y-px hover:bg-ink-700; }
+    .btn-light { @apply bg-white text-ink hover:-translate-y-px hover:bg-teal-50; box-shadow: 0 10px 30px -12px rgb(0 0 0 / 0.5); }
+    .btn-secondary { @apply border border-line bg-white text-ink shadow-[var(--shadow-xs)] hover:border-ink/25 hover:bg-cloud; }
+    .btn-ghost-dark { @apply border border-white/15 bg-white/[0.06] text-white backdrop-blur hover:border-white/30 hover:bg-white/10; }
+    .btn-teal { @apply bg-teal text-white hover:bg-teal-600; }
+    .btn-lg { @apply min-h-12 px-6 py-3 text-[0.95rem]; }
+    .btn-icon { @apply grid size-7 place-items-center rounded-full bg-white/20 transition group-hover:translate-x-0.5; }
+
+    .card { @apply relative rounded-[var(--radius-card)] border border-line bg-white p-7 shadow-[var(--shadow-card)] transition duration-300; }
+    .card-hover { @apply hover:-translate-y-1 hover:border-ink/10 hover:shadow-[var(--shadow-lift)]; }
+    .card-dark { @apply relative rounded-[var(--radius-card)] border border-white/10 bg-white/[0.04] p-7 transition duration-300 hover:border-white/20 hover:bg-white/[0.07]; }
+
+    /*
+     * Cursor spotlight: a soft glow plus a lit border that follow the pointer (Runtime.tsx sets --mx/--my).
+     * Works on light and dark cards; content must sit above via normal flow (the glow is z-index -1 in an isolated box).
+     */
+    .spotlight { position: relative; isolation: isolate; }
+    .spotlight::before,
+    .spotlight::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity 0.35s ease; }
+    .spotlight::before { z-index: -1; background: radial-gradient(380px circle at var(--mx, 50%) var(--my, 50%), color-mix(in oklab, var(--color-teal) 16%, transparent), transparent 65%); }
+    .spotlight::after { padding: 1px; background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), color-mix(in oklab, var(--color-brand) 75%, transparent), transparent 70%); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+    .spotlight:hover::before,
+    .spotlight:hover::after { opacity: 1; }
+
+    .icon-tile { @apply grid size-12 shrink-0 place-items-center rounded-2xl; }
+    .icon-grad { @apply bg-gradient-to-br from-brand to-teal text-white shadow-[0_8px_18px_-8px_rgb(22_123_139/0.6)]; }
+
+    .chip { @apply inline-flex items-center rounded-full border border-line bg-white px-3 py-1 text-xs font-medium text-ink-600; }
+    .divider-dot { @apply size-1 rounded-full bg-current opacity-40; }
+
+    /* ---------- Dark sections ---------- */
+    .section-dark { @apply relative isolate overflow-hidden bg-night text-white/65; }
+    .section-dark :where(h1, h2, h3, h4, h5, dd, strong) { color: #fff; }
+    .section-dark .eyebrow { @apply text-teal-200; }
+    .section-dark .lead { color: rgb(255 255 255 / 0.62); }
+    .section-dark .text-gradient,
+    .text-gradient-light { background-image: linear-gradient(95deg, #7FD6E2 0%, #B7EEF4 35%, #FFC874 65%, #7FD6E2 100%); }
+    .section-dark .btn-secondary { @apply border-white/15 bg-white/[0.06] text-white shadow-none backdrop-blur; }
+    .section-dark .btn-secondary:hover { @apply border-white/30 bg-white/10; }
+    .section-dark .spotlight::before { background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgb(255 255 255 / 0.07), transparent 65%); }
+    .section-dark .spotlight::after { background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), color-mix(in oklab, var(--color-teal) 85%, transparent), transparent 70%); }
+
+    /* Moving colour mesh for heroes and dark panels (pure CSS, no images). */
+    .mesh { @apply pointer-events-none absolute inset-0 -z-10 overflow-hidden; }
+    .mesh > span { @apply absolute block rounded-full blur-3xl motion-safe:animate-drift; }
+
+    .prose-content { @apply text-[1.04rem] leading-[1.85] text-ink-600; }
+    .prose-content h2 { @apply mt-12 mb-4 scroll-mt-28 text-2xl font-bold sm:text-[1.95rem]; }
+    .prose-content h3 { @apply mt-8 mb-3 scroll-mt-28 text-xl font-bold; }
+    .prose-content p { @apply mb-5; }
+    .prose-content a { @apply font-semibold text-brand-700 underline decoration-brand/30 underline-offset-4 hover:decoration-brand; }
+    .prose-content ul { @apply mb-6 list-none space-y-2.5 pl-0; }
+    .prose-content ul > li { @apply relative pl-8; }
+    .prose-content ul > li::before { content: ""; @apply absolute left-0 top-[0.42em] size-5 rounded-full bg-brand-50; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23167B8B' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E"); background-size: 12px; background-position: center; background-repeat: no-repeat; }
+    .prose-content ol { @apply mb-6 list-decimal space-y-2 pl-6 marker:font-bold marker:text-brand; }
+    .prose-content blockquote { @apply my-8 rounded-2xl border-l-4 border-brand bg-brand-50/60 px-6 py-5 text-ink-700; }
+    .prose-content img { @apply my-8 rounded-2xl; }
+    .prose-content table { @apply my-6 w-full border-collapse overflow-hidden rounded-xl text-sm; }
+    .prose-content th { @apply border border-line bg-mist px-4 py-3 text-left font-semibold text-ink; }
+    .prose-content td { @apply border border-line px-4 py-3; }
+    .prose-content strong { @apply font-semibold text-ink; }
+    .prose-content code { @apply rounded bg-mist px-1.5 py-0.5 text-sm text-brand-700; }
+
+    /* Forms: soft filled inputs that sharpen on focus. */
+    .form-label { @apply mb-1.5 block text-[0.8rem] font-semibold text-ink-700; }
+    .form-input {
+        @apply block h-12 w-full rounded-xl border border-transparent bg-mist px-4 text-[0.95rem] text-ink placeholder:text-ink-500/60 transition focus:border-brand/50 focus:bg-white focus:ring-4 focus:ring-brand/10 focus:outline-none;
+    }
+    textarea.form-input { @apply h-auto py-3 leading-relaxed; }
+    select.form-input { @apply appearance-none bg-[length:16px] bg-[right_1rem_center] bg-no-repeat pr-10; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235B6375' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); }
+    .form-input-dark { @apply border-white/10 bg-white/[0.06] text-white placeholder:text-white/40 focus:border-amber/60 focus:bg-white/10 focus:ring-amber/15; }
+    .form-input-dark option { @apply bg-white text-ink; }
+    .form-error { @apply mt-1.5 text-xs font-medium text-red-600; }
+
+    /* Brand square motif from the logo — decorative only */
+    .brand-squares { @apply inline-grid w-max grid-cols-2 gap-1; }
+    .brand-squares > span { @apply block size-2.5 rounded-[3px]; }
+
+    .bg-grid {
+        background-image: linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px),
+            linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
+        background-size: 64px 64px;
+        mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, #000 40%, transparent 100%);
+    }
+    .bg-grid-light {
+        background-image: linear-gradient(to right, rgb(22 123 139 / 0.06) 1px, transparent 1px),
+            linear-gradient(to bottom, rgb(22 123 139 / 0.06) 1px, transparent 1px);
+        background-size: 56px 56px;
+        mask-image: radial-gradient(ellipse 80% 70% at 50% 0%, #000 30%, transparent 100%);
+    }
+    .bg-dots { background-image: radial-gradient(rgb(10 12 18 / 0.08) 1px, transparent 1px); background-size: 22px 22px; }
+    .bg-dots-dark { background-image: radial-gradient(rgb(255 255 255 / 0.09) 1px, transparent 1px); background-size: 22px 22px; }
+    /* Soft decorative glows for light sections (names kept for template compatibility) */
+    .glow-orange { background: radial-gradient(closest-side, rgb(254 180 73 / 0.22), transparent); }
+    .glow-teal { background: radial-gradient(closest-side, rgb(83 175 190 / 0.26), transparent); }
+    .glow-amber { background: radial-gradient(closest-side, rgb(254 180 73 / 0.24), transparent); }
+    .noise::after { content: ""; @apply pointer-events-none absolute inset-0 opacity-[0.05] mix-blend-overlay; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+    /* Gradient hairline border for highlighted cards */
+    .ring-gradient { position: relative; }
+    .ring-gradient::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; background: linear-gradient(140deg, rgb(22 123 139 / .5), rgb(83 175 190 / .3) 45%, rgb(254 180 73 / .35)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+
+    /* Edge fade for horizontal marquees */
+    .fade-x { mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent); }
+}
+
+/*
+ * Scroll reveals (replaces AOS; same data-aos / data-aos-delay attributes). The html.js class is set inline in
+ * <head>, RevealScope (Runtime.tsx) adds .is-in when an element enters the viewport. Uses animations, not transitions, so it never
+ * fights the hover transitions on cards.
+ */
+@layer components {
+    .js [data-aos]:not(.is-in) { opacity: 0; }
+    .js [data-aos].is-in { animation: reveal 0.95s var(--ease-out-expo) var(--d, 0ms) both; }
+    [data-aos] { --from: translate3d(0, 28px, 0); --blur: 6px; }
+    [data-aos="fade-down"] { --from: translate3d(0, -18px, 0); }
+    [data-aos="fade-right"] { --from: translate3d(-32px, 0, 0); }
+    [data-aos="fade-left"] { --from: translate3d(32px, 0, 0); }
+    [data-aos="zoom-in"] { --from: scale(0.94); --blur: 4px; }
+    [data-aos="zoom-in-up"] { --from: translate3d(0, 32px, 0) scale(0.96); --blur: 4px; }
+    .no-reveal [data-aos] { opacity: 1 !important; animation: none !important; }
+
+    /* Word-by-word headline entrance: words of [data-split] are wrapped in .w > span when rendered */
+    [data-split] .w { display: inline-block; overflow: clip; overflow-clip-margin: 0.2em; vertical-align: top; padding-bottom: 0.06em; margin-bottom: -0.06em; }
+    [data-split] .w > span { display: inline-block; }
+    .js [data-split]:not(.is-in) .w > span { transform: translateY(105%); }
+    .js [data-split].is-in .w > span { animation: word-up 1s var(--ease-out-expo) calc(var(--d, 0ms) + var(--i, 0) * 55ms) both; }
+}
+
+@keyframes reveal {
+    from { opacity: 0; transform: var(--from); filter: blur(var(--blur)); }
+    to { opacity: 1; transform: none; filter: none; }
+}
+@keyframes word-up {
+    from { transform: translateY(105%); }
+    to { transform: none; }
+}
+@keyframes gradient-pan {
+    from { background-position: 0% 50%; }
+    to { background-position: 100% 50%; }
+}
+
+/* Scroll-linked effects (progressive enhancement: browsers without scroll timelines just show the end state). */
+@supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+        .parallax { animation: parallax linear both; animation-timeline: view(); animation-range: cover 0% cover 100%; }
+        .scroll-fill { animation: scroll-fill linear both; animation-timeline: view(); animation-range: entry 40% cover 55%; transform-origin: left center; }
+    }
+}
+@keyframes parallax {
+    from { transform: translateY(-6%) scale(1.08); }
+    to { transform: translateY(6%) scale(1.08); }
+}
+@keyframes scroll-fill {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+/* ---------- Next.js only: overlay entrance (replaces Alpine x-transition) ---------- */
+@layer components {
+    .overlay-fade { animation: overlay-fade 0.3s ease-out both; }
+    .overlay-rise { animation: overlay-rise 0.35s var(--ease-out-expo) both; }
+    .slide-in-right { animation: slide-in-right 0.3s ease-out both; }
+}
+@keyframes overlay-fade { from { opacity: 0; } }
+@keyframes overlay-rise { from { opacity: 0; transform: translateY(2rem) scale(0.97); } }@keyframes slide-in-right { from { transform: translateX(100%); } }
+
+/* ---------- Next.js only: [data-reveal] without data-aos animates as fade-up (app.js used to add data-aos) ---------- */
+@layer components {
+    [data-reveal]:not([data-aos]) { --from: translate3d(0, 28px, 0); --blur: 6px; }
+    .js [data-reveal]:not([data-aos]):not(.is-in) { opacity: 0; }
+    .js [data-reveal]:not([data-aos]).is-in { animation: reveal 0.95s var(--ease-out-expo) var(--d, 0ms) both; }
+    /* Runtime never booted (see layout.tsx): show everything the reveal rules above would keep hidden. */
+    .no-reveal [data-reveal], .no-reveal [data-aos] { opacity: 1 !important; animation: none !important; }
+    .no-reveal [data-split] .w > span { transform: none !important; animation: none !important; }
+}
