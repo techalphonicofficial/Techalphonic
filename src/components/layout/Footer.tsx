@@ -16,7 +16,16 @@ const COLUMNS: [string, string][] = [
 /** Port of components/footer.blade.php */
 export function Footer({ layout }: { layout: Layout }) {
   const s = layout.settings;
-  const columns = COLUMNS.map(([loc, label]) => ({ label, items: layout.menus[loc] ?? [] })).filter((c) => c.items.length);
+  const columns = COLUMNS.map(([loc, label]) => {
+    const items = [...(layout.menus[loc] ?? [])];
+    if (loc === "footer_company" && !items.some((i) => i.url?.replace(/\/$/, "") === "/blog")) {
+      const blogItem = { label: "Blog", url: "/blog/", icon: null, description: null, mega: false, new_tab: false, is_heading: false, children: [] };
+      const contactIdx = items.findIndex((i) => i.label?.trim().toLowerCase() === "contact");
+      if (contactIdx !== -1) items.splice(contactIdx, 0, blogItem);
+      else items.push(blogItem);
+    }
+    return { label, items };
+  }).filter((c) => c.items.length);
   const legal = layout.menus.legal ?? [];
   const wa = s.whatsapp_url;
   const hours = lines(s.business_hours);

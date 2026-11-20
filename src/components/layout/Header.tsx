@@ -18,8 +18,8 @@ export function HeaderWithPathname() {
 export function Header({ pathname }: { pathname: string }) {
   const { layout } = useSite();
   const s = layout.settings;
-  const items = useMemo(() => organizeMenuItems(layout.menus.main ?? []), [layout.menus.main]);
-  const mobileItems = useMemo(() => organizeMenuItems(layout.menus.mobile ?? []), [layout.menus.mobile]);
+  const items = useMemo(() => organizeMenuItems(layout.menus.main ?? [], layout.menus.footer_development ?? []), [layout.menus.main, layout.menus.footer_development]);
+  const mobileItems = useMemo(() => organizeMenuItems(layout.menus.mobile ?? [], layout.menus.footer_development ?? []), [layout.menus.mobile, layout.menus.footer_development]);
   const hours = lines(s.business_hours)[0];
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -227,21 +227,82 @@ export function Header({ pathname }: { pathname: string }) {
   );
 }
 
-function organizeMenuItems(rawItems: MenuItem[]): MenuItem[] {
-  // 1. Remove "Home"
-  const list = rawItems.filter((item) => {
+function organizeMenuItems(rawItems: MenuItem[], devChildren: MenuItem[] = []): MenuItem[] {
+  const packagesItem: MenuItem = {
+    label: "Packages",
+    url: "/packages/",
+    icon: null,
+    description: null,
+    mega: false,
+    new_tab: false,
+    is_heading: false,
+    children: [],
+  };
+
+  let devItem: MenuItem | null = null;
+  let hasPackages = false;
+  const list: MenuItem[] = [];
+
+  for (const item of rawItems) {
     const label = item.label?.trim().toLowerCase();
     const url = item.url?.trim().replace(/\/$/, "");
-    return label !== "home" && url !== "";
-  });
 
-  // 2. Extract "About"
+    // 1. Remove "Home" and "Blog"
+    if (label === "home" || label === "blog" || url === "" || url === "/blog") continue;
+
+    // 2. Capture "Development" so it always sits first with dropdown items
+    if (label === "development") {
+      devItem = item.children.length > 0 ? item : { ...item, mega: false, children: devChildren };
+      continue;
+    }
+
+    // 3. Replace "Portfolio" with "Packages"
+    if (label === "portfolio") {
+      if (!hasPackages) {
+        list.push(packagesItem);
+        hasPackages = true;
+      }
+      continue;
+    }
+
+    if (label === "packages") {
+      hasPackages = true;
+    }
+
+    list.push(item);
+  }
+
+  // Place "Development" at the very beginning of the navbar
+  if (!devItem && devChildren.length > 0) {
+    devItem = {
+      label: "Development",
+      url: "/development/",
+      icon: null,
+      description: null,
+      mega: false,
+      new_tab: false,
+      is_heading: false,
+      children: devChildren,
+    };
+  }
+  if (devItem) {
+    list.unshift(devItem);
+  }
+
+  if (!hasPackages) {
+    const insertIdx = list.findIndex((item) => {
+      const l = item.label?.trim().toLowerCase();
+      return l === "blog" || l === "about" || l === "contact";
+    });
+    if (insertIdx !== -1) list.splice(insertIdx, 0, packagesItem);
+    else list.push(packagesItem);
+  }
+
+  // 4. Extract "About" and shift immediately before "Contact"
   const aboutIdx = list.findIndex((item) => item.label?.trim().toLowerCase() === "about");
   if (aboutIdx === -1) return list;
 
   const [aboutItem] = list.splice(aboutIdx, 1);
-
-  // 3. Shift "About" immediately before "Contact"
   const contactIdx = list.findIndex((item) => item.label?.trim().toLowerCase() === "contact");
   if (contactIdx !== -1) {
     list.splice(contactIdx, 0, aboutItem);
