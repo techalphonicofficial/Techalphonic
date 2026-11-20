@@ -15,6 +15,9 @@ const BACKEND = process.env.BACKEND_URL.trim().replace(/\/$/, "");
 const ADMIN_PATH = process.env.ADMIN_PATH?.trim() || "admin";
 
 const nextConfig: NextConfig = {
+  experimental: {
+    agentUpgrade: "security",
+  },
   cacheComponents: true,
   partialPrefetching: true,
   // Canonical URLs end with "/" (same as Laravel). The proxy adds the slash itself so backend paths are untouched.
