@@ -8,23 +8,26 @@ import { Icon } from "./Icon";
 /** <x-logo> */
 export function Logo({ settings, dark = false, className }: { settings: Settings; dark?: boolean; className?: string }) {
   const logo = dark ? settings.logo_dark ?? settings.logo : settings.logo;
-  const name = settings.site_name;
+  const name = settings.site_name || "Tech Alphonic";
   return (
     <Link href="/" className={cn("inline-flex shrink-0 items-center gap-2.5", className)} aria-label={`${name} — home`}>
       {logo ? (
-        <img
-          src={logo.webp || logo.url}
-          alt={name}
-          width={logo.width || 180}
-          height={logo.height || 65}
-          className={cn("h-9 w-auto sm:h-10", dark && !settings.logo_dark && "rounded-md bg-white px-2 py-1")}
-          fetchPriority="high"
-        />
-      ) : (
         <>
-          <BrandSquares />
-          <span className={cn("font-display text-lg font-extrabold leading-none", dark ? "text-white" : "text-ink")}>{name}</span>
+          <img
+            src={logo.webp || logo.url}
+            alt={name}
+            width={logo.width || 180}
+            height={logo.height || 65}
+            data-logo-img=""
+            className={cn("h-9 w-auto sm:h-10", dark && !settings.logo_dark && "rounded-md bg-white px-2 py-1")}
+            fetchPriority="high"
+          />
+          <span data-logo-fallback="" className={cn("hidden font-display text-lg font-extrabold leading-none whitespace-nowrap", dark ? "text-white" : "text-ink")}>
+            {name}
+          </span>
         </>
+      ) : (
+        <span className={cn("font-display text-lg font-extrabold leading-none whitespace-nowrap", dark ? "text-white" : "text-ink")}>{name}</span>
       )}
     </Link>
   );
@@ -88,14 +91,14 @@ export function SectionHeading({
   children?: ReactNode;
 }) {
   return (
-    <div className={cn(align === "center" ? "mx-auto max-w-2xl text-center" : "max-w-2xl", "mb-14")} data-reveal="">
+    <div className={cn(align === "center" ? "mx-auto max-w-2xl text-center" : "max-w-2xl", "mb-6")} data-reveal="">
       {eyebrow && <p className={cn("eyebrow", dark && "eyebrow-dark", align === "center" && "justify-center")}>{eyebrow}</p>}
       {title && (
-        <h2 id={id} className={cn("h-section mt-4", dark && "text-white")}>
+        <h2 id={id} className={cn("h-section mt-2", dark && "text-white")}>
           {title}
         </h2>
       )}
-      {subtitle && <p className={cn("mt-5 text-[1.075rem] leading-relaxed", dark ? "text-white/60" : "text-ink-500")}>{subtitle}</p>}
+      {subtitle && <p className={cn("mt-2.5 text-[1.02rem] leading-relaxed", dark ? "text-white/60" : "text-ink-500")}>{subtitle}</p>}
       {children}
     </div>
   );

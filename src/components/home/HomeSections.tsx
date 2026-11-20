@@ -79,7 +79,7 @@ function Hero({ section, data }: P) {
           <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white to-transparent" />
         </div>
 
-        <div className="container-x grid items-center gap-12 pb-10 pt-12 sm:pt-16 lg:min-h-[660px] lg:grid-cols-[minmax(0,1.2fr)_minmax(0,25rem)] lg:gap-16 lg:pb-14 lg:pt-16 xl:min-h-[700px]">
+        <div className="container-x grid items-center gap-8 py-5 sm:py-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,25rem)] lg:gap-10 lg:py-7">
           <div className="max-w-[44rem]">
             {hero.badge && (
               <span className="badge-pill border-ink/10 bg-white/80 py-1 pl-1 pr-3.5 text-ink-700 shadow-[var(--shadow-xs)] backdrop-blur" data-aos="fade-down">
@@ -90,17 +90,17 @@ function Hero({ section, data }: P) {
               </span>
             )}
 
-            <h1 id="hero-title" className="h-display mt-7 text-ink" data-split="">
+            <h1 id="hero-title" className="h-display mt-3.5 text-ink" data-split="">
               {splitWords(hero.heading)}
             </h1>
 
             {hero.description && (
-              <p className="mt-5 max-w-xl text-base leading-relaxed text-ink-600 sm:text-[1.05rem]" data-aos="fade-up" data-aos-delay="250">
+              <p className="mt-3 max-w-xl text-base leading-relaxed text-ink-600 sm:text-[1.05rem]" data-aos="fade-up" data-aos-delay="250">
                 {hero.description}
               </p>
             )}
 
-            <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-4" data-aos="fade-up" data-aos-delay="350">
+            <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3" data-aos="fade-up" data-aos-delay="350">
               {hero.cta_text && (
                 <a href={toPopup ? "#enquiry-popup" : hero.cta_url!} {...(toPopup ? { "data-enquiry": "hero" } : {})} className="btn btn-primary btn-lg group pr-2" data-cta="hero-primary" data-magnetic="">
                   {hero.cta_text}
@@ -128,7 +128,7 @@ function Hero({ section, data }: P) {
             </div>
 
             {hero.trust_text && (
-              <div className="mt-10 inline-flex items-center gap-3 rounded-full border border-line bg-white/70 py-2 pl-3 pr-4 backdrop-blur" data-aos="fade-up" data-aos-delay="450">
+              <div className="mt-5 inline-flex items-center gap-3 rounded-full border border-line bg-white/70 py-1.5 pl-3 pr-4 backdrop-blur" data-aos="fade-up" data-aos-delay="450">
                 <span className="flex gap-0.5 text-amber" aria-hidden="true">
                   <Stars rating={5} />
                 </span>
@@ -171,15 +171,15 @@ function Hero({ section, data }: P) {
         </div>
 
         {stats.length > 0 && (
-          <div className="container-x pb-12 lg:pb-16" data-aos="fade-up" data-aos-delay="300">
-            <dl className="grid grid-cols-2 gap-y-8 border-t border-ink/10 pt-8 lg:grid-cols-4">
+          <div className="container-x pb-6 lg:pb-7" data-aos="fade-up" data-aos-delay="300">
+            <dl className="grid grid-cols-2 gap-y-5 border-t border-ink/10 pt-5 lg:grid-cols-4">
               {stats.map((s, i) => (
                 <div key={i} className={cn("px-4 sm:px-6", i % 2 ? "border-l border-ink/10" : "pl-0 sm:pl-0", i > 0 && i % 2 === 0 && "lg:border-l lg:border-ink/10 lg:pl-6")}>
                   <dd className="font-display text-[2.4rem] font-bold leading-none tracking-[-0.05em] text-ink sm:text-5xl">
                     <CountUp value={s.value} />
                     <span className="text-brand">{s.suffix ?? ""}</span>
                   </dd>
-                  <dt className="mt-2 text-[0.82rem] font-medium leading-snug text-ink-500">{s.label ?? ""}</dt>
+                  <dt className="mt-1.5 text-[0.82rem] font-medium leading-snug text-ink-500">{s.label ?? ""}</dt>
                 </div>
               ))}
             </dl>
@@ -189,7 +189,7 @@ function Hero({ section, data }: P) {
 
       {ticker.length > 0 && (
         /* Moving services ribbon: dark band, alternating solid and faded words */
-        <div className="relative overflow-hidden bg-night py-5 text-white sm:py-6" aria-hidden="true">
+        <div className="relative overflow-hidden bg-night py-3.5 text-white sm:py-4" aria-hidden="true">
           <div className="flex w-max animate-marquee items-center gap-8 whitespace-nowrap motion-reduce:animate-none sm:gap-12">
             {[0, 1].map((pass) =>
               ticker.map((t, i) => (
@@ -215,7 +215,7 @@ function Clients({ section, data }: P) {
   const logos = (section.content.items ?? []) as { name?: string; logo_id?: number }[];
   if (!logos.length) return null;
   return (
-    <section className="border-b border-line bg-white py-10" aria-label={section.title || "Clients"}>
+    <section className="border-b border-line bg-white py-4 sm:py-5" aria-label={section.title || "Clients"}>
       <div className="container-x">
         {section.title && (
           <p className="flex items-center justify-center gap-4 text-center text-xs font-bold uppercase tracking-[0.2em] text-ink-500">
@@ -224,7 +224,7 @@ function Clients({ section, data }: P) {
             <span className="h-px w-10 bg-line" />
           </p>
         )}
-        <div className="fade-x relative mt-7 overflow-hidden">
+        <div className="fade-x relative mt-3 overflow-hidden">
           <ul className="flex w-max animate-marquee items-center gap-14 hover:[animation-play-state:paused] motion-reduce:animate-none" role="list">
             {[0, 1].map((pass) =>
               logos.map((logo, i) => {
@@ -255,13 +255,13 @@ function Services({ section, data }: P) {
     <section className="section relative" aria-labelledby="services-heading">
       <TabGroup initial="0">
         <div className="container-x">
-          <div className="mb-14 flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-end">
+          <div className="mb-6 flex flex-col items-start justify-between gap-5 lg:flex-row lg:items-end">
             <div className="max-w-2xl" data-reveal="">
               {section.eyebrow && <p className="eyebrow">{section.eyebrow}</p>}
-              <h2 id="services-heading" className="h-section mt-4">
+              <h2 id="services-heading" className="h-section mt-2">
                 {highlight(section.title)}
               </h2>
-              {section.subtitle && <p className="mt-5 max-w-xl text-[1.075rem] leading-relaxed text-ink-500">{section.subtitle}</p>}
+              {section.subtitle && <p className="mt-2.5 max-w-xl text-[1.02rem] leading-relaxed text-ink-500">{section.subtitle}</p>}
             </div>
             {cats.length > 1 && (
               <div className="inline-flex max-w-full shrink-0 overflow-x-auto rounded-full border border-line bg-mist p-1.5" role="tablist" aria-label="Service categories" data-reveal="">
@@ -278,7 +278,7 @@ function Services({ section, data }: P) {
             <TabPanel key={cat.slug} id={String(i)}>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {/* Feature tile (bento anchor) */}
-                <Link href={cat.url} className="group relative isolate flex min-h-[24rem] flex-col justify-end overflow-hidden rounded-[var(--radius-card)] bg-night p-8 text-white sm:col-span-2 lg:row-span-2 lg:p-10" data-aos="zoom-in">
+                <Link href={cat.url} className="group relative isolate flex min-h-[20rem] flex-col justify-end overflow-hidden rounded-[var(--radius-card)] bg-night p-6 text-white sm:col-span-2 lg:row-span-2 lg:p-8" data-aos="zoom-in">
                   {image && <Img media={image} sizes="(min-width:1024px) 600px, 100vw" className="absolute inset-0 -z-10 size-full object-cover opacity-55 transition duration-[1.2s] group-hover:scale-105 group-hover:opacity-65" alt="" />}
                   <div className="absolute inset-0 -z-10 bg-gradient-to-t from-night via-night/70 to-night/10" />
                   <div className="mesh opacity-80">
@@ -309,7 +309,7 @@ function Services({ section, data }: P) {
                 ))}
               </div>
 
-              <div className="relative mt-8 flex flex-col items-start justify-between gap-5 overflow-hidden rounded-[var(--radius-card)] bg-night px-7 py-6 text-white sm:flex-row sm:items-center sm:px-8">
+              <div className="relative mt-5 flex flex-col items-start justify-between gap-4 overflow-hidden rounded-[var(--radius-card)] bg-night px-5 py-4 text-white sm:flex-row sm:items-center sm:px-6">
                 <div className="bg-dots-dark pointer-events-none absolute inset-0 opacity-60 [mask-image:linear-gradient(to_left,black,transparent_70%)]" />
                 <div className="relative flex items-center gap-4">
                   <span className="icon-tile icon-grad">
@@ -342,7 +342,7 @@ function Promo({ section, data }: P) {
   const image = media(data, c.image_id);
   const points = (c.points ?? []) as string[];
   return (
-    <section className="section-sm" aria-labelledby="promo-heading">
+    <section className="pb-7 pt-1 sm:pb-8 sm:pt-2" aria-labelledby="promo-heading">
       <div className="container-x">
         <div className="section-dark noise rounded-[2rem] shadow-[0_40px_80px_-40px_rgb(6_20_24/0.7)]" data-reveal="">
           <div className="mesh">
@@ -351,19 +351,19 @@ function Promo({ section, data }: P) {
           </div>
           <div className="bg-grid absolute inset-0 -z-10" />
 
-          <div className="relative grid items-center gap-10 p-8 sm:p-12 lg:grid-cols-[1.2fr_1fr] lg:p-16">
+          <div className="relative grid items-center gap-8 p-6 sm:p-8 lg:grid-cols-[1.2fr_1fr] lg:p-10">
             <div>
               {section.eyebrow && (
                 <span className="badge-pill border-amber/30 bg-amber/10 text-amber">
                   <Icon name="sparkles" className="size-3.5" /> {section.eyebrow}
                 </span>
               )}
-              <h2 id="promo-heading" className="mt-6 font-display font-bold leading-[1.04]" style={{ fontSize: "clamp(2rem, 1.2rem + 2.4vw, 3.3rem)", letterSpacing: "-0.045em" }}>
+              <h2 id="promo-heading" className="mt-4 font-display font-bold leading-[1.04]" style={{ fontSize: "clamp(2rem, 1.2rem + 2.4vw, 3.3rem)", letterSpacing: "-0.045em" }}>
                 {highlight(section.title)}
               </h2>
-              {section.subtitle && <p className="mt-5 max-w-xl text-[1.075rem] leading-relaxed text-white/65">{section.subtitle}</p>}
+              {section.subtitle && <p className="mt-3 max-w-xl text-[1.02rem] leading-relaxed text-white/65">{section.subtitle}</p>}
               {points.length > 0 && (
-                <ul className="mt-8 grid gap-3 sm:grid-cols-2" role="list">
+                <ul className="mt-5 grid gap-2.5 sm:grid-cols-2" role="list">
                   {points.map((p, i) => (
                     <li key={i} className="flex items-start gap-2.5 text-[0.95rem] font-medium text-white/85" data-aos="fade-up" data-aos-delay={String(i * 70)}>
                       <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-teal/20 text-teal-200 ring-1 ring-teal/40">
@@ -374,7 +374,7 @@ function Promo({ section, data }: P) {
                   ))}
                 </ul>
               )}
-              <div className="mt-10 flex flex-wrap items-center gap-4">
+              <div className="mt-6 flex flex-wrap items-center gap-4">
                 <button type="button" data-enquiry="promo-banner" className="btn btn-light btn-lg group" data-magnetic="">
                   {c.button_text || "Claim my free audit"} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
                 </button>
@@ -411,7 +411,7 @@ function About({ section, data }: P) {
   return (
     <section className="section relative overflow-hidden bg-cloud" aria-labelledby="about-heading">
       <div className="bg-dots pointer-events-none absolute inset-y-0 left-0 w-1/2 opacity-60 [mask-image:linear-gradient(to_right,black,transparent)]" />
-      <div className="container-x relative grid items-center gap-16 lg:grid-cols-2 lg:gap-20">
+      <div className="container-x relative grid items-center gap-10 lg:grid-cols-2 lg:gap-12">
         <div className="relative order-2 lg:order-1" data-reveal="">
           {image ? (
             <div className="overflow-hidden rounded-[2rem] shadow-[var(--shadow-lift)]">
@@ -467,13 +467,13 @@ function About({ section, data }: P) {
         </div>
         <div className="order-1 lg:order-2" data-reveal="">
           {section.eyebrow && <p className="eyebrow">{section.eyebrow}</p>}
-          <h2 id="about-heading" className="h-section mt-4">
+          <h2 id="about-heading" className="h-section mt-2.5">
             {highlight(section.title)}
           </h2>
-          {section.subtitle && <p className="mt-5 text-lg font-medium leading-relaxed text-ink-700">{section.subtitle}</p>}
-          <Html html={c.text} className="prose-content mt-4 !text-ink-500" />
+          {section.subtitle && <p className="mt-3 text-lg font-medium leading-relaxed text-ink-700">{section.subtitle}</p>}
+          <Html html={c.text} className="prose-content mt-3 !text-ink-500" />
           {points.length > 0 && (
-            <ul className="mt-8 grid gap-x-6 gap-y-4 sm:grid-cols-2" role="list">
+            <ul className="mt-5 grid gap-x-6 gap-y-3 sm:grid-cols-2" role="list">
               {points.map((p, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-brand-50 text-brand">
@@ -485,7 +485,7 @@ function About({ section, data }: P) {
             </ul>
           )}
           {c.cta_text && (
-            <div className="mt-10 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap gap-3">
               <Link href={c.cta_url || data.links.about} className="btn btn-dark btn-lg group" data-cta="home-about">
                 {c.cta_text} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
               </Link>
@@ -506,7 +506,7 @@ function Showreel({ section, data }: P) {
   return (
     <section className="section relative overflow-hidden bg-white" aria-labelledby="showreel-heading">
       <div className="container-x relative">
-        <div className="mb-12 grid items-end gap-6 lg:grid-cols-[1.3fr_1fr]">
+        <div className="mb-7 grid items-end gap-6 lg:grid-cols-[1.3fr_1fr]">
           <div data-reveal="" data-aos="fade-right">
             {section.eyebrow && <p className="eyebrow">{section.eyebrow}</p>}
             <h2 id="showreel-heading" className="h-section mt-4">
@@ -570,15 +570,15 @@ function Process({ section }: P) {
       <div className="bg-grid absolute inset-0 -z-10" />
 
       <div className="container-x">
-        <div className="mb-16 grid items-end gap-6 lg:grid-cols-[1.2fr_1fr]">
+        <div className="mb-6 grid items-end gap-5 lg:grid-cols-[1.2fr_1fr]">
           <div data-reveal="">
             {section.eyebrow && <p className="eyebrow">{section.eyebrow}</p>}
-            <h2 id="process-heading" className="h-section mt-4">
+            <h2 id="process-heading" className="h-section mt-2">
               {highlight(section.title)}
             </h2>
           </div>
           {section.subtitle && (
-            <p className="max-w-md text-[1.075rem] leading-relaxed text-white/60 lg:justify-self-end" data-reveal="">
+            <p className="max-w-md text-[1.02rem] leading-relaxed text-white/60 lg:justify-self-end" data-reveal="">
               {section.subtitle}
             </p>
           )}
@@ -599,19 +599,19 @@ function Process({ section }: P) {
                   </span>
                   <span className="relative z-10 rounded-full border border-white/10 bg-night-800 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-white/60">Step {String(i + 1).padStart(2, "0")}</span>
                 </div>
-                <div className="card-dark spotlight mt-6 overflow-hidden">
+                <div className="card-dark spotlight mt-4 overflow-hidden">
                   <span className="text-outline pointer-events-none absolute -right-2 -top-4 font-display text-[6.5rem] font-bold leading-none" style={{ "--stroke": "rgb(255 255 255 / 0.05)" } as React.CSSProperties} aria-hidden="true">
                     {i + 1}
                   </span>
                   <h3 className="relative text-[1.2rem] font-bold tracking-[-0.03em]">{step.title}</h3>
-                  <p className="relative mt-2.5 text-[0.93rem] leading-relaxed text-white/60">{step.text}</p>
+                  <p className="relative mt-2 text-[0.93rem] leading-relaxed text-white/60">{step.text}</p>
                 </div>
               </li>
             ))}
           </ol>
         </div>
 
-        <div className="mt-14 flex flex-wrap items-center gap-4" data-reveal="">
+        <div className="mt-7 flex flex-wrap items-center gap-4" data-reveal="">
           <button type="button" data-enquiry="process" className="btn btn-light btn-lg group">
             Start with a free consultation <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
           </button>
@@ -628,15 +628,15 @@ function Industries({ section, data }: P) {
     <section className="section relative overflow-hidden bg-white" aria-labelledby="industries-heading">
       <div className="bg-dots pointer-events-none absolute inset-0 opacity-70 [mask-image:radial-gradient(ellipse_70%_60%_at_50%_100%,black,transparent)]" />
       <div className="container-x relative">
-        <div className="mb-14 grid items-end gap-6 lg:grid-cols-[1.2fr_1fr]">
+        <div className="mb-6 grid items-end gap-5 lg:grid-cols-[1.2fr_1fr]">
           <div data-reveal="" data-aos="fade-right">
             {section.eyebrow && <p className="eyebrow">{section.eyebrow}</p>}
-            <h2 id="industries-heading" className="h-section mt-4">
+            <h2 id="industries-heading" className="h-section mt-2">
               {highlight(section.title)}
             </h2>
           </div>
           {section.subtitle && (
-            <p className="max-w-md text-[1.05rem] leading-relaxed text-ink-500 lg:justify-self-end lg:text-right" data-reveal="" data-aos="fade-left">
+            <p className="max-w-md text-[1.02rem] leading-relaxed text-ink-500 lg:justify-self-end lg:text-right" data-reveal="" data-aos="fade-left">
               {section.subtitle}
             </p>
           )}
@@ -644,19 +644,19 @@ function Industries({ section, data }: P) {
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5" role="list">
           {data.industries.map((industry) => (
             <li key={industry.id} data-reveal="stagger" data-aos="zoom-in">
-              <Link href={industry.url || data.links.industries} className="spotlight group flex h-full flex-col justify-between gap-10 rounded-2xl border border-line bg-white p-5 transition duration-300 hover:-translate-y-1 hover:border-transparent hover:shadow-[var(--shadow-lift)]">
+              <Link href={industry.url || data.links.industries} className="spotlight group flex h-full flex-col justify-between gap-6 rounded-2xl border border-line bg-white p-4 transition duration-300 hover:-translate-y-1 hover:border-transparent hover:shadow-[var(--shadow-lift)]">
                 <span className="flex items-start justify-between">
-                  <span className="grid size-11 place-items-center rounded-xl bg-mist text-ink-700 transition group-hover:bg-night group-hover:text-teal-200">
+                  <span className="grid size-10 place-items-center rounded-xl bg-mist text-ink-700 transition group-hover:bg-night group-hover:text-teal-200">
                     <Icon name={industry.icon || "building"} className="size-5" />
                   </span>
                   <Icon name="arrow-up-right" className="size-4 text-ink/20 transition duration-300 group-hover:rotate-45 group-hover:text-brand" />
                 </span>
-                <span className="font-display text-[1.05rem] font-semibold leading-snug tracking-[-0.02em] text-ink">{industry.name}</span>
+                <span className="font-display text-[1.02rem] font-semibold leading-snug tracking-[-0.02em] text-ink">{industry.name}</span>
               </Link>
             </li>
           ))}
         </ul>
-        <div className="mt-12 text-center" data-aos="fade-up">
+        <div className="mt-7 text-center" data-aos="fade-up">
           <Link href={data.links.industries} className="btn btn-secondary btn-lg group" data-cta="home-industries">
             See all industries <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
           </Link>
@@ -672,17 +672,17 @@ function Technologies({ section }: P) {
   items.forEach((t) => groups.set(t.group ?? "Other", [...(groups.get(t.group ?? "Other") ?? []), t]));
   if (!groups.size) return null;
   return (
-    <section className="section" aria-labelledby="tech-heading">
+    <section className="py-3 sm:py-4" aria-labelledby="tech-heading">
       <TabGroup initial="0">
         <div className="container-x">
-          <div className="grid gap-12 rounded-[2rem] border border-line bg-cloud p-8 sm:p-12 lg:grid-cols-[0.9fr_1.4fr] lg:p-14">
+          <div className="grid gap-8 rounded-[2rem] border border-line bg-cloud p-6 sm:p-8 lg:grid-cols-[0.9fr_1.4fr] lg:p-10">
             <div data-reveal="">
               {section.eyebrow && <p className="eyebrow">{section.eyebrow}</p>}
-              <h2 id="tech-heading" className="h-section mt-4">
+              <h2 id="tech-heading" className="h-section mt-2">
                 {highlight(section.title)}
               </h2>
-              {section.subtitle && <p className="mt-5 text-[1.05rem] leading-relaxed text-ink-500">{section.subtitle}</p>}
-              <div className="mt-8 flex flex-wrap gap-2" role="tablist">
+              {section.subtitle && <p className="mt-3 text-[1.02rem] leading-relaxed text-ink-500">{section.subtitle}</p>}
+              <div className="mt-5 flex flex-wrap gap-2" role="tablist">
                 {[...groups.keys()].map((name, i) => (
                   <TabButton key={name} id={String(i)} className="rounded-full border px-4 py-2 text-sm font-semibold transition" activeClass="border-night bg-night text-white" inactiveClass="border-line bg-white text-ink-600 hover:border-ink/30">
                     {name}
@@ -693,9 +693,9 @@ function Technologies({ section }: P) {
             <div className="self-center">
               {[...groups.values()].map((techs, i) => (
                 <TabPanel key={i} id={String(i)}>
-                  <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3" role="list">
+                  <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-3" role="list">
                     {techs.map((t, j) => (
-                      <li key={j} className="spotlight flex items-center gap-3 rounded-2xl border border-line bg-white px-4 py-4 shadow-[var(--shadow-xs)] transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-card)]">
+                      <li key={j} className="spotlight flex items-center gap-3 rounded-2xl border border-line bg-white px-3.5 py-3 shadow-[var(--shadow-xs)] transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-card)]">
                         <span className={cn("grid size-9 shrink-0 place-items-center rounded-lg text-sm font-extrabold text-white", ["bg-brand", "bg-teal", "bg-amber", "bg-steel"][j % 4])}>{(t.name ?? "?").charAt(0)}</span>
                         <span className="truncate text-[0.93rem] font-semibold text-ink">{t.name}</span>
                       </li>
@@ -718,7 +718,7 @@ function Portfolio({ section, data }: P) {
   return (
     <section className="section" aria-labelledby="work-heading">
       <div className="container-x">
-        <div className="mb-12 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+        <div className="mb-8 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <div className="max-w-2xl" data-reveal="">
             {section.eyebrow && <p className="eyebrow">{section.eyebrow}</p>}
             <h2 id="work-heading" className="h-section mt-4">
@@ -798,16 +798,16 @@ export function CaseStudyCards({ studies }: { studies: CaseStudyCard[] }) {
               <Img media={study.featured_image} sizes={`(min-width:1024px) ${solo ? "600px" : "400px"}, 100vw`} className="size-full object-cover transition duration-700 group-hover:scale-105" />
             </div>
           )}
-          <div className={cn("flex flex-1 flex-col p-6 sm:p-8", solo && "lg:justify-center lg:p-14")}>
+          <div className={cn("flex flex-1 flex-col p-5 sm:p-6", solo && "lg:justify-center lg:p-10")}>
             <p className={cn("text-xs font-bold uppercase tracking-[0.16em]", i === 0 ? "text-teal-200" : "text-brand")}>{study.industry?.name ?? "Case study"}</p>
-            <h3 className={cn("mt-3 font-bold leading-snug tracking-[-0.03em]", solo ? "text-[1.6rem] lg:text-[2.1rem] lg:leading-[1.1]" : "text-[1.35rem]")}>
+            <h3 className={cn("mt-2.5 font-bold leading-snug tracking-[-0.03em]", solo ? "text-[1.6rem] lg:text-[2.1rem] lg:leading-[1.1]" : "text-[1.3rem]")}>
               <Link href={study.url} className="after:absolute after:inset-0">
                 {study.title}
               </Link>
             </h3>
-            {study.summary && <p className={cn("mt-3", i === 0 ? "text-white/60" : "text-ink-500")}>{limit(study.summary, 160)}</p>}
+            {study.summary && <p className={cn("mt-2.5", i === 0 ? "text-white/60" : "text-ink-500")}>{limit(study.summary, 160)}</p>}
             {study.metrics.length > 0 && (
-              <dl className={cn("grid grid-cols-2 gap-4 border-t pt-6", solo ? "mt-8" : "mt-auto", i === 0 ? "border-white/10" : "border-line")}>
+              <dl className={cn("grid grid-cols-2 gap-4 border-t pt-4", solo ? "mt-6" : "mt-auto", i === 0 ? "border-white/10" : "border-line")}>
                 {study.metrics.slice(0, 2).map((m, j) => (
                   <div key={j}>
                     <dd className={cn("font-display text-[2.4rem] font-bold leading-none tracking-[-0.05em]", i !== 0 && "text-ink")}>{m.value}</dd>
@@ -836,16 +836,16 @@ function Testimonials({ section, data }: P) {
       </div>
 
       <div className="container-x">
-        <div className="mb-14 grid items-end gap-8 lg:grid-cols-[1.2fr_1fr]">
+        <div className="mb-6 grid items-end gap-6 lg:grid-cols-[1.2fr_1fr]">
           <div data-reveal="">
             {section.eyebrow && <p className="eyebrow">{section.eyebrow}</p>}
-            <h2 id="testimonials-heading" className="h-section mt-4">
+            <h2 id="testimonials-heading" className="h-section mt-2">
               {highlight(section.title)}
             </h2>
           </div>
           <div className="lg:justify-self-end" data-reveal="">
-            {section.subtitle && <p className="max-w-md text-[1.075rem] leading-relaxed text-white/60">{section.subtitle}</p>}
-            <button type="button" data-enquiry="testimonials" className="btn btn-light group mt-6">
+            {section.subtitle && <p className="max-w-md text-[1.02rem] leading-relaxed text-white/60">{section.subtitle}</p>}
+            <button type="button" data-enquiry="testimonials" className="btn btn-light group mt-4">
               Become our next success story <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
             </button>
           </div>
@@ -892,8 +892,8 @@ function DarkTestimonial({ t }: { t: Testimonial }) {
           <path d={QUOTE_PATH} />
         </svg>
       </div>
-      <blockquote className="mt-5 flex-1 text-[1rem] leading-relaxed text-white/85">“{limit(t.review, 260)}”</blockquote>
-      <figcaption className="mt-6 flex items-center gap-3.5 border-t border-white/10 pt-5">
+      <blockquote className="mt-3.5 flex-1 text-[0.95rem] leading-relaxed text-white/85">“{limit(t.review, 260)}”</blockquote>
+      <figcaption className="mt-4 flex items-center gap-3.5 border-t border-white/10 pt-4">
         {t.photo ? (
           <Img media={t.photo} className="size-11 rounded-full object-cover ring-2 ring-white/10" sizes="44px" />
         ) : (
@@ -913,7 +913,7 @@ function Blogs({ section, data }: P) {
   return (
     <section className="section" aria-labelledby="blogs-heading">
       <div className="container-x">
-        <div className="mb-12 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+        <div className="mb-8 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <div className="max-w-2xl" data-reveal="">
             {section.eyebrow && <p className="eyebrow">{section.eyebrow}</p>}
             <h2 id="blogs-heading" className="h-section mt-4">
@@ -965,7 +965,7 @@ async function FinalCta({ section, data }: P) {
   const { settings } = await getLayout();
   const bg = media(data, section.content.image_id) ?? media(data, data.promo_image_id);
   return (
-    <section className="section-sm pb-24" aria-labelledby="final-cta-heading">
+    <section className="py-5 pb-8" aria-labelledby="final-cta-heading">
       <div className="container-x">
         <div className="section-dark noise rounded-[2rem] shadow-[0_40px_90px_-40px_rgb(6_20_24/0.75)]" data-reveal="" data-aos="zoom-in-up">
           {bg && <Img media={bg} sizes="(min-width:1280px) 1200px, 100vw" className="absolute inset-0 -z-10 size-full object-cover opacity-[0.07] grayscale [mask-image:radial-gradient(ellipse_at_center,transparent_30%,black_80%)]" alt="" />}
@@ -976,13 +976,13 @@ async function FinalCta({ section, data }: P) {
           </div>
           <div className="bg-grid absolute inset-0 -z-10" />
 
-          <div className="relative px-7 py-16 text-center sm:px-14 lg:py-24">
+          <div className="relative px-6 py-8 text-center sm:px-10 lg:py-11">
             {section.eyebrow && <p className="eyebrow justify-center">{section.eyebrow}</p>}
-            <h2 id="final-cta-heading" className="mx-auto mt-5 max-w-4xl font-display font-bold leading-[1.02]" style={{ fontSize: "clamp(2.3rem, 1.2rem + 3.6vw, 4.5rem)", letterSpacing: "-0.05em" }}>
+            <h2 id="final-cta-heading" className="mx-auto mt-3 max-w-4xl font-display font-bold leading-[1.02]" style={{ fontSize: "clamp(2.3rem, 1.2rem + 3.6vw, 4.5rem)", letterSpacing: "-0.05em" }}>
               {highlight(section.title)}
             </h2>
-            {section.subtitle && <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-white/65">{section.subtitle}</p>}
-            <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row" data-aos="fade-up" data-aos-delay="150">
+            {section.subtitle && <p className="mx-auto mt-3.5 max-w-xl text-lg leading-relaxed text-white/65">{section.subtitle}</p>}
+            <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row" data-aos="fade-up" data-aos-delay="150">
               <button type="button" data-enquiry="final-cta" className="btn btn-light btn-lg group w-full sm:w-auto" data-magnetic="">
                 {section.content.button_text || "Get my free consultation"} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
               </button>
@@ -992,7 +992,7 @@ async function FinalCta({ section, data }: P) {
                 </a>
               )}
             </div>
-            <p className="mt-6 text-sm text-white/45">Free consultation · Reply within one business day</p>
+            <p className="mt-4 text-sm text-white/45">Free consultation · Reply within one business day</p>
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { Logo } from "@/components/ui/basics";
 import { useSite } from "@/components/runtime/site-context";
@@ -18,18 +18,34 @@ export function HeaderWithPathname() {
 export function Header({ pathname }: { pathname: string }) {
   const { layout } = useSite();
   const s = layout.settings;
-  const items = layout.menus.main ?? [];
-  const mobileItems = layout.menus.mobile ?? [];
+  const items = useMemo(() => organizeMenuItems(layout.menus.main ?? []), [layout.menus.main]);
+  const mobileItems = useMemo(() => organizeMenuItems(layout.menus.mobile ?? []), [layout.menus.mobile]);
   const hours = lines(s.business_hours)[0];
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const menu = useMenuIntent();
 
+  const scrolledRef = useRef(false);
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
-    onScroll();
+    let raf = 0;
+    const check = () => {
+      raf = 0;
+      const y = window.scrollY;
+      const next = scrolledRef.current ? y > 12 : y > 28;
+      if (next !== scrolledRef.current) {
+        scrolledRef.current = next;
+        setScrolled(next);
+      }
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(check);
+    };
+    check();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+    };
   }, []);
 
   const toggleMobile = (open: boolean) => {
@@ -65,101 +81,111 @@ export function Header({ pathname }: { pathname: string }) {
   };
 
   return (
-    <header className="sticky top-0 z-50">
-      {/* Utility bar (desktop): collapses once the visitor scrolls */}
-      <div className={cn("hidden overflow-hidden bg-night text-[0.78rem] text-white/60 transition-all duration-300 lg:block", scrolled ? "max-h-0" : "max-h-10")}>
-        <div className="container-x flex h-10 items-center justify-between gap-6">
-          <div className="flex items-center gap-6">
-            {s.phone && (
-              <a href={s.phone_href ?? undefined} className="flex items-center gap-2 transition hover:text-white">
-                <Icon name="phone" className="size-3.5 text-teal-200" />
-                {s.phone}
-              </a>
-            )}
-            {s.email && (
-              <a href={`mailto:${s.email}`} className="flex items-center gap-2 transition hover:text-white">
-                <Icon name="mail" className="size-3.5 text-teal-200" />
-                {s.email}
-              </a>
-            )}
-            {hours && (
-              <span className="flex items-center gap-2">
-                <Icon name="clock" className="size-3.5 text-teal-200" />
-                {hours}
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-2">
-              <span className="relative flex size-2">
-                <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-60 motion-reduce:hidden" />
-                <span className="relative inline-flex size-2 rounded-full bg-emerald-400" />
-              </span>
-              Free consultation — reply within 1 business day
-            </span>
-            {layout.socials.length > 0 && <span className="h-3.5 w-px bg-white/15" />}
-            {layout.socials.map((so) => (
-              <a key={so.url} href={so.url} target="_blank" rel="noopener me" className="text-white/50 transition hover:text-white" aria-label={capitalize(so.platform)}>
-                <Icon name={so.icon} className="size-3.5" />
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Main bar: full-width at the top, becomes a floating frosted pill once scrolled (desktop) */}
+    <header className="sticky top-0 z-50 h-[68px] lg:h-[110px] pointer-events-none">
       <div
         className={cn(
-          "transition-[padding,background-color,border-color] duration-300",
-          scrolled ? "border-b border-line/80 bg-white/85 backdrop-blur-xl lg:border-transparent lg:bg-transparent lg:px-4 lg:pt-3 lg:backdrop-blur-none" : "border-b border-line/60 bg-white",
+          "will-change-transform transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          scrolled ? "lg:-translate-y-[30px]" : "lg:translate-y-0",
         )}
       >
+        {/* Utility bar (desktop): glides out with GPU transform/opacity instead of layout-thrashing max-height */}
         <div
           className={cn(
-            "mx-auto transition-[max-width,border-radius,box-shadow,background-color] duration-300",
-            scrolled ? "lg:max-w-[1240px] lg:rounded-full lg:border lg:border-ink/[0.07] lg:bg-white/80 lg:shadow-[0_18px_40px_-20px_rgb(6_20_24/0.35)] lg:backdrop-blur-xl" : "max-w-full",
+            "hidden h-10 bg-night text-[0.78rem] text-white/60 transition-[opacity,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:block",
+            scrolled ? "pointer-events-none -translate-y-2.5 opacity-0" : "pointer-events-auto translate-y-0 opacity-100",
           )}
         >
-          <nav className={cn("container-x relative flex h-[68px] items-center justify-between gap-3 transition-[height] duration-300 xl:gap-6", scrolled ? "lg:h-[62px] lg:px-2.5 lg:pl-6" : "lg:h-[76px]")} aria-label="Main">
-            <Logo settings={s} />
-
-            {/* Desktop navigation */}
-            <ul className="hidden items-center gap-0.5 self-stretch whitespace-nowrap lg:flex" role="list">
-              {items.map((item, i) =>
-                item.children.length ? (
-                  <DesktopDropdown key={i} item={item} index={i} menu={menu} phone={s.phone} phoneHref={s.phone_href} ctaHeading={s.footer_cta_heading} ctaText={s.footer_cta_text} />
-                ) : (
-                  <li key={i}>
-                    <Link
-                      href={item.url ?? "#"}
-                      aria-current={isActive(item.url) ? "page" : undefined}
-                      className={cn("block whitespace-nowrap rounded-full px-2.5 py-2 text-[0.875rem] font-medium transition xl:px-3.5 xl:text-[0.9rem]", isActive(item.url) ? "bg-mist text-ink" : "text-ink-700 hover:bg-mist hover:text-ink")}
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ),
+          <div className="container-x flex h-10 items-center justify-between gap-6">
+            <div className="flex items-center gap-6">
+              {s.phone && (
+                <a href={s.phone_href ?? undefined} className="flex items-center gap-2 transition-colors hover:text-white">
+                  <Icon name="phone" className="size-3.5 text-teal-200" />
+                  {s.phone}
+                </a>
               )}
-            </ul>
-
-            <div className="flex items-center gap-2">
-              <Link href="/search/" className="hidden size-10 place-items-center rounded-full text-ink-600 transition hover:bg-mist hover:text-ink sm:grid" aria-label="Search">
-                <Icon name="search" className="size-[18px]" />
-              </Link>
-              <Link href="/contact/" className="btn btn-dark group hidden sm:inline-flex" data-enquiry="header">
-                Get a free quote <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
-              </Link>
-              <button type="button" className="grid size-11 place-items-center rounded-full border border-line text-ink lg:hidden" onClick={() => toggleMobile(true)} aria-label="Open menu" aria-expanded={mobileOpen} aria-controls="mobile-nav">
-                <Icon name="menu" className="size-5" />
-              </button>
+              {s.email && (
+                <a href={`mailto:${s.email}`} className="flex items-center gap-2 transition-colors hover:text-white">
+                  <Icon name="mail" className="size-3.5 text-teal-200" />
+                  {s.email}
+                </a>
+              )}
+              {hours && (
+                <span className="flex items-center gap-2">
+                  <Icon name="clock" className="size-3.5 text-teal-200" />
+                  {hours}
+                </span>
+              )}
             </div>
-          </nav>
+            <div className="flex items-center gap-4">
+              <span className="flex items-center gap-2">
+                <span className="relative flex size-2">
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-60 motion-reduce:hidden" />
+                  <span className="relative inline-flex size-2 rounded-full bg-emerald-400" />
+                </span>
+                Free consultation — reply within 1 business day
+              </span>
+              {layout.socials.length > 0 && <span className="h-3.5 w-px bg-white/15" />}
+              {layout.socials.map((so) => (
+                <a key={so.url} href={so.url} target="_blank" rel="noopener me" className="text-white/50 transition-colors hover:text-white" aria-label={capitalize(so.platform)}>
+                  <Icon name={so.icon} className="size-3.5" />
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Main bar: single morphing container (concrete 100vw → 1240px and 0px → 35px radius so CSS interpolates smoothly) */}
+        <div
+          className={cn(
+            "pointer-events-auto mx-auto transition-[max-width,border-radius,background-color,border-color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+            scrolled
+              ? "max-w-[100vw] border-b border-line/80 bg-white/95 shadow-[0_10px_28px_-14px_rgb(6_20_24/0.18)] backdrop-blur-md lg:max-w-[min(1240px,calc(100vw-2rem))] lg:rounded-[35px] lg:border lg:border-ink/[0.08] lg:bg-white/95 lg:shadow-[0_16px_36px_-16px_rgb(6_20_24/0.26)]"
+              : "max-w-[100vw] rounded-none border-b border-line/60 bg-white shadow-none",
+          )}
+        >
+          <nav className="container-x relative flex h-[68px] items-center justify-between gap-3 lg:h-[70px] xl:gap-6" aria-label="Main">
+              <Logo settings={s} />
+
+              {/* Desktop navigation */}
+              <ul className="hidden items-center gap-0.5 self-stretch whitespace-nowrap lg:flex" role="list">
+                {items.map((item, i) =>
+                  item.children.length ? (
+                    <DesktopDropdown key={i} item={item} index={i} menu={menu} phone={s.phone} phoneHref={s.phone_href} ctaHeading={s.footer_cta_heading} ctaText={s.footer_cta_text} />
+                  ) : (
+                    <li key={i} className="flex items-center" onMouseEnter={menu.close}>
+                      <Link
+                        href={item.url ?? "#"}
+                        aria-current={isActive(item.url) ? "page" : undefined}
+                        className={cn(
+                          "block whitespace-nowrap rounded-full px-2.5 py-2 text-[0.875rem] font-medium transition-colors duration-150 xl:px-3.5 xl:text-[0.9rem]",
+                          isActive(item.url) ? "bg-mist text-ink" : "text-ink-700 hover:bg-mist hover:text-ink",
+                        )}
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  ),
+                )}
+              </ul>
+
+              <div className="flex items-center gap-2" onMouseEnter={menu.close}>
+                <Link href="/search/" className="hidden size-10 place-items-center rounded-full text-ink-600 transition-colors duration-150 hover:bg-mist hover:text-ink sm:grid" aria-label="Search">
+                  <Icon name="search" className="size-[18px]" />
+                </Link>
+                <Link href="/contact/" className="btn btn-dark group hidden sm:inline-flex" data-enquiry="header">
+                  Get a free quote <Icon name="arrow-right" className="size-4 transition-transform duration-150 group-hover:translate-x-0.5" />
+                </Link>
+                <button type="button" className="grid size-11 place-items-center rounded-full border border-line text-ink lg:hidden" onClick={() => toggleMobile(true)} aria-label="Open menu" aria-expanded={mobileOpen} aria-controls="mobile-nav">
+                  <Icon name="menu" className="size-5" />
+                </button>
+              </div>
+            </nav>
         </div>
       </div>
 
       {/* Mobile navigation (slide-over) */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-[70] lg:hidden" role="dialog" aria-modal="true" aria-label="Menu" id="mobile-nav">
+        <div className="pointer-events-auto fixed inset-0 z-[70] lg:hidden" role="dialog" aria-modal="true" aria-label="Menu" id="mobile-nav">
           <div className="overlay-fade absolute inset-0 bg-ink/60 backdrop-blur-sm" onClick={() => toggleMobile(false)} />
           <div className="slide-in-right absolute inset-y-0 right-0 flex w-full max-w-sm flex-col bg-white shadow-2xl">
             <div className="flex h-[68px] items-center justify-between border-b border-line px-5">
@@ -201,13 +227,38 @@ export function Header({ pathname }: { pathname: string }) {
   );
 }
 
+function organizeMenuItems(rawItems: MenuItem[]): MenuItem[] {
+  // 1. Remove "Home"
+  const list = rawItems.filter((item) => {
+    const label = item.label?.trim().toLowerCase();
+    const url = item.url?.trim().replace(/\/$/, "");
+    return label !== "home" && url !== "";
+  });
+
+  // 2. Extract "About"
+  const aboutIdx = list.findIndex((item) => item.label?.trim().toLowerCase() === "about");
+  if (aboutIdx === -1) return list;
+
+  const [aboutItem] = list.splice(aboutIdx, 1);
+
+  // 3. Shift "About" immediately before "Contact"
+  const contactIdx = list.findIndex((item) => item.label?.trim().toLowerCase() === "contact");
+  if (contactIdx !== -1) {
+    list.splice(contactIdx, 0, aboutItem);
+  } else {
+    list.push(aboutItem);
+  }
+
+  return list;
+}
+
 function capitalize(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 /**
- * Hover intent shared by all desktop dropdowns: a menu opens at once when none is open, but switching to
- * another menu needs a short pause on its button, and closing waits a moment.
+ * Hover intent shared by all desktop dropdowns: immediate open when hovering any top-level button,
+ * and a short grace period on leave so diagonal cursor movement into the panel never drops the menu.
  */
 function useMenuIntent() {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
@@ -219,12 +270,11 @@ function useMenuIntent() {
     openIdx,
     enter(i: number) {
       window.clearTimeout(timer.current);
-      if (openIdx === null || openIdx === i) setOpenIdx(i);
-      else timer.current = window.setTimeout(() => setOpenIdx(i), 150);
+      setOpenIdx(i);
     },
     leave() {
       window.clearTimeout(timer.current);
-      timer.current = window.setTimeout(() => setOpenIdx(null), 350);
+      timer.current = window.setTimeout(() => setOpenIdx(null), 160);
     },
     toggle(i: number) {
       window.clearTimeout(timer.current);
@@ -271,8 +321,8 @@ function DesktopDropdown({
       <button
         type="button"
         className={cn(
-          "flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-2 text-[0.875rem] font-medium transition xl:px-3.5 xl:text-[0.9rem]",
-          open ? "bg-mist text-brand font-semibold" : "text-ink-700 hover:bg-mist hover:text-ink"
+          "flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-2 text-[0.875rem] font-medium transition-colors duration-150 xl:px-3.5 xl:text-[0.9rem]",
+          open ? "bg-mist text-brand" : "text-ink-700 hover:bg-mist hover:text-ink"
         )}
         onClick={() => menu.toggle(index)}
         aria-expanded={open}
@@ -281,7 +331,7 @@ function DesktopDropdown({
         <span className="whitespace-nowrap">{item.label}</span>
         <Icon
           name="chevron-down"
-          className={cn("size-3.5 shrink-0 opacity-60 transition-transform duration-200", open && "rotate-180 text-brand")}
+          className={cn("size-3.5 shrink-0 opacity-60 transition-transform duration-200 ease-out", open && "rotate-180 text-brand opacity-100")}
         />
       </button>
 
@@ -289,68 +339,75 @@ function DesktopDropdown({
         <div aria-hidden="true" className="absolute inset-x-0 bottom-0 z-10 h-[calc(50%-1.25rem)]" />
       )}
 
-      {open &&
-        (item.mega ? (
-          <div className="overlay-fade absolute inset-x-4 top-full pt-3 sm:inset-x-6 lg:inset-x-8">
-            <div className="grid overflow-hidden rounded-3xl border border-line bg-white shadow-[var(--shadow-lift)] lg:grid-cols-[1fr_300px]">
-              <div className="grid gap-x-10 gap-y-6 p-8" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
-                {item.children.map((col, i) => (
-                  <div key={i}>
-                    {col.url ? (
-                      <Link href={col.url} className="group mb-4 flex items-center justify-between border-b border-line pb-3 text-[0.72rem] font-bold uppercase tracking-[0.16em] text-ink-500 hover:text-brand">
-                        {col.label} <Icon name="arrow-right" className="size-3.5 transition group-hover:translate-x-0.5" />
-                      </Link>
-                    ) : (
-                      <p className="mb-4 border-b border-line pb-3 text-[0.72rem] font-bold uppercase tracking-[0.16em] text-ink-500">{col.label}</p>
-                    )}
-                    <ul className={cn("grid gap-x-4 gap-y-0.5", col.children.length > 6 && "xl:grid-cols-2")} role="list">
-                      {col.children.map((link, j) => (
-                        <li key={j}>
-                          <Link href={link.url ?? "#"} className="group flex items-center gap-3 rounded-xl px-2.5 py-2 transition hover:bg-mist" {...(link.new_tab ? { target: "_blank", rel: "noopener" } : {})}>
-                            {link.icon && (
-                              <span className="grid size-9 shrink-0 place-items-center rounded-xl border border-line bg-white text-ink-500 transition group-hover:border-brand/30 group-hover:text-brand">
-                                <Icon name={link.icon} className="size-[17px]" />
-                              </span>
-                            )}
-                            <span className="min-w-0">
-                              <span className="block truncate text-[0.88rem] font-semibold text-ink">{link.label}</span>
-                              {link.description && <span className="block truncate text-xs text-ink-500">{link.description}</span>}
+      {item.mega ? (
+        <div
+          aria-hidden={!open}
+          className={cn(
+            "absolute inset-x-4 top-full z-50 mx-auto max-w-[980px] pt-2 sm:inset-x-6 lg:inset-x-8 origin-top will-change-[opacity,transform] transition-[opacity,transform,visibility] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]",
+            open
+              ? "visible translate-y-0 scale-100 opacity-100 pointer-events-auto"
+              : "invisible -translate-y-1.5 scale-[0.985] opacity-0 pointer-events-none",
+          )}
+        >
+          <div className="grid overflow-hidden rounded-2xl border border-line bg-white shadow-[var(--shadow-lift)] lg:grid-cols-[1fr_220px]">
+            <div className="grid max-h-[calc(100vh-110px)] gap-x-6 gap-y-3 overflow-y-auto px-5 py-4" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
+              {item.children.map((col, i) => (
+                <div key={i}>
+                  {col.url ? (
+                    <Link href={col.url} onClick={menu.close} className="group mb-2 flex items-center justify-between border-b border-line pb-1.5 text-[0.64rem] font-bold uppercase tracking-[0.14em] text-ink-500 transition-colors hover:text-brand">
+                      {col.label} <Icon name="arrow-right" className="size-3 transition-transform duration-150 group-hover:translate-x-0.5" />
+                    </Link>
+                  ) : (
+                    <p className="mb-2 border-b border-line pb-1.5 text-[0.64rem] font-bold uppercase tracking-[0.14em] text-ink-500">{col.label}</p>
+                  )}
+                  <ul className={cn("grid gap-x-2 gap-y-0.5", col.children.length > 6 && "lg:grid-cols-2")} role="list">
+                    {col.children.map((link, j) => (
+                      <li key={j}>
+                        <Link href={link.url ?? "#"} onClick={menu.close} className="group flex items-center gap-2 rounded-lg px-1.5 py-1 transition-colors duration-150 hover:bg-mist" {...(link.new_tab ? { target: "_blank", rel: "noopener" } : {})}>
+                          {link.icon && (
+                            <span className="grid size-6 shrink-0 place-items-center rounded-md border border-line bg-white text-ink-500 transition-colors duration-150 group-hover:border-brand/30 group-hover:text-brand">
+                              <Icon name={link.icon} className="size-3.5" />
                             </span>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-              <div className="section-dark noise hidden p-8 lg:block">
-                <div className="mesh">
-                  <span className="-right-20 -top-20 size-72 bg-teal/35" />
-                  <span className="-bottom-24 -left-16 size-64 bg-amber/20 [animation-delay:-7s]" />
+                          )}
+                          <span className="min-w-0">
+                            <span className="block truncate text-[0.76rem] font-semibold leading-tight text-ink transition-colors duration-150 group-hover:text-brand">{link.label}</span>
+                            {link.description && <span className="block truncate text-[0.65rem] leading-tight text-ink-500">{link.description}</span>}
+                          </span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <div className="relative flex h-full flex-col">
-                  <span className="badge-pill w-max border-white/15 bg-white/10 text-amber">
-                    <Icon name="sparkles" className="size-3.5" /> Free audit
-                  </span>
-                  <p className="mt-5 font-display text-[1.4rem] font-bold leading-tight tracking-[-0.03em] text-white">{ctaHeading || "Not sure where to start?"}</p>
-                  <p className="mt-2 text-sm leading-relaxed text-white/60">{ctaText || "Get a free consultation and a growth plan tailored to your business."}</p>
-                  <div className="mt-auto pt-6">
-                    <button type="button" className="btn btn-light w-full" data-enquiry="mega-menu">
-                      Book a free consultation
-                    </button>
-                    {phone && (
-                      <a href={phoneHref ?? undefined} className="mt-3 flex items-center justify-center gap-2 text-sm text-white/60 hover:text-white">
-                        <Icon name="phone" className="size-4" /> {phone}
-                      </a>
-                    )}
-                  </div>
+              ))}
+            </div>
+            <div className="section-dark noise hidden p-4 lg:block">
+              <div className="mesh">
+                <span className="-right-20 -top-20 size-52 bg-teal/35" />
+                <span className="-bottom-24 -left-16 size-48 bg-amber/20" />
+              </div>
+              <div className="relative flex h-full flex-col">
+                <span className="badge-pill w-max border-white/15 bg-white/10 px-2.5 py-0.5 text-[0.68rem] text-amber">
+                  <Icon name="sparkles" className="size-3" /> Free audit
+                </span>
+                <p className="mt-3 font-display text-[1.02rem] font-bold leading-snug tracking-[-0.02em] text-white">{ctaHeading || "Not sure where to start?"}</p>
+                <p className="mt-1.5 text-[0.74rem] leading-relaxed text-white/60">{ctaText || "Get a free consultation and a growth plan tailored to your business."}</p>
+                <div className="mt-auto pt-4">
+                  <button type="button" className="btn btn-light w-full py-2 text-xs" data-enquiry="mega-menu" onClick={menu.close}>
+                    Book a free consultation
+                  </button>
+                  {phone && (
+                    <a href={phoneHref ?? undefined} className="mt-2 flex items-center justify-center gap-1.5 text-xs text-white/60 transition-colors hover:text-white">
+                      <Icon name="phone" className="size-3.5" /> {phone}
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
           </div>
-        ) : (
-          <CascadingDropdown item={item} index={index} menu={menu} onClose={menu.close} />
-        ))}
+        </div>
+      ) : (
+        <CascadingDropdown item={item} index={index} open={open} menu={menu} onClose={menu.close} />
+      )}
     </li>
   );
 }
@@ -359,18 +416,20 @@ function DesktopDropdown({
 function CascadingDropdown({
   item,
   index,
+  open,
   menu,
   onClose,
 }: {
   item: MenuItem;
   index: number;
+  open: boolean;
   menu: MenuIntent;
   onClose: () => void;
 }) {
   const [activeL1, setActiveL1] = useState<number | null>(null);
   const [activeL2, setActiveL2] = useState<number | null>(null);
 
-  const currentL1 = activeL1 !== null ? item.children[activeL1] : null;
+  const currentL1 = open && activeL1 !== null ? item.children[activeL1] : null;
   const hasL2 = Boolean(currentL1 && currentL1.children && currentL1.children.length > 0);
 
   const currentL2 = hasL2 && activeL2 !== null && currentL1 ? currentL1.children[activeL2] : null;
@@ -378,7 +437,13 @@ function CascadingDropdown({
 
   return (
     <div
-      className="overlay-fade absolute left-0 top-full pt-1.5 z-50 flex items-start"
+      aria-hidden={!open}
+      className={cn(
+        "absolute left-0 top-full z-50 flex items-start pt-2.5 origin-top-left will-change-[opacity,transform] transition-[opacity,transform,visibility] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]",
+        open
+          ? "visible translate-y-0 scale-100 opacity-100 pointer-events-auto"
+          : "invisible -translate-y-1.5 scale-[0.985] opacity-0 pointer-events-none",
+      )}
       onMouseEnter={() => menu.enter(index)}
       onMouseLeave={() => {
         setActiveL1(null);
@@ -386,18 +451,19 @@ function CascadingDropdown({
       }}
     >
       {/* Level 1 Panel */}
-      <div className="min-w-[210px] w-max rounded-md border border-gray-200 bg-[#f8f9fa] shadow-xl overflow-hidden py-0">
-        <ul role="list">
+      <div className="min-w-[220px] w-max overflow-hidden rounded-2xl border border-line bg-white p-1.5 shadow-[var(--shadow-lift)]">
+        <ul role="list" className="grid gap-0.5">
           {item.children.map((child, j) => {
             const isHovered = activeL1 === j;
             const hasChildren = child.children && child.children.length > 0;
             return (
               <li
                 key={j}
-                className="border-b border-gray-200/70 last:border-b-0"
                 onMouseEnter={() => {
-                  setActiveL1(j);
-                  setActiveL2(null);
+                  if (activeL1 !== j) {
+                    setActiveL1(j);
+                    setActiveL2(null);
+                  }
                 }}
               >
                 {hasChildren ? (
@@ -405,16 +471,16 @@ function CascadingDropdown({
                     href={child.url ?? "#"}
                     onClick={onClose}
                     className={cn(
-                      "flex items-center justify-between px-4 py-2.5 text-[0.92rem] font-medium transition-colors select-none gap-3",
-                      isHovered ? "bg-white text-brand" : "text-ink-700 hover:bg-white hover:text-ink"
+                      "flex items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 text-[0.9rem] font-medium transition-colors duration-150 select-none",
+                      isHovered ? "bg-mist text-brand" : "text-ink-700 hover:bg-mist hover:text-ink"
                     )}
                   >
                     <span>{child.label}</span>
                     <Icon
-                      name="chevron-down"
+                      name="chevron-right"
                       className={cn(
-                        "size-3.5 shrink-0 transition-colors",
-                        isHovered ? "text-brand" : "text-ink-400"
+                        "size-3.5 shrink-0 transition-transform duration-150",
+                        isHovered ? "translate-x-0.5 text-brand" : "text-ink-400"
                       )}
                     />
                   </Link>
@@ -422,7 +488,7 @@ function CascadingDropdown({
                   <Link
                     href={child.url ?? "#"}
                     onClick={onClose}
-                    className="flex items-center justify-between px-4 py-2.5 text-[0.92rem] font-medium text-ink-700 hover:bg-white hover:text-brand transition-colors"
+                    className="flex items-center justify-between rounded-xl px-3.5 py-2.5 text-[0.9rem] font-medium text-ink-700 transition-colors duration-150 hover:bg-mist hover:text-brand"
                   >
                     <span>{child.label}</span>
                   </Link>
@@ -435,17 +501,16 @@ function CascadingDropdown({
 
       {/* Level 2 Panel */}
       {hasL2 && currentL1 && (
-        <div className="min-w-[230px] w-max -ml-[1px] rounded-md border border-gray-200 bg-[#f8f9fa] shadow-xl overflow-hidden py-0">
-          <ul role="list">
+        <div className="ml-1.5 min-w-[230px] w-max overflow-hidden rounded-2xl border border-line bg-white p-1.5 shadow-[var(--shadow-lift)] overlay-fade">
+          <ul role="list" className="grid gap-0.5">
             {currentL1.children.map((sub, k) => {
               const isSubHovered = activeL2 === k;
               const hasSubChildren = sub.children && sub.children.length > 0;
               return (
                 <li
                   key={k}
-                  className="border-b border-gray-200/70 last:border-b-0"
                   onMouseEnter={() => {
-                    setActiveL2(k);
+                    if (activeL2 !== k) setActiveL2(k);
                   }}
                 >
                   {hasSubChildren ? (
@@ -453,16 +518,16 @@ function CascadingDropdown({
                       href={sub.url ?? "#"}
                       onClick={onClose}
                       className={cn(
-                        "flex items-center justify-between px-4 py-2.5 text-[0.92rem] font-medium transition-colors select-none gap-4",
-                        isSubHovered ? "bg-white text-brand" : "text-ink-700 hover:bg-white hover:text-ink"
+                        "flex items-center justify-between gap-4 rounded-xl px-3.5 py-2.5 text-[0.9rem] font-medium transition-colors duration-150 select-none",
+                        isSubHovered ? "bg-mist text-brand" : "text-ink-700 hover:bg-mist hover:text-ink"
                       )}
                     >
                       <span className="truncate">{sub.label}</span>
                       <Icon
-                        name="chevron-down"
+                        name="chevron-right"
                         className={cn(
-                          "size-3.5 shrink-0 transition-colors",
-                          isSubHovered ? "text-brand" : "text-ink-400"
+                          "size-3.5 shrink-0 transition-transform duration-150",
+                          isSubHovered ? "translate-x-0.5 text-brand" : "text-ink-400"
                         )}
                       />
                     </Link>
@@ -470,7 +535,7 @@ function CascadingDropdown({
                     <Link
                       href={sub.url ?? "#"}
                       onClick={onClose}
-                      className="flex items-center justify-between px-4 py-2.5 text-[0.92rem] font-medium text-ink-700 hover:bg-white hover:text-brand transition-colors"
+                      className="flex items-center justify-between rounded-xl px-3.5 py-2.5 text-[0.9rem] font-medium text-ink-700 transition-colors duration-150 hover:bg-mist hover:text-brand"
                     >
                       <span>{sub.label}</span>
                     </Link>
@@ -484,14 +549,14 @@ function CascadingDropdown({
 
       {/* Level 3 Panel */}
       {hasL3 && currentL2 && (
-        <div className="min-w-[260px] w-max -ml-[1px] rounded-md border border-gray-200 bg-[#f8f9fa] shadow-xl overflow-hidden py-0">
-          <ul role="list">
+        <div className="ml-1.5 min-w-[250px] w-max overflow-hidden rounded-2xl border border-line bg-white p-1.5 shadow-[var(--shadow-lift)] overlay-fade">
+          <ul role="list" className="grid gap-0.5">
             {currentL2.children.map((leaf, m) => (
-              <li key={m} className="border-b border-gray-200/70 last:border-b-0">
+              <li key={m}>
                 <Link
                   href={leaf.url ?? "#"}
                   onClick={onClose}
-                  className="flex items-center justify-between px-4 py-2.5 text-[0.92rem] font-medium text-ink-700 hover:bg-white hover:text-brand transition-colors"
+                  className="flex items-center justify-between rounded-xl px-3.5 py-2.5 text-[0.9rem] font-medium text-ink-700 transition-colors duration-150 hover:bg-mist hover:text-brand"
                 >
                   <span>{leaf.label}</span>
                 </Link>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import type { LocationItem } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -55,24 +55,24 @@ export function LocationDirectory({
   const [activeLetter, setActiveLetter] = useState<string>("ALL");
   const [search, setSearch] = useState<string>("");
 
-  if (!locations || locations.length === 0) return null;
+  const list = useMemo(() => locations ?? [], [locations]);
 
   // Live counts per country
   const countryCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: locations.length };
-    for (const loc of locations) {
+    const counts: Record<string, number> = { all: list.length };
+    for (const loc of list) {
       const c = (loc.country || "").toLowerCase();
       counts[c] = (counts[c] || 0) + 1;
     }
     return counts;
-  }, [locations]);
+  }, [list]);
 
   // Active letters that have at least 1 city for current country selection
   const lettersWithCount = useMemo(() => {
     const pool =
       activeCountry === "all"
-        ? locations
-        : locations.filter((l) => (l.country || "").toLowerCase() === activeCountry.toLowerCase());
+        ? list
+        : list.filter((l) => (l.country || "").toLowerCase() === activeCountry.toLowerCase());
 
     const map = new Map<string, number>();
     for (const loc of pool) {
@@ -82,22 +82,18 @@ export function LocationDirectory({
       }
     }
     return map;
-  }, [locations, activeCountry]);
+  }, [list, activeCountry]);
 
   const sortedLetters = useMemo(() => {
     return Array.from(lettersWithCount.keys()).sort();
   }, [lettersWithCount]);
 
-  // Reset active letter if no longer available in selected country
-  useEffect(() => {
-    if (activeLetter !== "ALL" && !lettersWithCount.has(activeLetter)) {
-      setActiveLetter("ALL");
-    }
-  }, [activeCountry, activeLetter, lettersWithCount]);
+  // Fall back to "ALL" if the selected letter is not present in the active country
+  const currentLetter = activeLetter !== "ALL" && !lettersWithCount.has(activeLetter) ? "ALL" : activeLetter;
 
   // Filter locations by Country, Letter, and Search Query
   const filteredLocations = useMemo(() => {
-    return locations.filter((loc) => {
+    return list.filter((loc) => {
       const name = (loc.name || "").toLowerCase();
       const country = (loc.country || "").toLowerCase();
       const state = (loc.state || "").toLowerCase();
@@ -109,7 +105,7 @@ export function LocationDirectory({
       }
 
       // Letter filter
-      if (activeLetter !== "ALL" && first !== activeLetter) {
+      if (currentLetter !== "ALL" && first !== currentLetter) {
         return false;
       }
 
@@ -122,7 +118,7 @@ export function LocationDirectory({
 
       return true;
     });
-  }, [locations, activeCountry, activeLetter, search]);
+  }, [list, activeCountry, currentLetter, search]);
 
   // Split into India vs International for clean sectioning when "All" is active
   const groupedByRegion = useMemo(() => {
@@ -131,11 +127,13 @@ export function LocationDirectory({
     return { india: indiaList, global: globalList };
   }, [filteredLocations]);
 
+  if (list.length === 0) return null;
+
   const defaultTitle = `${serviceName} Services Across Top Locations`;
   const defaultSubtitle = `Explore our dedicated ${serviceName.toLowerCase()} solutions tailored for businesses across India, North America, and Australia.`;
 
   return (
-    <section className="py-10 sm:py-14 relative overflow-hidden bg-gradient-to-b from-mist/50 via-white to-mist/40 border-t border-line/80" id="locations">
+    <section className="py-7 sm:py-9 relative overflow-hidden bg-gradient-to-b from-mist/50 via-white to-mist/40 border-t border-line/80" id="locations">
       <div className="container-x relative">
         {/* Header - Compact Spacing */}
         <div className="mx-auto max-w-3xl text-center mb-6" data-reveal="">
@@ -224,7 +222,7 @@ export function LocationDirectory({
               onClick={() => setActiveLetter("ALL")}
               className={cn(
                 "rounded-md px-2 py-0.5 text-[0.72rem] font-bold transition",
-                activeLetter === "ALL"
+                currentLetter === "ALL"
                   ? "bg-brand text-white shadow-xs"
                   : "bg-mist/60 text-ink-600 hover:bg-mist hover:text-ink"
               )}
@@ -233,7 +231,7 @@ export function LocationDirectory({
             </button>
 
             {sortedLetters.map((letter) => {
-              const isSelected = activeLetter === letter;
+              const isSelected = currentLetter === letter;
               return (
                 <button
                   key={letter}
@@ -251,7 +249,7 @@ export function LocationDirectory({
               );
             })}
 
-            {(activeLetter !== "ALL" || activeCountry !== "all" || search) && (
+            {(currentLetter !== "ALL" || activeCountry !== "all" || search) && (
               <button
                 type="button"
                 onClick={() => {
@@ -282,10 +280,10 @@ export function LocationDirectory({
                 }}
                 className="btn btn-dark btn-xs mt-3"
               >
-                Show all {locations.length} locations
+                Show all {list.length} locations
               </button>
             </div>
-          ) : activeCountry === "all" && activeLetter === "ALL" && !search ? (
+          ) : activeCountry === "all" && currentLetter === "ALL" && !search ? (
             /* DUAL REGION VIEW */
             <div className="grid gap-6">
               {/* India Section */}

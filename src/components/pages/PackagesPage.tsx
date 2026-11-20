@@ -69,7 +69,7 @@ export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
   return (
     <div className="bg-white">
       {/* 1. Hero Section - Styled in TechAlphonic Theme */}
-      <section className="relative overflow-hidden border-b border-line/80 bg-gradient-to-b from-mist/70 via-white to-mist/30 py-16 sm:py-24">
+      <section className="relative overflow-hidden border-b border-line/80 bg-gradient-to-b from-mist/70 via-white to-mist/30 py-9 sm:py-12">
         {/* Subtle background glow */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute -top-32 left-1/2 -translate-x-1/2 size-96 rounded-full bg-brand/10 blur-3xl" />
@@ -109,7 +109,7 @@ export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
           </div>
 
           {/* 2. Stats Bar */}
-          <div className="mt-14 sm:mt-18 rounded-2xl border border-line bg-white/90 p-5 sm:p-7 shadow-xs backdrop-blur-sm">
+          <div className="mt-8 sm:mt-10 rounded-2xl border border-line bg-white/90 p-5 sm:p-6 shadow-xs backdrop-blur-sm">
             <div className="grid grid-cols-2 gap-6 divide-y sm:divide-y-0 sm:divide-x divide-line sm:grid-cols-4">
               {STATS.map((st, i) => (
                 <div key={i} className={cn("text-center", i > 1 ? "pt-4 sm:pt-0" : "")}>
@@ -129,9 +129,9 @@ export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
 
       {/* 4. Optional Add-Ons Section */}
       {addOns.length > 0 && (
-        <section className="py-14 sm:py-18 bg-gradient-to-b from-mist/50 via-mist/30 to-white border-t border-line/80">
+        <section className="py-8 sm:py-10 bg-gradient-to-b from-mist/50 via-mist/30 to-white border-t border-line/80">
           <div className="container-x">
-            <div className="mx-auto max-w-2xl text-center mb-10">
+            <div className="mx-auto max-w-2xl text-center mb-6">
               <span className="text-xs font-bold uppercase tracking-[0.18em] text-brand">
                 Customize Your Plan
               </span>
@@ -165,9 +165,9 @@ export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
 
       {/* 5. Get Started in 4 Simple Steps */}
       {processSteps.length > 0 && (
-        <section className="py-14 sm:py-18 border-t border-line/80">
+        <section className="py-8 sm:py-10 border-t border-line/80">
           <div className="container-x">
-            <div className="mx-auto max-w-2xl text-center mb-10">
+            <div className="mx-auto max-w-2xl text-center mb-6">
               <span className="text-xs font-bold uppercase tracking-[0.18em] text-brand">
                 Simple Workflow
               </span>
@@ -198,9 +198,9 @@ export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
       )}
 
       {/* 6. Why 1000+ Clients Trust Us */}
-      <section className="py-14 sm:py-18 bg-mist/40 border-t border-line/80">
+      <section className="py-8 sm:py-10 bg-mist/40 border-t border-line/80">
         <div className="container-x">
-          <div className="mx-auto max-w-2xl text-center mb-10">
+          <div className="mx-auto max-w-2xl text-center mb-6">
             <span className="text-xs font-bold uppercase tracking-[0.18em] text-brand">
               Why TechAlphonic
             </span>
@@ -228,9 +228,9 @@ export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
 
       {/* 7. What Our Clients Say (Testimonials) */}
       {testimonials.length > 0 && (
-        <section className="py-14 sm:py-18 border-t border-line/80">
+        <section className="py-8 sm:py-10 border-t border-line/80">
           <div className="container-x">
-            <div className="mx-auto max-w-2xl text-center mb-10">
+            <div className="mx-auto max-w-2xl text-center mb-6">
               <span className="text-xs font-bold uppercase tracking-[0.18em] text-brand">
                 Client Testimonials
               </span>
@@ -267,7 +267,7 @@ export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
       )}
 
       {/* 8. Dark Mesh Banner CTA */}
-      <section className="section-dark noise py-14 sm:py-18 relative overflow-hidden">
+      <section className="section-dark noise py-8 sm:py-11 relative overflow-hidden">
         <div className="mesh">
           <span className="-right-20 -top-20 size-72 bg-teal/35" />
           <span className="-bottom-24 -left-16 size-64 bg-amber/20 [animation-delay:-7s]" />

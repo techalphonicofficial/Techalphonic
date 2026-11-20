@@ -27,11 +27,11 @@ export async function Cta({
   const dark = variant === "dark";
   const wa = settings.whatsapp_url;
   return (
-    <section className="section-sm">
+    <section className="py-5 sm:py-6">
       <div className="container-x">
         <div
           className={cn(
-            "relative overflow-hidden rounded-[2rem] px-7 py-14 sm:px-14 lg:px-16 lg:py-16",
+            "relative overflow-hidden rounded-[2rem] px-6 py-7 sm:px-9 lg:px-11 lg:py-9",
             dark && "section-dark noise shadow-[0_40px_80px_-40px_rgb(6_20_24/0.7)]",
             variant === "brand" && "border border-teal/25 bg-gradient-to-br from-teal-50 via-white to-brand-50 text-ink shadow-[var(--shadow-card)]",
             variant === "light" && "border border-line bg-cloud text-ink",
@@ -82,14 +82,14 @@ export async function FaqSection({ faqs, title = "Frequently asked questions", e
   const { settings } = await getLayout();
   return (
     <section className="section" aria-labelledby="faq-heading" id="faq">
-      <div className="container-x grid gap-12 lg:grid-cols-[0.85fr_1.4fr] lg:gap-16">
+      <div className="container-x grid gap-8 lg:grid-cols-[0.85fr_1.4fr] lg:gap-12">
         <div className="lg:sticky lg:top-32 lg:self-start" data-reveal="">
           <p className="eyebrow">{eyebrow}</p>
-          <h2 id="faq-heading" className="h-section mt-4">
+          <h2 id="faq-heading" className="h-section mt-2.5">
             {title}
           </h2>
-          <p className="mt-5 text-[1.05rem] leading-relaxed text-ink-500">{subtitle ?? "Can’t find what you’re looking for? Our team is happy to help."}</p>
-          <div className="mt-8 rounded-2xl border border-line bg-cloud p-5">
+          <p className="mt-3 text-[1.02rem] leading-relaxed text-ink-500">{subtitle ?? "Can’t find what you’re looking for? Our team is happy to help."}</p>
+          <div className="mt-5 rounded-2xl border border-line bg-cloud p-4">
             <p className="font-semibold text-ink">Still have questions?</p>
             <p className="mt-1 text-sm text-ink-500">Speak directly with a specialist.</p>
             <div className="mt-4 flex flex-wrap gap-2">
@@ -129,20 +129,20 @@ export async function EnquirySection({
   const { settings: s } = await getLayout();
   const wa = s.whatsapp_enabled ? s.whatsapp_url : null;
   return (
-    <section id="enquire" className="relative isolate scroll-mt-24 overflow-hidden bg-cloud py-20 sm:py-24 lg:py-28">
+    <section id="enquire" className="relative isolate scroll-mt-24 overflow-hidden bg-cloud py-8 sm:py-10 lg:py-11">
       <div className="bg-grid-light pointer-events-none absolute inset-0 -z-10" />
       <div className="mesh">
         <span className="-left-40 -top-40 size-[34rem] bg-amber/15" />
         <span className="-bottom-40 right-0 size-[30rem] bg-teal/20 [animation-delay:-9s]" />
       </div>
 
-      <div className="container-x relative grid items-center gap-14 lg:grid-cols-[1fr_minmax(0,34rem)] lg:gap-20">
+      <div className="container-x relative grid items-center gap-10 lg:grid-cols-[1fr_minmax(0,34rem)] lg:gap-12">
         <div data-reveal="" data-aos="fade-right">
           <p className="eyebrow">{eyebrow}</p>
-          <h2 className="h-section mt-5">{highlight(heading || "Tell us about your project")}</h2>
-          <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-600">{text || "Get a free, no-obligation consultation. We’ll review your goals and come back with a clear plan, timeline and estimate."}</p>
+          <h2 className="h-section mt-3">{highlight(heading || "Tell us about your project")}</h2>
+          <p className="mt-3.5 max-w-xl text-lg leading-relaxed text-ink-600">{text || "Get a free, no-obligation consultation. We’ll review your goals and come back with a clear plan, timeline and estimate."}</p>
 
-          <ul className="mt-9 grid gap-4" role="list">
+          <ul className="mt-6 grid gap-3.5" role="list">
             {[
               ["Free strategy call with a specialist", "A 30-minute session focused on your goals."],
               ["Clear proposal within 48 hours", "Scope, timeline and transparent pricing."],
@@ -160,7 +160,7 @@ export async function EnquirySection({
             ))}
           </ul>
 
-          <div className="mt-10 grid gap-3 sm:grid-cols-2">
+          <div className="mt-7 grid gap-3 sm:grid-cols-2">
             {s.phone && (
               <a href={s.phone_href ?? undefined} className="spotlight group flex items-center gap-3 rounded-2xl border border-line bg-white p-4 shadow-[var(--shadow-xs)] transition hover:border-transparent hover:shadow-[var(--shadow-card)]">
                 <span className="grid size-10 place-items-center rounded-xl bg-brand-50 text-brand">
@@ -300,33 +300,33 @@ export async function PageHero({
       )}
       {!dark && <div className="absolute inset-x-0 bottom-0 -z-10 h-24 bg-gradient-to-t from-white/80 to-transparent" />}
 
-      <div className={cn("container-x relative", lay === "minimal" ? "py-14 sm:py-16" : "py-14 sm:py-20 lg:py-24")}>
-        <Breadcrumb items={breadcrumbs} dark={dark} className="mb-10" />
+      <div className={cn("container-x relative", lay === "minimal" ? "py-5 sm:py-7" : "py-6 sm:py-8 lg:py-9")}>
+        <Breadcrumb items={breadcrumbs} dark={dark} className="mb-4" />
 
-        <div className={cn("grid items-center gap-14", twoCol && "lg:grid-cols-[minmax(0,1.1fr)_minmax(0,28rem)] lg:gap-16", lay === "centered" && "mx-auto max-w-3xl text-center")}>
+        <div className={cn("grid items-center gap-8", twoCol && "lg:grid-cols-[minmax(0,1.1fr)_minmax(0,28rem)] lg:gap-10", lay === "centered" && "mx-auto max-w-3xl text-center")}>
           <div className={lay === "minimal" ? "max-w-3xl" : ""}>
             {eyebrow && (
               <p className={cn("eyebrow", dark && "eyebrow-dark", lay === "centered" && "justify-center")} data-aos="fade-down">
                 {eyebrow}
               </p>
             )}
-            <h1 className={cn("mt-5 font-display font-bold leading-[1.03]", dark && "text-white")} style={{ fontSize: "clamp(2.25rem, 1.3rem + 3vw, 4rem)", letterSpacing: "-0.045em" }} data-split="">
+            <h1 className={cn("mt-3 font-display font-bold leading-[1.03]", dark && "text-white")} style={{ fontSize: "clamp(2.25rem, 1.3rem + 3vw, 4rem)", letterSpacing: "-0.045em" }} data-split="">
               {splitWords(title)}
             </h1>
             {subtitle && (
-              <p className={cn("mt-5 text-lg font-semibold", dark ? "text-amber" : "text-brand-700")} data-aos="fade-up" data-aos-delay="150">
+              <p className={cn("mt-3 text-lg font-semibold", dark ? "text-amber" : "text-brand-700")} data-aos="fade-up" data-aos-delay="150">
                 {subtitle}
               </p>
             )}
             {intro && (
               <Html
                 html={intro}
-                className={cn("mt-5 max-w-2xl text-[1.075rem] leading-relaxed [&_a]:underline [&_p]:mb-3 [&_p:last-child]:mb-0", lay === "centered" && "mx-auto", dark ? "text-white/65" : "text-ink-500")}
+                className={cn("mt-3.5 max-w-2xl text-[1.075rem] leading-relaxed [&_a]:underline [&_p]:mb-3 [&_p:last-child]:mb-0", lay === "centered" && "mx-auto", dark ? "text-white/65" : "text-ink-500")}
                 data-aos="fade-up"
                 data-aos-delay="200"
               />
             )}
-            <div className={cn("mt-9 flex flex-wrap gap-3", lay === "centered" && "justify-center")} data-aos="fade-up" data-aos-delay="280">
+            <div className={cn("mt-6 flex flex-wrap gap-3", lay === "centered" && "justify-center")} data-aos="fade-up" data-aos-delay="280">
               {hasActions ? (
                 actions || null
               ) : (
@@ -343,7 +343,7 @@ export async function PageHero({
               )}
             </div>
             {rich && !hasActions && lay !== "centered" && (
-              <ul className={cn("mt-10 flex flex-wrap gap-x-6 gap-y-3 text-sm", dark ? "text-white/60" : "text-ink-600")} role="list" data-aos="fade-up" data-aos-delay="340">
+              <ul className={cn("mt-6 flex flex-wrap gap-x-6 gap-y-3 text-sm", dark ? "text-white/60" : "text-ink-600")} role="list" data-aos="fade-up" data-aos-delay="340">
                 {["Free consultation", "Transparent pricing", "Reply within 1 business day"].map((t) => (
                   <li key={t} className="flex items-center gap-2">
                     <Icon name="check-circle" className={cn("size-4", dark ? "text-teal-200" : "text-teal")} /> {t}

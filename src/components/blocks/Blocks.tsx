@@ -60,10 +60,10 @@ function BlockSection({ block }: { block: Block }) {
       )}
       <div className="container-x relative">
         {d.heading && !["hero", "image_text"].includes(block.type) && (
-          <div className={cn(center || CENTERED_TYPES.includes(block.type) ? "mx-auto max-w-3xl text-center" : "max-w-3xl", "mb-12")} data-reveal="">
+          <div className={cn(center || CENTERED_TYPES.includes(block.type) ? "mx-auto max-w-3xl text-center" : "max-w-3xl", "mb-8")} data-reveal="">
             {d.eyebrow && <p className={cn("eyebrow", dark && "eyebrow-dark")}>{d.eyebrow}</p>}
-            <h2 className={cn("h-section mt-4", dark && "text-white")}>{highlight(d.heading)}</h2>
-            {d.subheading && <p className={cn("mt-5 text-lg", dark ? "text-white/65" : "text-ink-500")}>{d.subheading}</p>}
+            <h2 className={cn("h-section mt-2.5", dark && "text-white")}>{highlight(d.heading)}</h2>
+            {d.subheading && <p className={cn("mt-3 text-lg", dark ? "text-white/65" : "text-ink-500")}>{d.subheading}</p>}
           </div>
         )}
         <Body block={block} />

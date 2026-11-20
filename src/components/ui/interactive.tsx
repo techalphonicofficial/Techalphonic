@@ -5,10 +5,9 @@ import type { Faq } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Icon } from "./Icon";
 
-/** Animated number (the [data-count] counter from app.js). */
+/** Animated number (the [data-count] counter from app.js). Updates DOM text directly to avoid 60fps React re-renders. */
 export function CountUp({ value }: { value: string | number | null | undefined }) {
   const raw = String(value ?? 0);
-  const [text, setText] = useState(raw);
   const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -17,15 +16,20 @@ export function CountUp({ value }: { value: string | number | null | undefined }
     if (!el || !isFinite(target) || window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) return;
     const decimals = (raw.split(".")[1] || "").length;
     let frame = 0;
+    let last = "";
     const io = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
         io.disconnect();
         const start = performance.now();
         const step = (now: number) => {
-          const p = Math.min((now - start) / 1400, 1);
+          const p = Math.min((now - start) / 1100, 1);
           const eased = 1 - Math.pow(1 - p, 3);
-          setText((target * eased).toLocaleString("en-IN", { minimumFractionDigits: decimals, maximumFractionDigits: decimals }));
+          const next = (target * eased).toLocaleString("en-IN", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+          if (next !== last) {
+            last = next;
+            el.textContent = next;
+          }
           if (p < 1) frame = requestAnimationFrame(step);
         };
         frame = requestAnimationFrame(step);
@@ -39,7 +43,7 @@ export function CountUp({ value }: { value: string | number | null | undefined }
     };
   }, [raw]);
 
-  return <span ref={ref}>{text}</span>;
+  return <span ref={ref}>{raw}</span>;
 }
 
 /** FAQ accordion (first item open), used by <x-faq>. */

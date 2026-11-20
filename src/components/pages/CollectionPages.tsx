@@ -88,17 +88,17 @@ export function BlogPost({ data, seo }: { data: BlogData; seo: Seo }) {
       <article>
         <header className="relative overflow-hidden bg-mist">
           <div className="bg-grid-light absolute inset-0" />
-          <div className="container-x relative py-12 sm:py-16">
-            <Breadcrumb items={seo.breadcrumbs} className="mb-8" />
+          <div className="container-x relative py-7 sm:py-9">
+            <Breadcrumb items={seo.breadcrumbs} className="mb-4" />
             <div className="mx-auto max-w-3xl text-center">
               {b.category && (
                 <Link href={b.category.url} className="eyebrow">
                   {b.category.name}
                 </Link>
               )}
-              <h1 className="mt-5 font-display text-3xl font-extrabold leading-tight sm:text-4xl lg:text-5xl">{b.title}</h1>
-              {b.excerpt && <p className="lead mt-5">{b.excerpt}</p>}
-              <div className="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-steel">
+              <h1 className="mt-3 font-display text-3xl font-extrabold leading-tight sm:text-4xl lg:text-5xl">{b.title}</h1>
+              {b.excerpt && <p className="lead mt-3">{b.excerpt}</p>}
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-steel">
                 {b.author && (
                   <span className="flex items-center gap-2">
                     {b.author.avatar ? (
@@ -121,14 +121,14 @@ export function BlogPost({ data, seo }: { data: BlogData; seo: Seo }) {
               </div>
             </div>
             {b.featured_image && (
-              <div className="mx-auto mt-10 max-w-5xl">
+              <div className="mx-auto mt-6 max-w-5xl">
                 <Img media={b.featured_image} priority sizes="(min-width:1024px) 1024px, 100vw" className="aspect-[16/8] w-full rounded-[2rem] object-cover shadow-[var(--shadow-lift)]" />
               </div>
             )}
           </div>
         </header>
 
-        <div className="container-x section grid gap-12 lg:grid-cols-[240px_minmax(0,1fr)_280px]">
+        <div className="container-x section grid gap-8 lg:grid-cols-[240px_minmax(0,1fr)_280px]">
           <aside className="hidden lg:block" aria-label="Table of contents">
             {b.toc.length > 0 && <Toc items={b.toc} />}
           </aside>

@@ -91,10 +91,10 @@ function AboutPage({ data, seo }: { data: PageData; seo: Seo }) {
       />
       {page.content && (
         <section className="section">
-          <div className="container-x grid gap-12 lg:grid-cols-[1fr_1.4fr]">
+          <div className="container-x grid gap-8 lg:grid-cols-[1fr_1.4fr]">
             <div data-reveal="">
               <BrandSquares className="origin-top-left scale-[2.2]" />
-              <p className="mt-14 font-display text-2xl font-bold leading-snug text-ink">{data.tagline}</p>
+              <p className="mt-8 font-display text-2xl font-bold leading-snug text-ink">{data.tagline}</p>
             </div>
             <Html as="article" html={page.content} className="prose-content" data-reveal="" />
           </div>
@@ -119,14 +119,14 @@ async function ContactPage({ data, seo }: { data: PageData; seo: Seo }) {
     <>
       <PageHero title={page.heading} eyebrow="Contact" subtitle={page.hero_subheading} intro={pIntro(page.excerpt)} breadcrumbs={seo.breadcrumbs} layout="minimal" actions={false} />
 
-      <section className="section !pt-14">
-        <div className="container-x grid items-start gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16">
+      <section className="section !pt-8">
+        <div className="container-x grid items-start gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-12">
           <div>
             <p className="eyebrow">Reach us directly</p>
-            <h2 className="mt-4 text-2xl font-bold sm:text-3xl">We’d love to hear about your project</h2>
-            <p className="mt-3 text-ink-500">Prefer to talk? Call or WhatsApp us — a specialist (not a call centre) will pick up.</p>
+            <h2 className="mt-3 text-2xl font-bold sm:text-3xl">We’d love to hear about your project</h2>
+            <p className="mt-2.5 text-ink-500">Prefer to talk? Call or WhatsApp us — a specialist (not a call centre) will pick up.</p>
 
-            <ul className="mt-8 divide-y divide-line rounded-[1.75rem] border border-line bg-white" role="list">
+            <ul className="mt-5 divide-y divide-line rounded-[1.75rem] border border-line bg-white" role="list">
               {s.phone && (
                 <li>
                   <a href={s.phone_href ?? undefined} className={row}>
@@ -224,10 +224,10 @@ async function ContactPage({ data, seo }: { data: PageData; seo: Seo }) {
       )}
 
       {map && map.startsWith("https://www.google.com/maps") && (
-        <section className="pb-20">
+        <section className="pb-10">
           <div className="container-x">
             <div className="relative overflow-hidden rounded-[2rem] border border-line shadow-[var(--shadow-card)]">
-              <iframe src={map} title={`Map: ${s.site_name} office`} className="h-[440px] w-full grayscale-[35%]" loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
+              <iframe src={map} title={`Map: ${s.site_name} office`} className="h-[360px] w-full grayscale-[35%]" loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
               {s.full_address && (
                 <div className="absolute bottom-5 left-5 max-w-xs rounded-2xl bg-white p-5 shadow-[var(--shadow-lift)]">
                   <p className="font-bold text-ink">{s.site_name}</p>

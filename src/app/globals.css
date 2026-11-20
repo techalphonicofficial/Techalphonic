@@ -94,8 +94,8 @@
 
 @layer components {
     .container-x { @apply mx-auto w-full max-w-[1240px] px-5 sm:px-6 lg:px-8; }
-    .section { @apply py-20 sm:py-24 lg:py-32; }
-    .section-sm { @apply py-14 sm:py-16; }
+    .section { @apply py-7 sm:py-8 lg:py-10; }
+    .section-sm { @apply py-5 sm:py-6 lg:py-7; }
 
     /* Eyebrow: small label with a brand dash — calmer than a pill badge. */
     .eyebrow { @apply inline-flex items-center gap-2.5 text-[0.75rem] font-bold uppercase tracking-[0.18em] text-brand-600; }
@@ -108,15 +108,13 @@
     .h-mega { @apply font-display font-bold leading-[0.95]; font-size: clamp(3rem, 1.4rem + 6vw, 7rem); letter-spacing: -0.05em; }
     .lead { @apply text-[1.075rem] leading-relaxed text-ink-500 sm:text-lg; }
 
-    /* Gradient keyword ([[word]] in admin headings) — drifts slowly. */
+    /* Gradient keyword ([[word]] in admin headings) */
     .text-gradient {
-        background-image: linear-gradient(95deg, var(--color-brand, #167B8B) 0%, #2E9FB1 25%, #FE5C36 50%, #FEB449 75%, var(--color-brand, #167B8B) 100%) !important;
-        background-size: 200% auto !important;
+        background-image: linear-gradient(95deg, var(--color-brand, #167B8B) 0%, #2E9FB1 35%, #FE5C36 68%, #FEB449 100%) !important;
         -webkit-background-clip: text !important;
         -webkit-text-fill-color: transparent !important;
         background-clip: text !important;
         color: transparent !important;
-        animation: gradient-pan 6s ease-in-out infinite alternate !important;
         display: inline-block;
     }
     /* Ghost text (faded fill). A true -webkit-text-stroke shows the variable font's overlapping contours. */
@@ -138,9 +136,9 @@
     .btn-lg { @apply min-h-12 px-6 py-3 text-[0.95rem]; }
     .btn-icon { @apply grid size-7 place-items-center rounded-full bg-white/20 transition group-hover:translate-x-0.5; }
 
-    .card { @apply relative rounded-[var(--radius-card)] border border-line bg-white p-7 shadow-[var(--shadow-card)] transition duration-300; }
+    .card { @apply relative rounded-[var(--radius-card)] border border-line bg-white p-5 sm:p-6 shadow-[var(--shadow-card)] transition duration-300; }
     .card-hover { @apply hover:-translate-y-1 hover:border-ink/10 hover:shadow-[var(--shadow-lift)]; }
-    .card-dark { @apply relative rounded-[var(--radius-card)] border border-white/10 bg-white/[0.04] p-7 transition duration-300 hover:border-white/20 hover:bg-white/[0.07]; }
+    .card-dark { @apply relative rounded-[var(--radius-card)] border border-white/10 bg-white/[0.04] p-5 sm:p-6 transition duration-300 hover:border-white/20 hover:bg-white/[0.07]; }
 
     /*
      * Cursor spotlight: a soft glow plus a lit border that follow the pointer (Runtime.tsx sets --mx/--my).
@@ -172,21 +170,30 @@
     .section-dark .spotlight::before { background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgb(255 255 255 / 0.07), transparent 65%); }
     .section-dark .spotlight::after { background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), color-mix(in oklab, var(--color-teal) 85%, transparent), transparent 70%); }
 
-    /* Moving colour mesh for heroes and dark panels (pure CSS, no images). */
+    /* Ambient colour mesh for heroes and dark panels: radial-gradient mask avoids heavy GPU blur-3xl shaders during scroll. */
     .mesh { @apply pointer-events-none absolute inset-0 -z-10 overflow-hidden; }
-    .mesh > span { @apply absolute block rounded-full blur-3xl motion-safe:animate-drift; }
+    .mesh > span {
+        position: absolute;
+        display: block;
+        border-radius: 9999px;
+        filter: none !important;
+        animation: none !important;
+        -webkit-mask-image: radial-gradient(closest-side, #000 0%, rgb(0 0 0 / 0.5) 48%, transparent 100%);
+        mask-image: radial-gradient(closest-side, #000 0%, rgb(0 0 0 / 0.5) 48%, transparent 100%);
+        transform: scale(1.22);
+    }
 
-    .prose-content { @apply text-[1.04rem] leading-[1.85] text-ink-600; }
-    .prose-content h2 { @apply mt-12 mb-4 scroll-mt-28 text-2xl font-bold sm:text-[1.95rem]; }
-    .prose-content h3 { @apply mt-8 mb-3 scroll-mt-28 text-xl font-bold; }
-    .prose-content p { @apply mb-5; }
+    .prose-content { @apply text-[1.02rem] leading-[1.75] text-ink-600; }
+    .prose-content h2 { @apply mt-7 mb-3 scroll-mt-28 text-2xl font-bold sm:text-[1.85rem]; }
+    .prose-content h3 { @apply mt-5 mb-2 scroll-mt-28 text-xl font-bold; }
+    .prose-content p { @apply mb-3.5; }
     .prose-content a { @apply font-semibold text-brand-700 underline decoration-brand/30 underline-offset-4 hover:decoration-brand; }
-    .prose-content ul { @apply mb-6 list-none space-y-2.5 pl-0; }
+    .prose-content ul { @apply mb-4 list-none space-y-2 pl-0; }
     .prose-content ul > li { @apply relative pl-8; }
     .prose-content ul > li::before { content: ""; @apply absolute left-0 top-[0.42em] size-5 rounded-full bg-brand-50; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23167B8B' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E"); background-size: 12px; background-position: center; background-repeat: no-repeat; }
-    .prose-content ol { @apply mb-6 list-decimal space-y-2 pl-6 marker:font-bold marker:text-brand; }
-    .prose-content blockquote { @apply my-8 rounded-2xl border-l-4 border-brand bg-brand-50/60 px-6 py-5 text-ink-700; }
-    .prose-content img { @apply my-8 rounded-2xl; }
+    .prose-content ol { @apply mb-4 list-decimal space-y-1.5 pl-6 marker:font-bold marker:text-brand; }
+    .prose-content blockquote { @apply my-5 rounded-2xl border-l-4 border-brand bg-brand-50/60 px-5 py-4 text-ink-700; }
+    .prose-content img { @apply my-5 rounded-2xl; }
     .prose-content table { @apply my-6 w-full border-collapse overflow-hidden rounded-xl text-sm; }
     .prose-content th { @apply border border-line bg-mist px-4 py-3 text-left font-semibold text-ink; }
     .prose-content td { @apply border border-line px-4 py-3; }
@@ -226,7 +233,7 @@
     .glow-orange { background: radial-gradient(closest-side, rgb(254 180 73 / 0.22), transparent); }
     .glow-teal { background: radial-gradient(closest-side, rgb(83 175 190 / 0.26), transparent); }
     .glow-amber { background: radial-gradient(closest-side, rgb(254 180 73 / 0.24), transparent); }
-    .noise::after { content: ""; @apply pointer-events-none absolute inset-0 opacity-[0.05] mix-blend-overlay; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+    .noise::after { content: none; }
 
     /* Gradient hairline border for highlighted cards */
     .ring-gradient { position: relative; }
@@ -237,51 +244,43 @@
 }
 
 /*
- * Scroll reveals (replaces AOS; same data-aos / data-aos-delay attributes). The html.js class is set inline in
- * <head>, RevealScope (Runtime.tsx) adds .is-in when an element enters the viewport. Uses animations, not transitions, so it never
- * fights the hover transitions on cards.
+ * Scroll reveals (replaces AOS; same data-aos / data-aos-delay attributes). RevealScope (Runtime.tsx) keeps
+ * above-the-fold elements immediately visible (.is-instant) and animates below-the-fold elements using pure
+ * GPU-composited opacity + transform (no per-frame blur filter).
  */
 @layer components {
     .js [data-aos]:not(.is-in) { opacity: 0; }
-    .js [data-aos].is-in { animation: reveal 0.95s var(--ease-out-expo) var(--d, 0ms) both; }
-    [data-aos] { --from: translate3d(0, 28px, 0); --blur: 6px; }
-    [data-aos="fade-down"] { --from: translate3d(0, -18px, 0); }
-    [data-aos="fade-right"] { --from: translate3d(-32px, 0, 0); }
-    [data-aos="fade-left"] { --from: translate3d(32px, 0, 0); }
-    [data-aos="zoom-in"] { --from: scale(0.94); --blur: 4px; }
-    [data-aos="zoom-in-up"] { --from: translate3d(0, 32px, 0) scale(0.96); --blur: 4px; }
-    .no-reveal [data-aos] { opacity: 1 !important; animation: none !important; }
+    .js [data-aos].is-in:not(.is-instant) { animation: reveal 0.55s var(--ease-out-expo) var(--d, 0ms) both; }
+    [data-aos] { --from: translate3d(0, 18px, 0); }
+    [data-aos="fade-down"] { --from: translate3d(0, -14px, 0); }
+    [data-aos="fade-right"] { --from: translate3d(-20px, 0, 0); }
+    [data-aos="fade-left"] { --from: translate3d(20px, 0, 0); }
+    [data-aos="zoom-in"] { --from: scale(0.96); }
+    [data-aos="zoom-in-up"] { --from: translate3d(0, 20px, 0) scale(0.97); }
+    .no-reveal [data-aos], .is-instant { opacity: 1 !important; transform: none !important; animation: none !important; }
 
     /* Word-by-word headline entrance: words of [data-split] are wrapped in .w > span when rendered */
     [data-split] .w { display: inline-block; overflow: clip; overflow-clip-margin: 0.2em; vertical-align: top; padding-bottom: 0.06em; margin-bottom: -0.06em; }
     [data-split] .w > span { display: inline-block; }
-    .js [data-split]:not(.is-in) .w > span { transform: translateY(105%); }
-    .js [data-split].is-in .w > span { animation: word-up 1s var(--ease-out-expo) calc(var(--d, 0ms) + var(--i, 0) * 55ms) both; }
+    .js [data-split]:not(.is-in) .w > span { opacity: 0; transform: translate3d(0, 110%, 0); }
+    .js [data-split].is-in:not(.is-instant) .w > span { animation: word-up 0.6s var(--ease-out-expo) calc(var(--d, 0ms) + var(--i, 0) * 35ms) both; }
+    .is-instant .w > span { opacity: 1 !important; transform: none !important; animation: none !important; }
 }
 
 @keyframes reveal {
-    from { opacity: 0; transform: var(--from); filter: blur(var(--blur)); }
-    to { opacity: 1; transform: none; filter: none; }
+    from { opacity: 0; transform: var(--from); }
+    to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 @keyframes word-up {
-    from { transform: translateY(105%); }
-    to { transform: none; }
-}
-@keyframes gradient-pan {
-    from { background-position: 0% 50%; }
-    to { background-position: 100% 50%; }
+    from { opacity: 0; transform: translate3d(0, 110%, 0); }
+    to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 /* Scroll-linked effects (progressive enhancement: browsers without scroll timelines just show the end state). */
 @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
-        .parallax { animation: parallax linear both; animation-timeline: view(); animation-range: cover 0% cover 100%; }
         .scroll-fill { animation: scroll-fill linear both; animation-timeline: view(); animation-range: entry 40% cover 55%; transform-origin: left center; }
     }
-}
-@keyframes parallax {
-    from { transform: translateY(-6%) scale(1.08); }
-    to { transform: translateY(6%) scale(1.08); }
 }
 @keyframes scroll-fill {
     from { transform: scaleX(0); }
@@ -295,19 +294,20 @@
 
 /* ---------- Next.js only: overlay entrance (replaces Alpine x-transition) ---------- */
 @layer components {
-    .overlay-fade { animation: overlay-fade 0.3s ease-out both; }
-    .overlay-rise { animation: overlay-rise 0.35s var(--ease-out-expo) both; }
-    .slide-in-right { animation: slide-in-right 0.3s ease-out both; }
+    .overlay-fade { animation: overlay-fade 0.25s ease-out both; }
+    .overlay-rise { animation: overlay-rise 0.3s var(--ease-out-expo) both; }
+    .slide-in-right { animation: slide-in-right 0.25s ease-out both; }
 }
 @keyframes overlay-fade { from { opacity: 0; } }
-@keyframes overlay-rise { from { opacity: 0; transform: translateY(2rem) scale(0.97); } }@keyframes slide-in-right { from { transform: translateX(100%); } }
+@keyframes overlay-rise { from { opacity: 0; transform: translateY(1.5rem) scale(0.98); } }
+@keyframes slide-in-right { from { transform: translateX(100%); } }
 
 /* ---------- Next.js only: [data-reveal] without data-aos animates as fade-up (app.js used to add data-aos) ---------- */
 @layer components {
-    [data-reveal]:not([data-aos]) { --from: translate3d(0, 28px, 0); --blur: 6px; }
+    [data-reveal]:not([data-aos]) { --from: translate3d(0, 18px, 0); }
     .js [data-reveal]:not([data-aos]):not(.is-in) { opacity: 0; }
-    .js [data-reveal]:not([data-aos]).is-in { animation: reveal 0.95s var(--ease-out-expo) var(--d, 0ms) both; }
-    /* Runtime never booted (see layout.tsx): show everything the reveal rules above would keep hidden. */
+    .js [data-reveal]:not([data-aos]).is-in:not(.is-instant) { animation: reveal 0.55s var(--ease-out-expo) var(--d, 0ms) both; }
+    /* Runtime never booted: show everything the reveal rules above would keep hidden. */
     .no-reveal [data-reveal], .no-reveal [data-aos] { opacity: 1 !important; animation: none !important; }
-    .no-reveal [data-split] .w > span { transform: none !important; animation: none !important; }
+    .no-reveal [data-split] .w > span { opacity: 1 !important; transform: none !important; animation: none !important; }
 }

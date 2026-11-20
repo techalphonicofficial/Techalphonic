@@ -10,7 +10,7 @@ export function ServiceCard({ service, index = 0 }: { service: Service; index?: 
   return (
     <Link
       href={service.url}
-      className="spotlight group flex h-full flex-col rounded-[var(--radius-card)] border border-line bg-white p-7 transition duration-300 hover:-translate-y-1 hover:border-transparent hover:shadow-[var(--shadow-lift)]"
+      className="spotlight group flex h-full flex-col rounded-[var(--radius-card)] border border-line bg-white p-5 sm:p-6 transition duration-300 hover:-translate-y-1 hover:border-transparent hover:shadow-[var(--shadow-lift)]"
       data-reveal="stagger"
     >
       <span className="flex items-start justify-between">
@@ -19,9 +19,9 @@ export function ServiceCard({ service, index = 0 }: { service: Service; index?: 
         </span>
         <span className="font-display text-sm font-bold tabular-nums text-ink/20 transition group-hover:text-brand">{pad2(index + 1)}</span>
       </span>
-      <h3 className="mt-7 text-[1.2rem] font-bold leading-snug tracking-[-0.03em]">{service.name}</h3>
-      {service.description && <p className="mt-2.5 flex-1 text-[0.93rem] leading-relaxed text-ink-500">{limit(service.description, 120)}</p>}
-      <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-ink transition group-hover:text-brand">
+      <h3 className="mt-4 text-[1.15rem] font-bold leading-snug tracking-[-0.03em]">{service.name}</h3>
+      {service.description && <p className="mt-2 flex-1 text-[0.9rem] leading-relaxed text-ink-500">{limit(service.description, 120)}</p>}
+      <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-ink transition group-hover:text-brand">
         Learn more
         <Icon name="arrow-right" className="size-4 -translate-x-1 opacity-0 transition duration-300 group-hover:translate-x-0 group-hover:opacity-100" />
       </span>
@@ -48,19 +48,19 @@ export function BlogCard({ post }: { post: Blog }) {
         )}
         {post.category && <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-[0.7rem] font-bold uppercase tracking-wider text-ink shadow-sm backdrop-blur">{post.category.name}</span>}
       </Link>
-      <div className="flex flex-1 flex-col px-6 pb-6 pt-4">
+      <div className="flex flex-1 flex-col px-5 pb-5 pt-3">
         <div className="flex items-center gap-2.5 text-xs text-ink-500">
           <time dateTime={post.published_at?.slice(0, 10)}>{formatDate(post.published_at)}</time>
           <span className="divider-dot" />
           <span>{post.reading_time} min read</span>
         </div>
-        <h3 className="mt-3 text-[1.2rem] font-bold leading-snug tracking-[-0.03em]">
+        <h3 className="mt-2 text-[1.15rem] font-bold leading-snug tracking-[-0.03em]">
           <Link href={post.url} className="after:absolute after:inset-0 group-hover:text-brand">
             {post.title}
           </Link>
         </h3>
-        {post.excerpt && <p className="mt-2.5 line-clamp-2 text-[0.92rem] leading-relaxed text-ink-500">{post.excerpt}</p>}
-        <span className="mt-auto inline-flex items-center gap-1.5 pt-5 text-sm font-semibold text-ink group-hover:text-brand">
+        {post.excerpt && <p className="mt-2 line-clamp-2 text-[0.9rem] leading-relaxed text-ink-500">{post.excerpt}</p>}
+        <span className="mt-auto inline-flex items-center gap-1.5 pt-3.5 text-sm font-semibold text-ink group-hover:text-brand">
           Read article <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
         </span>
       </div>
@@ -71,15 +71,15 @@ export function BlogCard({ post }: { post: Blog }) {
 /** <x-testimonial> (light card) */
 export function TestimonialCard({ testimonial: t }: { testimonial: Testimonial }) {
   return (
-    <figure className="relative flex h-full flex-col rounded-[var(--radius-card)] border border-line bg-white p-7 shadow-[var(--shadow-card)] transition duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]" data-reveal="stagger">
-      <svg className="absolute right-7 top-7 size-10 text-brand/10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <figure className="relative flex h-full flex-col rounded-[var(--radius-card)] border border-line bg-white p-5 sm:p-6 shadow-[var(--shadow-card)] transition duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]" data-reveal="stagger">
+      <svg className="absolute right-6 top-6 size-9 text-brand/10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
         <path d={QUOTE_PATH} />
       </svg>
       <div className="flex gap-0.5 text-amber" aria-label={`${t.rating} out of 5 stars`}>
         <Stars rating={t.rating} />
       </div>
-      <blockquote className="mt-5 flex-1 text-[1rem] leading-relaxed text-ink-700">“{t.review}”</blockquote>
-      <figcaption className="mt-7 flex items-center gap-3.5 border-t border-line pt-6">
+      <blockquote className="mt-3.5 flex-1 text-[0.95rem] leading-relaxed text-ink-700">“{t.review}”</blockquote>
+      <figcaption className="mt-4 flex items-center gap-3.5 border-t border-line pt-4">
         {t.photo ? (
           <Img media={t.photo} className="size-11 rounded-full object-cover" sizes="44px" />
         ) : (

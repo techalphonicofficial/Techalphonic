@@ -23,10 +23,10 @@ export function PricingPlansSection({ pricingBlocks }: { pricingBlocks: Block[] 
   }>;
 
   return (
-    <section className="py-14 sm:py-20" id="plans">
+    <section className="py-8 sm:py-11" id="plans">
       <div className="container-x">
         {/* Section Header */}
-        <div className="mx-auto max-w-2xl text-center mb-8">
+        <div className="mx-auto max-w-2xl text-center mb-5">
           <span className="text-xs font-bold uppercase tracking-[0.18em] text-brand">
             Our Pricing Plans
           </span>
@@ -40,7 +40,7 @@ export function PricingPlansSection({ pricingBlocks }: { pricingBlocks: Block[] 
         </div>
 
         {/* Guarantee Box */}
-        <div className="mx-auto max-w-3xl mb-8 rounded-2xl border border-brand/20 bg-brand-50/60 p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-3.5 shadow-xs">
+        <div className="mx-auto max-w-3xl mb-6 rounded-2xl border border-brand/20 bg-brand-50/60 p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-3.5 shadow-xs">
           <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand text-white shadow-xs">
             <Icon name="shield-check" className="size-5" />
           </div>
@@ -54,7 +54,7 @@ export function PricingPlansSection({ pricingBlocks }: { pricingBlocks: Block[] 
 
         {/* Category Tabs */}
         {pricingBlocks.length > 1 && (
-          <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 mb-10">
+          <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 mb-6">
             {pricingBlocks.map((b, i) => {
               const isActive = activeTabIdx === i;
               const cleanLabel = (b.data?.heading || `Plan ${i + 1}`).replace(/packages?/i, "").trim();
