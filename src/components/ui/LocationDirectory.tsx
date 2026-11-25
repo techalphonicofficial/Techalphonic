@@ -54,7 +54,6 @@ export function LocationDirectory({
   const [activeCountry, setActiveCountry] = useState<string>("all");
   const [activeLetter, setActiveLetter] = useState<string>("ALL");
   const [search, setSearch] = useState<string>("");
-  const [selectedLocName, setSelectedLocName] = useState<string | null>(null);
 
   const list = useMemo(() => locations ?? [], [locations]);
 
@@ -145,39 +144,6 @@ export function LocationDirectory({
         .filter((g) => g.cities.length > 0),
     [countryTabs, filteredLocations],
   );
-
-  // All India & USA/Global locations for the side panel
-  const allRegionGroups = useMemo(() => {
-    const india = list.filter((l) => (l.country || "").toLowerCase() === "india");
-    const usa = list.filter((l) => (l.country || "").toLowerCase() === "united states");
-    const other = list.filter((l) => {
-      const c = (l.country || "").toLowerCase();
-      return c !== "india" && c !== "united states";
-    });
-    return { india, usa, global: [...usa, ...other] };
-  }, [list]);
-
-  // Selected location for the side panel
-  const selectedLoc = useMemo(() => {
-    if (selectedLocName) {
-      const found = list.find((l) => l.name.toLowerCase() === selectedLocName.toLowerCase());
-      if (found) return found;
-    }
-    if (activeCountry === "united states") {
-      return (
-        filteredLocations.find((l) => l.name.toLowerCase() === "los angeles") ??
-        filteredLocations[0] ??
-        allRegionGroups.usa[0] ??
-        list[0]
-      );
-    }
-    return (
-      filteredLocations.find((l) => l.name.toLowerCase() === "noida") ??
-      filteredLocations[0] ??
-      allRegionGroups.india[0] ??
-      list[0]
-    );
-  }, [selectedLocName, activeCountry, filteredLocations, allRegionGroups, list]);
 
   if (list.length === 0) return null;
 
@@ -317,8 +283,8 @@ export function LocationDirectory({
           </div>
         </div>
 
-        {/* Content Area + Side Panel */}
-        <div className="mt-5 grid gap-6 lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_370px] lg:items-start">
+        {/* Content Area */}
+        <div className="mt-5">
           <div>
             {filteredLocations.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-line bg-white p-8 text-center">
@@ -347,166 +313,15 @@ export function LocationDirectory({
                       <span className="text-xs text-ink-400">({group.cities.length} {group.cities.length === 1 ? "hub" : "hubs"})</span>
                     </div>
 
-                    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                      {group.cities.map((loc) => (
-                        <CityCard
-                          key={loc.url + loc.name}
-                          loc={loc}
-                          serviceName={serviceName}
-                          isSelected={selectedLoc?.name === loc.name}
-                          onSelect={() => setSelectedLocName(loc.name)}
-                        />
-                      ))}
-                    </div>
+                    <CityGrid cities={group.cities} serviceName={serviceName} />
                   </div>
                 ))}
               </div>
             ) : (
               /* FILTERED GRID */
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                {filteredLocations.map((loc) => (
-                  <CityCard
-                    key={loc.url + loc.name}
-                    loc={loc}
-                    serviceName={serviceName}
-                    isSelected={selectedLoc?.name === loc.name}
-                    onSelect={() => setSelectedLocName(loc.name)}
-                  />
-                ))}
-              </div>
+              <CityGrid key={`${activeCountry}|${currentLetter}|${search}`} cities={filteredLocations} serviceName={serviceName} />
             )}
           </div>
-
-          {/* Right-hand Side Panel: Selected City Pages + India & USA Location Pages Index */}
-          <aside className="grid gap-4 lg:sticky lg:top-24 lg:self-start" aria-label="Created location pages">
-            {selectedLoc && (
-              <div className="rounded-2xl border border-brand/25 bg-white p-4 shadow-[var(--shadow-card)]">
-                <div className="flex items-start justify-between gap-2 border-b border-line pb-3">
-                  <div>
-                    <p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-brand">
-                      {getFlag(selectedLoc.country)} {selectedLoc.country} · Created Pages
-                    </p>
-                    <h3 className="mt-0.5 font-display text-base font-bold text-ink">{selectedLoc.name}</h3>
-                    {selectedLoc.state && selectedLoc.state !== selectedLoc.name && (
-                      <p className="text-[0.72rem] text-ink-500">{selectedLoc.state}</p>
-                    )}
-                  </div>
-                  <Link
-                    href={selectedLoc.url}
-                    className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-brand px-2.5 py-1 text-[0.7rem] font-bold text-white transition hover:bg-brand-600"
-                  >
-                    Open <Icon name="arrow-up-right" className="size-3" />
-                  </Link>
-                </div>
-
-                <ul className="mt-3 grid max-h-[260px] gap-1.5 overflow-y-auto pr-1" role="list">
-                  {(selectedLoc.pages && selectedLoc.pages.length > 0
-                    ? selectedLoc.pages
-                    : [{ title: selectedLoc.title || `${serviceName} in ${selectedLoc.name}`, url: selectedLoc.url, is_dedicated: true }]
-                  ).map((pg) => (
-                    <li key={pg.url}>
-                      <Link
-                        href={pg.url}
-                        className="group flex items-center justify-between gap-2 rounded-lg border border-line/70 bg-mist/40 px-2.5 py-2 text-xs transition hover:border-brand/40 hover:bg-brand-50/50"
-                      >
-                        <span className="min-w-0">
-                          <span className="block truncate font-semibold text-ink group-hover:text-brand">{pg.title}</span>
-                          <span className="block truncate text-[0.65rem] text-ink-500">{pg.url}</span>
-                        </span>
-                        <span
-                          className={cn(
-                            "shrink-0 rounded-full px-1.5 py-0.5 text-[0.6rem] font-bold uppercase",
-                            pg.is_dedicated ? "bg-teal/15 text-teal-700" : "bg-ink/5 text-ink-500",
-                          )}
-                        >
-                          {pg.is_dedicated ? "Published" : "Live"}
-                        </span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Quick Directory: India & USA Location Pages */}
-            <div className="rounded-2xl border border-line bg-white p-4 shadow-xs">
-              <p className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-500">
-                India &amp; USA Location Pages
-              </p>
-
-              {allRegionGroups.india.length > 0 && (
-                <div className="mt-3">
-                  <div className="mb-1.5 flex items-center justify-between text-xs font-bold text-ink">
-                    <span>🇮🇳 India ({allRegionGroups.india.length})</span>
-                  </div>
-                  <ul className="grid max-h-[180px] gap-1 overflow-y-auto pr-1" role="list">
-                    {allRegionGroups.india.map((loc) => (
-                      <li key={`side-in-${loc.name}`} className="flex items-center justify-between gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => setSelectedLocName(loc.name)}
-                          className={cn(
-                            "flex-1 truncate rounded-md px-2 py-1 text-left text-xs font-medium transition",
-                            selectedLoc?.name === loc.name
-                              ? "bg-brand-50 font-bold text-brand"
-                              : "text-ink-700 hover:bg-mist hover:text-ink",
-                          )}
-                        >
-                          {loc.name}
-                          {loc.pages && loc.pages.length > 0 && (
-                            <span className="ml-1 text-[0.65rem] text-ink-400">({loc.pages.length})</span>
-                          )}
-                        </button>
-                        <Link
-                          href={loc.url}
-                          className="shrink-0 rounded px-1.5 py-0.5 text-[0.68rem] font-semibold text-brand hover:bg-brand-50"
-                          title={loc.title || loc.name}
-                        >
-                          View →
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {allRegionGroups.global.length > 0 && (
-                <div className="mt-3.5 border-t border-line pt-3">
-                  <div className="mb-1.5 flex items-center justify-between text-xs font-bold text-ink">
-                    <span>🇺🇸 USA &amp; Global ({allRegionGroups.global.length})</span>
-                  </div>
-                  <ul className="grid gap-1" role="list">
-                    {allRegionGroups.global.map((loc) => (
-                      <li key={`side-us-${loc.name}`} className="flex items-center justify-between gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => setSelectedLocName(loc.name)}
-                          className={cn(
-                            "flex-1 truncate rounded-md px-2 py-1 text-left text-xs font-medium transition",
-                            selectedLoc?.name === loc.name
-                              ? "bg-brand-50 font-bold text-brand"
-                              : "text-ink-700 hover:bg-mist hover:text-ink",
-                          )}
-                        >
-                          {getFlag(loc.country)} {loc.name}
-                          {loc.pages && loc.pages.length > 0 && (
-                            <span className="ml-1 text-[0.65rem] text-ink-400">({loc.pages.length})</span>
-                          )}
-                        </button>
-                        <Link
-                          href={loc.url}
-                          className="shrink-0 rounded px-1.5 py-0.5 text-[0.68rem] font-semibold text-brand hover:bg-brand-50"
-                          title={loc.title || loc.name}
-                        >
-                          View →
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          </aside>
         </div>
       </div>
     </section>
@@ -521,29 +336,43 @@ function getFlag(country: string | null | undefined) {
   return "🌐";
 }
 
-function CityCard({
-  loc,
-  serviceName,
-  isSelected,
-  onSelect,
-}: {
-  loc: LocationItem;
-  serviceName: string;
-  isSelected?: boolean;
-  onSelect?: () => void;
-}) {
-  const badge = REGION_BADGES[loc.name.toLowerCase()] || [loc.state, loc.country].filter(Boolean).join(" · ");
-  const pageCount = loc.pages?.length ?? 0;
-  const areaCount = loc.areas?.length ?? 0;
+/** Cities shown before "Show more". */
+const CITY_PREVIEW = 4;
+
+/** City cards; the ones past the preview stay in the HTML (crawlable links) and are only hidden. */
+function CityGrid({ cities, serviceName }: { cities: LocationItem[]; serviceName: string }) {
+  const [showAll, setShowAll] = useState(false);
 
   return (
-    <div
-      onMouseEnter={onSelect}
-      className={cn(
-        "group relative flex flex-col justify-between rounded-xl border bg-white p-3.5 sm:p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm",
-        isSelected ? "border-brand/60 ring-2 ring-brand/10" : "border-line hover:border-brand/40",
+    <>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {cities.map((loc, i) => (
+          <CityCard key={loc.url + loc.name} loc={loc} serviceName={serviceName} hidden={!showAll && i >= CITY_PREVIEW} />
+        ))}
+      </div>
+      {cities.length > CITY_PREVIEW && (
+        <div className="mt-4 text-center">
+          <button type="button" onClick={() => setShowAll((v) => !v)} aria-expanded={showAll} className="btn btn-secondary group">
+            {showAll ? "Show less" : "Show more"}
+            <Icon name="chevron-down" className={cn("size-4 transition-transform", showAll && "rotate-180")} />
+          </button>
+        </div>
       )}
-    >
+    </>
+  );
+}
+
+/** Area links shown in a card before "+ more". */
+const AREA_PREVIEW = 4;
+
+function CityCard({ loc, serviceName, hidden }: { loc: LocationItem; serviceName: string; hidden?: boolean }) {
+  const [showAll, setShowAll] = useState(false);
+  const badge = REGION_BADGES[loc.name.toLowerCase()] || [loc.state, loc.country].filter(Boolean).join(" · ");
+  const areas = loc.areas ?? [];
+  const visibleAreas = showAll ? areas : areas.slice(0, AREA_PREVIEW);
+
+  return (
+    <div hidden={hidden} className="group relative flex flex-col justify-between rounded-xl border border-line bg-white p-3.5 sm:p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-sm">
       <div>
         {/* Top Badges */}
         <div className="flex items-center justify-between gap-1.5 mb-2.5">
@@ -552,7 +381,7 @@ function CityCard({
             {loc.country}
           </span>
           <span className="text-[0.62rem] font-bold text-teal tracking-wide uppercase">
-            {pageCount > 0 ? `${pageCount} pages` : loc.type || "City"}
+            {loc.type || "City"}
           </span>
         </div>
 
@@ -568,28 +397,55 @@ function CityCard({
             <p className="mt-0.5 text-[0.7rem] text-ink-500 leading-snug truncate">
               {badge}
             </p>
-            {areaCount > 0 && (
-              <p className="mt-0.5 text-[0.7rem] font-semibold text-brand">
-                {areaCount} {areaCount === 1 ? "area" : "areas"} covered
-              </p>
-            )}
           </div>
         </Link>
 
-        {/* Quick preview of top created pages for this location */}
-        {loc.pages && loc.pages.length > 0 && (
-          <div className="mt-2.5 flex flex-wrap gap-1">
-            {loc.pages.slice(0, 2).map((pg) => (
-              <Link
-                key={pg.url}
-                href={pg.url}
-                className="truncate max-w-full rounded-md bg-mist/70 px-1.5 py-0.5 text-[0.64rem] font-medium text-ink-600 transition hover:bg-brand-50 hover:text-brand"
-                title={pg.title}
-              >
-                {pg.service || pg.title}
-              </Link>
-            ))}
+        {/* City → areas: this service's page in each area */}
+        {areas.length > 0 ? (
+          <div className="mt-3">
+            <p className="text-[0.62rem] font-bold uppercase tracking-wide text-ink-500">Areas in {loc.name}</p>
+            <ul className="mt-1.5 flex flex-wrap gap-1" role="list">
+              {visibleAreas.map((area) => (
+                <li key={area.slug} className="max-w-full">
+                  <Link
+                    href={area.url}
+                    className="inline-flex max-w-full items-center gap-1 rounded-md bg-brand-50 px-2 py-1 text-[0.68rem] font-semibold text-brand transition hover:bg-brand hover:text-white"
+                  >
+                    <Icon name="map-pin" className="size-3 shrink-0" />
+                    <span className="truncate">{area.name}</span>
+                  </Link>
+                </li>
+              ))}
+              {areas.length > AREA_PREVIEW && (
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => setShowAll((v) => !v)}
+                    aria-expanded={showAll}
+                    className="rounded-md px-2 py-1 text-[0.68rem] font-bold text-brand hover:underline"
+                  >
+                    {showAll ? "Show less" : `+${areas.length - AREA_PREVIEW} more`}
+                  </button>
+                </li>
+              )}
+            </ul>
           </div>
+        ) : (
+          /* Quick preview of top created pages for this location */
+          loc.pages && loc.pages.length > 0 && (
+            <div className="mt-2.5 flex flex-wrap gap-1">
+              {loc.pages.slice(0, 2).map((pg) => (
+                <Link
+                  key={pg.url}
+                  href={pg.url}
+                  className="truncate max-w-full rounded-md bg-mist/70 px-1.5 py-0.5 text-[0.64rem] font-medium text-ink-600 transition hover:bg-brand-50 hover:text-brand"
+                  title={pg.title}
+                >
+                  {pg.service || pg.title}
+                </Link>
+              ))}
+            </div>
+          )
         )}
       </div>
 
@@ -598,15 +454,7 @@ function CityCard({
         <Link href={loc.url} className="truncate transition-colors hover:text-brand">
           {serviceName} in {loc.name}
         </Link>
-        {onSelect && (
-          <button
-            type="button"
-            onClick={onSelect}
-            className="shrink-0 text-[0.65rem] font-bold text-brand hover:underline"
-          >
-            Pages
-          </button>
-        )}
+        <Icon name="arrow-right" className="size-3.5 shrink-0 text-brand" />
       </div>
     </div>
   );
