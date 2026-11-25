@@ -58,6 +58,20 @@ export function LocationDirectory({
 
   const list = useMemo(() => locations ?? [], [locations]);
 
+  // Country tabs: the known ones first, then any other country added in the admin panel
+  const countryTabs = useMemo(() => {
+    const tabs = Object.entries(COUNTRY_CONFIG);
+    const seen = new Set(Object.keys(COUNTRY_CONFIG));
+    for (const loc of list) {
+      const key = (loc.country || "").toLowerCase();
+      if (key && !seen.has(key)) {
+        seen.add(key);
+        tabs.push([key, { flag: getFlag(key), label: loc.country }]);
+      }
+    }
+    return tabs;
+  }, [list]);
+
   // Live counts per country
   const countryCounts = useMemo(() => {
     const counts: Record<string, number> = { all: list.length };
@@ -113,7 +127,8 @@ export function LocationDirectory({
       // Search query
       if (search.trim()) {
         const q = search.toLowerCase().trim();
-        const matches = name.includes(q) || country.includes(q) || state.includes(q);
+        const inArea = (loc.areas ?? []).some((a) => a.name.toLowerCase().includes(q));
+        const matches = name.includes(q) || country.includes(q) || state.includes(q) || inArea;
         if (!matches) return false;
       }
 
@@ -121,12 +136,15 @@ export function LocationDirectory({
     });
   }, [list, activeCountry, currentLetter, search]);
 
-  // Split into India vs International for clean sectioning when "All" is active
-  const groupedByRegion = useMemo(() => {
-    const indiaList = filteredLocations.filter((l) => (l.country || "").toLowerCase() === "india");
-    const globalList = filteredLocations.filter((l) => (l.country || "").toLowerCase() !== "india");
-    return { india: indiaList, global: globalList };
-  }, [filteredLocations]);
+  // One section per country (same order as the tabs) when "All" is active
+  const groupedByCountry = useMemo(
+    () =>
+      countryTabs
+        .filter(([key]) => key !== "all")
+        .map(([key, config]) => ({ key, ...config, cities: filteredLocations.filter((l) => (l.country || "").toLowerCase() === key) }))
+        .filter((g) => g.cities.length > 0),
+    [countryTabs, filteredLocations],
+  );
 
   // All India & USA/Global locations for the side panel
   const allRegionGroups = useMemo(() => {
@@ -190,7 +208,7 @@ export function LocationDirectory({
           <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center lg:justify-between">
             {/* Country Segmented Pills */}
             <div className="flex flex-wrap items-center gap-1 p-0.5 rounded-xl bg-mist/70 border border-line/60">
-              {Object.entries(COUNTRY_CONFIG).map(([key, config]) => {
+              {countryTabs.map(([key, config]) => {
                 const isActive = activeCountry === key;
                 const count = countryCounts[key] ?? 0;
                 return (
@@ -230,7 +248,7 @@ export function LocationDirectory({
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search city or state..."
+                placeholder="Search city, area or state..."
                 className="w-full rounded-lg border border-line bg-mist/50 pl-8 pr-7 py-1.5 text-xs text-ink outline-none transition focus:border-brand focus:bg-white focus:ring-2 focus:ring-brand/10"
               />
               {search && (
@@ -319,19 +337,18 @@ export function LocationDirectory({
                 </button>
               </div>
             ) : activeCountry === "all" && currentLetter === "ALL" && !search ? (
-              /* DUAL REGION VIEW */
+              /* COUNTRY → CITY VIEW */
               <div className="grid gap-6">
-                {/* India Section */}
-                {groupedByRegion.india.length > 0 && (
-                  <div>
+                {groupedByCountry.map((group, i) => (
+                  <div key={group.key} className={cn(i > 0 && "border-t border-line/70 pt-5")}>
                     <div className="flex items-center gap-2 mb-3">
-                      <span className="text-base">🇮🇳</span>
-                      <h3 className="font-display text-sm font-bold text-ink">India — Major Cities & Metros</h3>
-                      <span className="text-xs text-ink-400">({groupedByRegion.india.length} hubs)</span>
+                      <span className="text-base">{group.flag}</span>
+                      <h3 className="font-display text-sm font-bold text-ink">{group.label} — Major Cities & Metros</h3>
+                      <span className="text-xs text-ink-400">({group.cities.length} {group.cities.length === 1 ? "hub" : "hubs"})</span>
                     </div>
 
                     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                      {groupedByRegion.india.map((loc) => (
+                      {group.cities.map((loc) => (
                         <CityCard
                           key={loc.url + loc.name}
                           loc={loc}
@@ -342,30 +359,7 @@ export function LocationDirectory({
                       ))}
                     </div>
                   </div>
-                )}
-
-                {/* International Section */}
-                {groupedByRegion.global.length > 0 && (
-                  <div className="border-t border-line/70 pt-5">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-base">🇺🇸</span>
-                      <h3 className="font-display text-sm font-bold text-ink">United States & International Hubs</h3>
-                      <span className="text-xs text-ink-400">({groupedByRegion.global.length} hubs)</span>
-                    </div>
-
-                    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                      {groupedByRegion.global.map((loc) => (
-                        <CityCard
-                          key={loc.url + loc.name}
-                          loc={loc}
-                          serviceName={serviceName}
-                          isSelected={selectedLoc?.name === loc.name}
-                          onSelect={() => setSelectedLocName(loc.name)}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
+                ))}
               </div>
             ) : (
               /* FILTERED GRID */
@@ -523,7 +517,8 @@ function getFlag(country: string | null | undefined) {
   const c = (country || "").toLowerCase();
   if (c === "india") return "🇮🇳";
   if (c === "australia") return "🇦🇺";
-  return "🇺🇸";
+  if (c === "united states") return "🇺🇸";
+  return "🌐";
 }
 
 function CityCard({
@@ -539,6 +534,7 @@ function CityCard({
 }) {
   const badge = REGION_BADGES[loc.name.toLowerCase()] || [loc.state, loc.country].filter(Boolean).join(" · ");
   const pageCount = loc.pages?.length ?? 0;
+  const areaCount = loc.areas?.length ?? 0;
 
   return (
     <div
@@ -572,6 +568,11 @@ function CityCard({
             <p className="mt-0.5 text-[0.7rem] text-ink-500 leading-snug truncate">
               {badge}
             </p>
+            {areaCount > 0 && (
+              <p className="mt-0.5 text-[0.7rem] font-semibold text-brand">
+                {areaCount} {areaCount === 1 ? "area" : "areas"} covered
+              </p>
+            )}
           </div>
         </Link>
 

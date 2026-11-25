@@ -8,7 +8,7 @@ import { LocationDirectory } from "@/components/ui/LocationDirectory";
 import { LeadForm } from "@/components/forms/LeadForm";
 import { PackagesPage } from "@/components/pages/PackagesPage";
 import { getLayout } from "@/lib/api";
-import type { Block, CategoryData, LandingData, PageData, Seo, ServiceData } from "@/lib/types";
+import type { Block, CategoryData, LandingData, LocationItem, PageData, Seo, ServiceData } from "@/lib/types";
 import { cn, formatDate, itemTitle, lines } from "@/lib/utils";
 
 /* CMS page templates (port of resources/views/frontend/pages/*, services/*, landing/show). */
@@ -535,6 +535,56 @@ export function CategoryPage({ data, seo }: { data: CategoryData; seo: Seo }) {
   );
 }
 
+/** Third step of country → city → area: every area of the city, linked to this service's page there. */
+function CityAreas({ city, currentSlug, serviceName }: { city: LocationItem; currentSlug?: string; serviceName?: string }) {
+  const areas = city.areas ?? [];
+  const onAreaPage = currentSlug !== city.slug;
+  if (areas.length === 0) return null;
+
+  return (
+    <section className="section-sm bg-mist" id="areas">
+      <div className="container-x">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="eyebrow">{city.name} · {city.country}</p>
+            <h2 className="h-section mt-4">{serviceName ? `${serviceName} locations in ${city.name}` : `Locations in ${city.name}`}</h2>
+          </div>
+          {onAreaPage && (
+            <Link href={city.url} className="inline-flex items-center gap-2 text-sm font-semibold text-brand hover:underline">
+              All of {city.name} <Icon name="arrow-right" className="size-4" />
+            </Link>
+          )}
+        </div>
+        <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" role="list">
+          {areas.map((area) => {
+            const active = area.slug === currentSlug;
+            return (
+              <li key={area.slug}>
+                <Link
+                  href={area.url}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "group flex h-full items-start gap-3 rounded-xl border bg-white p-4 transition hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-sm",
+                    active ? "border-brand/60 ring-2 ring-brand/10" : "border-line",
+                  )}
+                >
+                  <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-brand-50 text-brand transition group-hover:bg-brand group-hover:text-white">
+                    <Icon name="map-pin" className="size-4" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block font-semibold text-ink group-hover:text-brand">{area.name}</span>
+                    <span className="mt-0.5 block line-clamp-2 text-xs text-ink-500">{area.description || (serviceName ? `${serviceName} in ${area.name}` : city.name)}</span>
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 // ---------------------------------------------------------------- landing/show (programmatic SEO page)
 
 export function LandingPage({ data, seo }: { data: LandingData; seo: Seo }) {
@@ -542,9 +592,8 @@ export function LandingPage({ data, seo }: { data: LandingData; seo: Seo }) {
   const eyebrow = [service?.name, industry?.name, location?.name].filter(Boolean).join(" · ");
   const layout = page.hero_layout;
   const locationsList = data.locations ?? [];
-  const currentLocationItem = location?.name
-    ? locationsList.find((l) => l.name.toLowerCase() === location.name.toLowerCase())
-    : undefined;
+  // The city this page belongs to (an area page belongs to its city).
+  const currentLocationItem = location?.city_slug ? locationsList.find((l) => l.slug === location.city_slug) : undefined;
   const indiaLocations = locationsList.filter((l) => (l.country || "").toLowerCase() === "india");
   const usaLocations = locationsList.filter((l) => (l.country || "").toLowerCase() !== "india");
 
@@ -562,6 +611,8 @@ export function LandingPage({ data, seo }: { data: LandingData; seo: Seo }) {
         formService={service?.name}
         formLocation={location?.name}
       />
+
+      {currentLocationItem && location && <CityAreas city={currentLocationItem} currentSlug={location.slug} serviceName={service?.name} />}
 
       {data.content && (
         <section className="section">
@@ -599,7 +650,7 @@ export function LandingPage({ data, seo }: { data: LandingData; seo: Seo }) {
                       <p className="mb-1.5 text-xs font-bold text-ink">🇮🇳 India ({indiaLocations.length})</p>
                       <ul className="grid max-h-[210px] gap-1 overflow-y-auto pr-1" role="list">
                         {indiaLocations.map((loc) => {
-                          const active = location?.name && loc.name.toLowerCase() === location.name.toLowerCase();
+                          const active = loc === currentLocationItem;
                           return (
                             <li key={loc.url + loc.name}>
                               <Link
@@ -623,7 +674,7 @@ export function LandingPage({ data, seo }: { data: LandingData; seo: Seo }) {
                       <p className="mb-1.5 text-xs font-bold text-ink">🇺🇸 USA &amp; Global ({usaLocations.length})</p>
                       <ul className="grid gap-1" role="list">
                         {usaLocations.map((loc) => {
-                          const active = location?.name && loc.name.toLowerCase() === location.name.toLowerCase();
+                          const active = loc === currentLocationItem;
                           return (
                             <li key={loc.url + loc.name}>
                               <Link

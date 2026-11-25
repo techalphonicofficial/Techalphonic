@@ -253,6 +253,14 @@ export type LocationPageLink = {
   is_dedicated?: boolean;
 };
 
+/** A locality inside a city ("Sector 62" in Noida). */
+export type LocationArea = {
+  name: string;
+  slug: string;
+  url: string;
+  description?: string | null;
+};
+
 export type LocationItem = {
   name: string;
   slug?: string;
@@ -262,6 +270,7 @@ export type LocationItem = {
   url: string;
   title?: string;
   pages?: LocationPageLink[];
+  areas?: LocationArea[];
 };
 
 export type ServiceData = Common & {
@@ -302,7 +311,8 @@ export type CategoryData = Common & {
 export type LandingData = Common & {
   page: { hero_layout: string; faq_enabled: boolean; faq_title: string | null; featured_image: Media | null };
   service: { name: string } | null;
-  location: { name: string } | null;
+  /** city_slug: the directory entry (city) whose areas this page belongs to. */
+  location: { name: string; slug?: string; city_slug?: string | null } | null;
   industry: Industry | null;
   site_name: string;
   h1: string;
