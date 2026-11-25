@@ -48,7 +48,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         )}
         {s.recaptcha_site_key && <script src={`https://www.google.com/recaptcha/api.js?render=${s.recaptcha_site_key}`} async defer />}
       </head>
-      <body className="min-h-screen bg-white">
+      {/* suppressHydrationWarning: browser extensions add their own attributes to <body> before React hydrates. */}
+      <body className="min-h-screen bg-white" suppressHydrationWarning>
         {s.gtm_id && (
           <noscript>
             <iframe src={`https://www.googletagmanager.com/ns.html?id=${encodeURIComponent(s.gtm_id)}`} height="0" width="0" style={{ display: "none", visibility: "hidden" }} />
