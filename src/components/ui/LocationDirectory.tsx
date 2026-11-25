@@ -54,6 +54,7 @@ export function LocationDirectory({
   const [activeCountry, setActiveCountry] = useState<string>("all");
   const [activeLetter, setActiveLetter] = useState<string>("ALL");
   const [search, setSearch] = useState<string>("");
+  const [selectedLocName, setSelectedLocName] = useState<string | null>(null);
 
   const list = useMemo(() => locations ?? [], [locations]);
 
@@ -126,6 +127,39 @@ export function LocationDirectory({
     const globalList = filteredLocations.filter((l) => (l.country || "").toLowerCase() !== "india");
     return { india: indiaList, global: globalList };
   }, [filteredLocations]);
+
+  // All India & USA/Global locations for the side panel
+  const allRegionGroups = useMemo(() => {
+    const india = list.filter((l) => (l.country || "").toLowerCase() === "india");
+    const usa = list.filter((l) => (l.country || "").toLowerCase() === "united states");
+    const other = list.filter((l) => {
+      const c = (l.country || "").toLowerCase();
+      return c !== "india" && c !== "united states";
+    });
+    return { india, usa, global: [...usa, ...other] };
+  }, [list]);
+
+  // Selected location for the side panel
+  const selectedLoc = useMemo(() => {
+    if (selectedLocName) {
+      const found = list.find((l) => l.name.toLowerCase() === selectedLocName.toLowerCase());
+      if (found) return found;
+    }
+    if (activeCountry === "united states") {
+      return (
+        filteredLocations.find((l) => l.name.toLowerCase() === "los angeles") ??
+        filteredLocations[0] ??
+        allRegionGroups.usa[0] ??
+        list[0]
+      );
+    }
+    return (
+      filteredLocations.find((l) => l.name.toLowerCase() === "noida") ??
+      filteredLocations[0] ??
+      allRegionGroups.india[0] ??
+      list[0]
+    );
+  }, [selectedLocName, activeCountry, filteredLocations, allRegionGroups, list]);
 
   if (list.length === 0) return null;
 
@@ -265,98 +299,269 @@ export function LocationDirectory({
           </div>
         </div>
 
-        {/* Content Area */}
-        <div className="mt-5">
-          {filteredLocations.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-line bg-white p-8 text-center">
-              <p className="text-sm font-bold text-ink">No matching location found</p>
-              <p className="mt-1 text-xs text-ink-500">Try searching for a different city or reset the filters.</p>
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveCountry("all");
-                  setActiveLetter("ALL");
-                  setSearch("");
-                }}
-                className="btn btn-dark btn-xs mt-3"
-              >
-                Show all {list.length} locations
-              </button>
-            </div>
-          ) : activeCountry === "all" && currentLetter === "ALL" && !search ? (
-            /* DUAL REGION VIEW */
-            <div className="grid gap-6">
-              {/* India Section */}
-              {groupedByRegion.india.length > 0 && (
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-base">🇮🇳</span>
-                    <h3 className="font-display text-sm font-bold text-ink">India — Major Cities & Metros</h3>
-                    <span className="text-xs text-ink-400">({groupedByRegion.india.length} hubs)</span>
-                  </div>
+        {/* Content Area + Side Panel */}
+        <div className="mt-5 grid gap-6 lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_370px] lg:items-start">
+          <div>
+            {filteredLocations.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-line bg-white p-8 text-center">
+                <p className="text-sm font-bold text-ink">No matching location found</p>
+                <p className="mt-1 text-xs text-ink-500">Try searching for a different city or reset the filters.</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveCountry("all");
+                    setActiveLetter("ALL");
+                    setSearch("");
+                  }}
+                  className="btn btn-dark btn-xs mt-3"
+                >
+                  Show all {list.length} locations
+                </button>
+              </div>
+            ) : activeCountry === "all" && currentLetter === "ALL" && !search ? (
+              /* DUAL REGION VIEW */
+              <div className="grid gap-6">
+                {/* India Section */}
+                {groupedByRegion.india.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-base">🇮🇳</span>
+                      <h3 className="font-display text-sm font-bold text-ink">India — Major Cities & Metros</h3>
+                      <span className="text-xs text-ink-400">({groupedByRegion.india.length} hubs)</span>
+                    </div>
 
-                  <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                    {groupedByRegion.india.map((loc) => (
-                      <CityCard key={loc.url + loc.name} loc={loc} serviceName={serviceName} />
-                    ))}
+                    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                      {groupedByRegion.india.map((loc) => (
+                        <CityCard
+                          key={loc.url + loc.name}
+                          loc={loc}
+                          serviceName={serviceName}
+                          isSelected={selectedLoc?.name === loc.name}
+                          onSelect={() => setSelectedLocName(loc.name)}
+                        />
+                      ))}
+                    </div>
                   </div>
+                )}
+
+                {/* International Section */}
+                {groupedByRegion.global.length > 0 && (
+                  <div className="border-t border-line/70 pt-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-base">🇺🇸</span>
+                      <h3 className="font-display text-sm font-bold text-ink">United States & International Hubs</h3>
+                      <span className="text-xs text-ink-400">({groupedByRegion.global.length} hubs)</span>
+                    </div>
+
+                    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                      {groupedByRegion.global.map((loc) => (
+                        <CityCard
+                          key={loc.url + loc.name}
+                          loc={loc}
+                          serviceName={serviceName}
+                          isSelected={selectedLoc?.name === loc.name}
+                          onSelect={() => setSelectedLocName(loc.name)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* FILTERED GRID */
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                {filteredLocations.map((loc) => (
+                  <CityCard
+                    key={loc.url + loc.name}
+                    loc={loc}
+                    serviceName={serviceName}
+                    isSelected={selectedLoc?.name === loc.name}
+                    onSelect={() => setSelectedLocName(loc.name)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Right-hand Side Panel: Selected City Pages + India & USA Location Pages Index */}
+          <aside className="grid gap-4 lg:sticky lg:top-24 lg:self-start" aria-label="Created location pages">
+            {selectedLoc && (
+              <div className="rounded-2xl border border-brand/25 bg-white p-4 shadow-[var(--shadow-card)]">
+                <div className="flex items-start justify-between gap-2 border-b border-line pb-3">
+                  <div>
+                    <p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-brand">
+                      {getFlag(selectedLoc.country)} {selectedLoc.country} · Created Pages
+                    </p>
+                    <h3 className="mt-0.5 font-display text-base font-bold text-ink">{selectedLoc.name}</h3>
+                    {selectedLoc.state && selectedLoc.state !== selectedLoc.name && (
+                      <p className="text-[0.72rem] text-ink-500">{selectedLoc.state}</p>
+                    )}
+                  </div>
+                  <Link
+                    href={selectedLoc.url}
+                    className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-brand px-2.5 py-1 text-[0.7rem] font-bold text-white transition hover:bg-brand-600"
+                  >
+                    Open <Icon name="arrow-up-right" className="size-3" />
+                  </Link>
+                </div>
+
+                <ul className="mt-3 grid max-h-[260px] gap-1.5 overflow-y-auto pr-1" role="list">
+                  {(selectedLoc.pages && selectedLoc.pages.length > 0
+                    ? selectedLoc.pages
+                    : [{ title: selectedLoc.title || `${serviceName} in ${selectedLoc.name}`, url: selectedLoc.url, is_dedicated: true }]
+                  ).map((pg) => (
+                    <li key={pg.url}>
+                      <Link
+                        href={pg.url}
+                        className="group flex items-center justify-between gap-2 rounded-lg border border-line/70 bg-mist/40 px-2.5 py-2 text-xs transition hover:border-brand/40 hover:bg-brand-50/50"
+                      >
+                        <span className="min-w-0">
+                          <span className="block truncate font-semibold text-ink group-hover:text-brand">{pg.title}</span>
+                          <span className="block truncate text-[0.65rem] text-ink-500">{pg.url}</span>
+                        </span>
+                        <span
+                          className={cn(
+                            "shrink-0 rounded-full px-1.5 py-0.5 text-[0.6rem] font-bold uppercase",
+                            pg.is_dedicated ? "bg-teal/15 text-teal-700" : "bg-ink/5 text-ink-500",
+                          )}
+                        >
+                          {pg.is_dedicated ? "Published" : "Live"}
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Quick Directory: India & USA Location Pages */}
+            <div className="rounded-2xl border border-line bg-white p-4 shadow-xs">
+              <p className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-500">
+                India &amp; USA Location Pages
+              </p>
+
+              {allRegionGroups.india.length > 0 && (
+                <div className="mt-3">
+                  <div className="mb-1.5 flex items-center justify-between text-xs font-bold text-ink">
+                    <span>🇮🇳 India ({allRegionGroups.india.length})</span>
+                  </div>
+                  <ul className="grid max-h-[180px] gap-1 overflow-y-auto pr-1" role="list">
+                    {allRegionGroups.india.map((loc) => (
+                      <li key={`side-in-${loc.name}`} className="flex items-center justify-between gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedLocName(loc.name)}
+                          className={cn(
+                            "flex-1 truncate rounded-md px-2 py-1 text-left text-xs font-medium transition",
+                            selectedLoc?.name === loc.name
+                              ? "bg-brand-50 font-bold text-brand"
+                              : "text-ink-700 hover:bg-mist hover:text-ink",
+                          )}
+                        >
+                          {loc.name}
+                          {loc.pages && loc.pages.length > 0 && (
+                            <span className="ml-1 text-[0.65rem] text-ink-400">({loc.pages.length})</span>
+                          )}
+                        </button>
+                        <Link
+                          href={loc.url}
+                          className="shrink-0 rounded px-1.5 py-0.5 text-[0.68rem] font-semibold text-brand hover:bg-brand-50"
+                          title={loc.title || loc.name}
+                        >
+                          View →
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
 
-              {/* International Section */}
-              {groupedByRegion.global.length > 0 && (
-                <div className="border-t border-line/70 pt-5">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-base">🌐</span>
-                    <h3 className="font-display text-sm font-bold text-ink">International & North America Hubs</h3>
-                    <span className="text-xs text-ink-400">({groupedByRegion.global.length} hubs)</span>
+              {allRegionGroups.global.length > 0 && (
+                <div className="mt-3.5 border-t border-line pt-3">
+                  <div className="mb-1.5 flex items-center justify-between text-xs font-bold text-ink">
+                    <span>🇺🇸 USA &amp; Global ({allRegionGroups.global.length})</span>
                   </div>
-
-                  <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                    {groupedByRegion.global.map((loc) => (
-                      <CityCard key={loc.url + loc.name} loc={loc} serviceName={serviceName} />
+                  <ul className="grid gap-1" role="list">
+                    {allRegionGroups.global.map((loc) => (
+                      <li key={`side-us-${loc.name}`} className="flex items-center justify-between gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedLocName(loc.name)}
+                          className={cn(
+                            "flex-1 truncate rounded-md px-2 py-1 text-left text-xs font-medium transition",
+                            selectedLoc?.name === loc.name
+                              ? "bg-brand-50 font-bold text-brand"
+                              : "text-ink-700 hover:bg-mist hover:text-ink",
+                          )}
+                        >
+                          {getFlag(loc.country)} {loc.name}
+                          {loc.pages && loc.pages.length > 0 && (
+                            <span className="ml-1 text-[0.65rem] text-ink-400">({loc.pages.length})</span>
+                          )}
+                        </button>
+                        <Link
+                          href={loc.url}
+                          className="shrink-0 rounded px-1.5 py-0.5 text-[0.68rem] font-semibold text-brand hover:bg-brand-50"
+                          title={loc.title || loc.name}
+                        >
+                          View →
+                        </Link>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                 </div>
               )}
             </div>
-          ) : (
-            /* FILTERED GRID */
-            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {filteredLocations.map((loc) => (
-                <CityCard key={loc.url + loc.name} loc={loc} serviceName={serviceName} />
-              ))}
-            </div>
-          )}
+          </aside>
         </div>
       </div>
     </section>
   );
 }
 
-function CityCard({ loc, serviceName }: { loc: LocationItem; serviceName: string }) {
+function getFlag(country: string | null | undefined) {
+  const c = (country || "").toLowerCase();
+  if (c === "india") return "🇮🇳";
+  if (c === "australia") return "🇦🇺";
+  return "🇺🇸";
+}
+
+function CityCard({
+  loc,
+  serviceName,
+  isSelected,
+  onSelect,
+}: {
+  loc: LocationItem;
+  serviceName: string;
+  isSelected?: boolean;
+  onSelect?: () => void;
+}) {
   const badge = REGION_BADGES[loc.name.toLowerCase()] || [loc.state, loc.country].filter(Boolean).join(" · ");
-  const isIndia = (loc.country || "").toLowerCase() === "india";
+  const pageCount = loc.pages?.length ?? 0;
 
   return (
-    <Link
-      href={loc.url}
-      className="group relative flex flex-col justify-between rounded-xl border border-line bg-white p-3.5 sm:p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-sm"
+    <div
+      onMouseEnter={onSelect}
+      className={cn(
+        "group relative flex flex-col justify-between rounded-xl border bg-white p-3.5 sm:p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm",
+        isSelected ? "border-brand/60 ring-2 ring-brand/10" : "border-line hover:border-brand/40",
+      )}
     >
       <div>
         {/* Top Badges */}
         <div className="flex items-center justify-between gap-1.5 mb-2.5">
           <span className="inline-flex items-center gap-1 rounded-full bg-mist px-2 py-0.5 text-[0.65rem] font-semibold text-ink-600">
-            <span>{isIndia ? "🇮🇳" : loc.country?.toLowerCase() === "australia" ? "🇦🇺" : "🇺🇸"}</span>
+            <span>{getFlag(loc.country)}</span>
             {loc.country}
           </span>
           <span className="text-[0.62rem] font-bold text-teal tracking-wide uppercase">
-            {loc.type || "City"}
+            {pageCount > 0 ? `${pageCount} pages` : loc.type || "City"}
           </span>
         </div>
 
         {/* City Info with sleek Map Pin icon */}
-        <div className="flex items-start gap-2.5">
+        <Link href={loc.url} className="flex items-start gap-2.5">
           <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand mt-0.5 group-hover:bg-brand group-hover:text-white transition-colors duration-200">
             <Icon name="map-pin" className="size-3.5" />
           </div>
@@ -368,14 +573,40 @@ function CityCard({ loc, serviceName }: { loc: LocationItem; serviceName: string
               {badge}
             </p>
           </div>
-        </div>
+        </Link>
+
+        {/* Quick preview of top created pages for this location */}
+        {loc.pages && loc.pages.length > 0 && (
+          <div className="mt-2.5 flex flex-wrap gap-1">
+            {loc.pages.slice(0, 2).map((pg) => (
+              <Link
+                key={pg.url}
+                href={pg.url}
+                className="truncate max-w-full rounded-md bg-mist/70 px-1.5 py-0.5 text-[0.64rem] font-medium text-ink-600 transition hover:bg-brand-50 hover:text-brand"
+                title={pg.title}
+              >
+                {pg.service || pg.title}
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Footer Link */}
-      <div className="mt-3 flex items-center justify-between border-t border-line/60 pt-2 text-[0.72rem] font-semibold text-ink-600 group-hover:text-brand transition-colors">
-        <span className="truncate">{serviceName} in {loc.name}</span>
-        <Icon name="arrow-right" className="size-3 transition-transform duration-200 group-hover:translate-x-0.5" />
+      <div className="mt-3 flex items-center justify-between gap-2 border-t border-line/60 pt-2 text-[0.72rem] font-semibold text-ink-600">
+        <Link href={loc.url} className="truncate transition-colors hover:text-brand">
+          {serviceName} in {loc.name}
+        </Link>
+        {onSelect && (
+          <button
+            type="button"
+            onClick={onSelect}
+            className="shrink-0 text-[0.65rem] font-bold text-brand hover:underline"
+          >
+            Pages
+          </button>
+        )}
       </div>
-    </Link>
+    </div>
   );
 }

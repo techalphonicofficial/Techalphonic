@@ -246,13 +246,22 @@ export type PageData = Common & {
   testimonials?: Testimonial[];
 };
 
+export type LocationPageLink = {
+  title: string;
+  url: string;
+  service?: string | null;
+  is_dedicated?: boolean;
+};
+
 export type LocationItem = {
   name: string;
+  slug?: string;
   country: string;
   state: string | null;
   type: string;
   url: string;
   title?: string;
+  pages?: LocationPageLink[];
 };
 
 export type ServiceData = Common & {
@@ -309,6 +318,7 @@ export type LandingData = Common & {
   industries: Industry[];
   testimonials: Testimonial[];
   blogs: BlogCard[];
+  locations?: LocationItem[];
   blocks: Block[];
 };
 

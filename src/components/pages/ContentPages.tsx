@@ -341,7 +341,6 @@ export async function ServicePage({ data, seo }: { data: ServiceData; seo: Seo }
           ) : undefined
         }
       />
-
       {blocks.length > 0 ? (
         <Blocks blocks={blocks} />
       ) : (
@@ -389,7 +388,6 @@ export async function ServicePage({ data, seo }: { data: ServiceData; seo: Seo }
               </div>
             </section>
           )}
-
           {service.features.length > 0 && (
             <section className="section bg-mist">
               <div className="container-x">
@@ -407,7 +405,6 @@ export async function ServicePage({ data, seo }: { data: ServiceData; seo: Seo }
               </div>
             </section>
           )}
-
           {service.process.length > 0 && <DarkProcess eyebrow="How we work" title="A proven, transparent process" items={service.process} />}
 
           {service.technologies.length > 0 && (
@@ -544,6 +541,12 @@ export function LandingPage({ data, seo }: { data: LandingData; seo: Seo }) {
   const { page, service, location, industry, blocks } = data;
   const eyebrow = [service?.name, industry?.name, location?.name].filter(Boolean).join(" · ");
   const layout = page.hero_layout;
+  const locationsList = data.locations ?? [];
+  const currentLocationItem = location?.name
+    ? locationsList.find((l) => l.name.toLowerCase() === location.name.toLowerCase())
+    : undefined;
+  const indiaLocations = locationsList.filter((l) => (l.country || "").toLowerCase() === "india");
+  const usaLocations = locationsList.filter((l) => (l.country || "").toLowerCase() !== "india");
 
   return (
     <>
@@ -562,8 +565,86 @@ export function LandingPage({ data, seo }: { data: LandingData; seo: Seo }) {
 
       {data.content && (
         <section className="section">
-          <div className="container-x">
-            <Html as="article" html={data.content} className="prose-content mx-auto max-w-4xl" data-reveal="" />
+          <div className={cn("container-x", locationsList.length > 0 ? "grid gap-10 lg:grid-cols-[1fr_350px]" : "")}>
+            <Html as="article" html={data.content} className={cn("prose-content", locationsList.length === 0 && "mx-auto max-w-4xl")} data-reveal="" />
+            {locationsList.length > 0 && (
+              <aside className="grid content-start gap-5 lg:sticky lg:top-28 lg:self-start" aria-label="Location pages">
+                {currentLocationItem && currentLocationItem.pages && currentLocationItem.pages.length > 0 && (
+                  <div className="rounded-[1.5rem] border border-brand/20 bg-gradient-to-br from-brand-50/70 via-white to-teal-50/40 p-5 shadow-xs">
+                    <p className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-brand">
+                      Pages in {currentLocationItem.name}
+                    </p>
+                    <ul className="mt-3 grid gap-1.5" role="list">
+                      {currentLocationItem.pages.map((pg) => (
+                        <li key={pg.url}>
+                          <Link
+                            href={pg.url}
+                            className="group flex items-center justify-between gap-2 rounded-xl border border-line/70 bg-white px-3 py-2 text-xs font-semibold text-ink transition hover:border-brand/40 hover:text-brand"
+                          >
+                            <span className="truncate">{pg.title}</span>
+                            <Icon name="arrow-right" className="size-3.5 shrink-0 opacity-40 transition group-hover:translate-x-0.5 group-hover:opacity-100" />
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <div className="rounded-[1.5rem] border border-line bg-white p-5 shadow-xs">
+                  <p className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-ink-500">
+                    🇮🇳 India &amp; 🇺🇸 USA Location Pages
+                  </p>
+                  {indiaLocations.length > 0 && (
+                    <div className="mt-3">
+                      <p className="mb-1.5 text-xs font-bold text-ink">🇮🇳 India ({indiaLocations.length})</p>
+                      <ul className="grid max-h-[210px] gap-1 overflow-y-auto pr-1" role="list">
+                        {indiaLocations.map((loc) => {
+                          const active = location?.name && loc.name.toLowerCase() === location.name.toLowerCase();
+                          return (
+                            <li key={loc.url + loc.name}>
+                              <Link
+                                href={loc.url}
+                                className={cn(
+                                  "flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs transition",
+                                  active ? "bg-brand-50 font-bold text-brand" : "font-medium text-ink-700 hover:bg-mist hover:text-brand",
+                                )}
+                              >
+                                <span className="truncate">{loc.title || loc.name}</span>
+                                <Icon name="chevron-right" className="size-3.5 shrink-0 opacity-50" />
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  )}
+                  {usaLocations.length > 0 && (
+                    <div className="mt-4 border-t border-line pt-3">
+                      <p className="mb-1.5 text-xs font-bold text-ink">🇺🇸 USA &amp; Global ({usaLocations.length})</p>
+                      <ul className="grid gap-1" role="list">
+                        {usaLocations.map((loc) => {
+                          const active = location?.name && loc.name.toLowerCase() === location.name.toLowerCase();
+                          return (
+                            <li key={loc.url + loc.name}>
+                              <Link
+                                href={loc.url}
+                                className={cn(
+                                  "flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs transition",
+                                  active ? "bg-brand-50 font-bold text-brand" : "font-medium text-ink-700 hover:bg-mist hover:text-brand",
+                                )}
+                              >
+                                <span className="truncate">{loc.title || loc.name}</span>
+                                <Icon name="chevron-right" className="size-3.5 shrink-0 opacity-50" />
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </aside>
+            )}
           </div>
         </section>
       )}
@@ -696,6 +777,10 @@ export function LandingPage({ data, seo }: { data: LandingData; seo: Seo }) {
             </div>
           </div>
         </section>
+      )}
+
+      {locationsList.length > 0 && (
+        <LocationDirectory locations={locationsList} serviceName={service?.name || "SEO & Web Development"} />
       )}
 
       <EnquirySection heading={data.cta.heading} text={data.cta.text} service={service?.name} location={location?.name} formName="landing-page" />
