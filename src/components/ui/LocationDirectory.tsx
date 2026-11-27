@@ -151,7 +151,7 @@ export function LocationDirectory({
   const defaultSubtitle = `Explore our dedicated ${serviceName.toLowerCase()} solutions tailored for businesses across India, North America, and Australia.`;
 
   return (
-    <section className="py-7 sm:py-9 relative overflow-hidden bg-gradient-to-b from-mist/50 via-white to-mist/40 border-t border-line/80" id="locations">
+    <section className="py-7 sm:py-9 relative bg-gradient-to-b from-mist/50 via-white to-mist/40 border-t border-line/80" id="locations">
       <div className="container-x relative">
         {/* Header - Compact Spacing */}
         <div className="mx-auto max-w-3xl text-center mb-6" data-reveal="">
@@ -372,89 +372,107 @@ function CityCard({ loc, serviceName, hidden }: { loc: LocationItem; serviceName
   const visibleAreas = showAll ? areas : areas.slice(0, AREA_PREVIEW);
 
   return (
-    <div hidden={hidden} className="group relative flex flex-col justify-between rounded-xl border border-line bg-white p-3.5 sm:p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-sm">
-      <div>
-        {/* Top Badges */}
-        <div className="flex items-center justify-between gap-1.5 mb-2.5">
-          <span className="inline-flex items-center gap-1 rounded-full bg-mist px-2 py-0.5 text-[0.65rem] font-semibold text-ink-600">
-            <span>{getFlag(loc.country)}</span>
-            {loc.country}
-          </span>
-          <span className="text-[0.62rem] font-bold text-teal tracking-wide uppercase">
-            {loc.type || "City"}
-          </span>
-        </div>
-
-        {/* City Info with sleek Map Pin icon */}
-        <Link href={loc.url} className="flex items-start gap-2.5">
-          <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand mt-0.5 group-hover:bg-brand group-hover:text-white transition-colors duration-200">
+    <div
+      hidden={hidden}
+      onMouseLeave={() => setShowAll(false)}
+      className="group relative hover:z-40 focus-within:z-40"
+    >
+      {/* Compact City Name Trigger */}
+      <Link
+        href={loc.url}
+        className="flex items-center justify-between gap-2.5 rounded-xl border border-line bg-white px-3.5 py-2.5 transition-all duration-200 group-hover:border-brand/50 group-hover:bg-brand-50/20 group-hover:shadow-sm"
+      >
+        <div className="flex min-w-0 items-center gap-2.5">
+          <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand transition-colors duration-200 group-hover:bg-brand group-hover:text-white">
             <Icon name="map-pin" className="size-3.5" />
           </div>
-          <div className="min-w-0 flex-1">
-            <h4 className="font-display text-[0.92rem] font-bold text-ink transition-colors group-hover:text-brand truncate">
-              {loc.name}
-            </h4>
-            <p className="mt-0.5 text-[0.7rem] text-ink-500 leading-snug truncate">
+          <h4 className="truncate font-display text-[0.92rem] font-bold text-ink transition-colors group-hover:text-brand">
+            {loc.name}
+          </h4>
+        </div>
+        <Icon
+          name="chevron-down"
+          className="size-3.5 shrink-0 text-ink-400 transition-transform duration-200 group-hover:rotate-180 group-hover:text-brand"
+        />
+      </Link>
+
+      {/* Hover Popover Box with Other Details */}
+      <div className="pointer-events-none invisible absolute left-0 right-0 top-full z-40 pt-1.5 opacity-0 translate-y-1 transition-all duration-200 group-hover:pointer-events-auto group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
+        <div className="rounded-xl border border-brand/25 bg-white p-3.5 shadow-[var(--shadow-lift)] ring-1 ring-black/5">
+          {/* Top Badges */}
+          <div className="flex items-center justify-between gap-1.5 mb-2">
+            <span className="inline-flex items-center gap-1 rounded-full bg-mist px-2 py-0.5 text-[0.65rem] font-semibold text-ink-600">
+              <span>{getFlag(loc.country)}</span>
+              {loc.country}
+            </span>
+            <span className="text-[0.62rem] font-bold text-teal tracking-wide uppercase">
+              {loc.type || "City"}
+            </span>
+          </div>
+
+          {/* Region / Subtitle */}
+          {badge && (
+            <p className="text-[0.72rem] font-medium text-ink-500 leading-snug truncate">
               {badge}
             </p>
-          </div>
-        </Link>
+          )}
 
-        {/* City → areas: this service's page in each area */}
-        {areas.length > 0 ? (
-          <div className="mt-3">
-            <p className="text-[0.62rem] font-bold uppercase tracking-wide text-ink-500">Areas in {loc.name}</p>
-            <ul className="mt-1.5 flex flex-wrap gap-1" role="list">
-              {visibleAreas.map((area) => (
-                <li key={area.slug} className="max-w-full">
-                  <Link
-                    href={area.url}
-                    className="inline-flex max-w-full items-center gap-1 rounded-md bg-brand-50 px-2 py-1 text-[0.68rem] font-semibold text-brand transition hover:bg-brand hover:text-white"
-                  >
-                    <Icon name="map-pin" className="size-3 shrink-0" />
-                    <span className="truncate">{area.name}</span>
-                  </Link>
-                </li>
-              ))}
-              {areas.length > AREA_PREVIEW && (
-                <li>
-                  <button
-                    type="button"
-                    onClick={() => setShowAll((v) => !v)}
-                    aria-expanded={showAll}
-                    className="rounded-md px-2 py-1 text-[0.68rem] font-bold text-brand hover:underline"
-                  >
-                    {showAll ? "Show less" : `+${areas.length - AREA_PREVIEW} more`}
-                  </button>
-                </li>
-              )}
-            </ul>
-          </div>
-        ) : (
-          /* Quick preview of top created pages for this location */
-          loc.pages && loc.pages.length > 0 && (
-            <div className="mt-2.5 flex flex-wrap gap-1">
-              {loc.pages.slice(0, 2).map((pg) => (
-                <Link
-                  key={pg.url}
-                  href={pg.url}
-                  className="truncate max-w-full rounded-md bg-mist/70 px-1.5 py-0.5 text-[0.64rem] font-medium text-ink-600 transition hover:bg-brand-50 hover:text-brand"
-                  title={pg.title}
-                >
-                  {pg.service || pg.title}
-                </Link>
-              ))}
+          {/* City → areas: this service's page in each area */}
+          {areas.length > 0 ? (
+            <div className="mt-2.5">
+              <p className="text-[0.62rem] font-bold uppercase tracking-wide text-ink-500">Areas in {loc.name}</p>
+              <ul className="mt-1.5 flex flex-wrap gap-1" role="list">
+                {visibleAreas.map((area) => (
+                  <li key={area.slug} className="max-w-full">
+                    <Link
+                      href={area.url}
+                      className="inline-flex max-w-full items-center gap-1 rounded-md bg-brand-50 px-2 py-1 text-[0.68rem] font-semibold text-brand transition hover:bg-brand hover:text-white"
+                    >
+                      <Icon name="map-pin" className="size-3 shrink-0" />
+                      <span className="truncate">{area.name}</span>
+                    </Link>
+                  </li>
+                ))}
+                {areas.length > AREA_PREVIEW && (
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => setShowAll((v) => !v)}
+                      aria-expanded={showAll}
+                      className="rounded-md px-2 py-1 text-[0.68rem] font-bold text-brand hover:underline"
+                    >
+                      {showAll ? "Show less" : `+${areas.length - AREA_PREVIEW} more`}
+                    </button>
+                  </li>
+                )}
+              </ul>
             </div>
-          )
-        )}
-      </div>
+          ) : (
+            /* Quick preview of top created pages for this location */
+            loc.pages && loc.pages.length > 0 && (
+              <div className="mt-2.5 flex flex-wrap gap-1">
+                {loc.pages.slice(0, 2).map((pg) => (
+                  <Link
+                    key={pg.url}
+                    href={pg.url}
+                    className="truncate max-w-full rounded-md bg-mist/70 px-1.5 py-0.5 text-[0.64rem] font-medium text-ink-600 transition hover:bg-brand-50 hover:text-brand"
+                    title={pg.title}
+                  >
+                    {pg.service || pg.title}
+                  </Link>
+                ))}
+              </div>
+            )
+          )}
 
-      {/* Footer Link */}
-      <div className="mt-3 flex items-center justify-between gap-2 border-t border-line/60 pt-2 text-[0.72rem] font-semibold text-ink-600">
-        <Link href={loc.url} className="truncate transition-colors hover:text-brand">
-          {serviceName} in {loc.name}
-        </Link>
-        <Icon name="arrow-right" className="size-3.5 shrink-0 text-brand" />
+          {/* Footer Link */}
+          <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-line/60 pt-2 text-[0.72rem] font-semibold text-ink-600">
+            <Link href={loc.url} className="truncate transition-colors hover:text-brand">
+              {serviceName} in {loc.name}
+            </Link>
+            <Icon name="arrow-right" className="size-3.5 shrink-0 text-brand" />
+          </div>
+        </div>
       </div>
     </div>
   );
