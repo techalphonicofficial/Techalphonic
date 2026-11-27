@@ -186,7 +186,7 @@ export function LocationDirectory({
                       setActiveLetter("ALL");
                     }}
                     className={cn(
-                      "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all duration-150",
+                      "cursor-pointer flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all duration-150",
                       isActive
                         ? "bg-white text-ink shadow-xs ring-1 ring-black/5"
                         : "text-ink-600 hover:text-ink hover:bg-white/60"
@@ -221,7 +221,7 @@ export function LocationDirectory({
                 <button
                   type="button"
                   onClick={() => setSearch("")}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink"
+                  className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink"
                 >
                   <Icon name="x" className="size-3" />
                 </button>
@@ -239,7 +239,7 @@ export function LocationDirectory({
               type="button"
               onClick={() => setActiveLetter("ALL")}
               className={cn(
-                "rounded-md px-2 py-0.5 text-[0.72rem] font-bold transition",
+                "cursor-pointer rounded-md px-2 py-0.5 text-[0.72rem] font-bold transition",
                 currentLetter === "ALL"
                   ? "bg-brand text-white shadow-xs"
                   : "bg-mist/60 text-ink-600 hover:bg-mist hover:text-ink"
@@ -256,7 +256,7 @@ export function LocationDirectory({
                   type="button"
                   onClick={() => setActiveLetter(letter)}
                   className={cn(
-                    "size-6 rounded-md text-[0.72rem] font-bold transition flex items-center justify-center",
+                    "cursor-pointer size-6 rounded-md text-[0.72rem] font-bold transition flex items-center justify-center",
                     isSelected
                       ? "bg-brand text-white shadow-xs scale-105"
                       : "text-ink-700 hover:bg-brand-50 hover:text-brand"
@@ -275,7 +275,7 @@ export function LocationDirectory({
                   setActiveLetter("ALL");
                   setSearch("");
                 }}
-                className="ml-auto text-xs font-semibold text-brand hover:underline"
+                className="cursor-pointer ml-auto text-xs font-semibold text-brand hover:underline"
               >
                 Reset
               </button>
@@ -352,7 +352,7 @@ function CityGrid({ cities, serviceName }: { cities: LocationItem[]; serviceName
       </div>
       {cities.length > CITY_PREVIEW && (
         <div className="mt-4 text-center">
-          <button type="button" onClick={() => setShowAll((v) => !v)} aria-expanded={showAll} className="btn btn-secondary group">
+          <button type="button" onClick={() => setShowAll((v) => !v)} aria-expanded={showAll} className="btn btn-secondary cursor-pointer group">
             {showAll ? "Show less" : "Show more"}
             <Icon name="chevron-down" className={cn("size-4 transition-transform", showAll && "rotate-180")} />
           </button>
