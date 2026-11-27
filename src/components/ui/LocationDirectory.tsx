@@ -81,46 +81,108 @@ export function LocationDirectory({
     return counts;
   }, [list]);
 
-  // Active letters that have at least 1 city for current country selection
+  // One entry per country (same order as the tabs)
+  const allCountries = useMemo(
+    () =>
+      countryTabs
+        .filter(([key]) => key !== "all")
+        .map(([key, config]) => {
+          const allInCountry = list.filter((l) => (l.country || "").toLowerCase() === key);
+          const cityItems = allInCountry.filter((l) => l.type !== "country" && l.state);
+          const states = new Set(cityItems.map((l) => (l.state || "").trim().toLowerCase()).filter(Boolean));
+          return {
+            key,
+            ...config,
+            cities: allInCountry,
+            cityCount: cityItems.length,
+            stateCount: states.size,
+          };
+        })
+        .filter((g) => g.cities.length > 0),
+    [countryTabs, list],
+  );
+
+  // Whether we are in the top-level "All Hubs" country-only view (no search query active)
+  const isCountryOnlyView = activeCountry === "all" && !search.trim();
+
+  // Active letters in the A-Z strip:
+  // - In "All Hubs" view (no search): initials of the Countries
+  // - In a selected Country view (or search): initials of the States (or city/place if no states)
   const lettersWithCount = useMemo(() => {
+    const map = new Map<string, number>();
+
+    if (isCountryOnlyView) {
+      for (const c of allCountries) {
+        const first = (c.label || "").trim().charAt(0).toUpperCase();
+        if (first) {
+          map.set(first, (map.get(first) || 0) + 1);
+        }
+      }
+      return map;
+    }
+
     const pool =
       activeCountry === "all"
         ? list
         : list.filter((l) => (l.country || "").toLowerCase() === activeCountry.toLowerCase());
 
-    const map = new Map<string, number>();
+    const hasStateEntries = pool.some((l) => l.type !== "country" && Boolean(l.state));
+    const seenStates = new Set<string>();
+
     for (const loc of pool) {
-      const first = (loc.name || "").trim().charAt(0).toUpperCase();
-      if (first) {
-        map.set(first, (map.get(first) || 0) + 1);
+      if (hasStateEntries && loc.type === "country") continue;
+      if (loc.state && loc.type !== "country") {
+        const stateKey = `${(loc.country || "").toLowerCase()}|${loc.state.trim().toLowerCase()}`;
+        if (seenStates.has(stateKey)) continue;
+        seenStates.add(stateKey);
+        const first = loc.state.trim().charAt(0).toUpperCase();
+        if (first) {
+          map.set(first, (map.get(first) || 0) + 1);
+        }
+      } else {
+        const first = (loc.name || "").trim().charAt(0).toUpperCase();
+        if (first) {
+          map.set(first, (map.get(first) || 0) + 1);
+        }
       }
     }
     return map;
-  }, [list, activeCountry]);
+  }, [isCountryOnlyView, allCountries, list, activeCountry]);
 
   const sortedLetters = useMemo(() => {
     return Array.from(lettersWithCount.keys()).sort();
   }, [lettersWithCount]);
 
-  // Fall back to "ALL" if the selected letter is not present in the active country
+  // Fall back to "ALL" if the selected letter is not present in the active view
   const currentLetter = activeLetter !== "ALL" && !lettersWithCount.has(activeLetter) ? "ALL" : activeLetter;
 
-  // Filter locations by Country, Letter, and Search Query
+  // Filtered countries when "All Hubs" is active (no search query)
+  const visibleCountries = useMemo(() => {
+    if (currentLetter === "ALL") return allCountries;
+    return allCountries.filter((c) => (c.label || "").trim().charAt(0).toUpperCase() === currentLetter);
+  }, [allCountries, currentLetter]);
+
+  // Filter locations by Country, Letter, and Search Query (when inside a country or searching)
   const filteredLocations = useMemo(() => {
-    return list.filter((loc) => {
+    const pool =
+      activeCountry === "all"
+        ? list
+        : list.filter((l) => (l.country || "").toLowerCase() === activeCountry.toLowerCase());
+    const hasStateEntries = pool.some((l) => l.type !== "country" && Boolean(l.state));
+
+    return pool.filter((loc) => {
       const name = (loc.name || "").toLowerCase();
       const country = (loc.country || "").toLowerCase();
       const state = (loc.state || "").toLowerCase();
-      const first = (loc.name || "").trim().charAt(0).toUpperCase();
+      const itemInitial =
+        hasStateEntries && loc.state && loc.type !== "country"
+          ? loc.state.trim().charAt(0).toUpperCase()
+          : (loc.name || "").trim().charAt(0).toUpperCase();
 
-      // Country filter
-      if (activeCountry !== "all" && country !== activeCountry.toLowerCase()) {
-        return false;
-      }
-
-      // Letter filter
-      if (currentLetter !== "ALL" && first !== currentLetter) {
-        return false;
+      // Letter filter (keep hidden country hub in pool for crawlability; CityGrid hides it when states exist)
+      if (currentLetter !== "ALL") {
+        if (hasStateEntries && loc.type === "country") return false;
+        if (itemInitial !== currentLetter) return false;
       }
 
       // Search query
@@ -135,14 +197,15 @@ export function LocationDirectory({
     });
   }, [list, activeCountry, currentLetter, search]);
 
-  // One section per country (same order as the tabs) when "All" is active
-  const groupedByCountry = useMemo(
-    () =>
-      countryTabs
-        .filter(([key]) => key !== "all")
-        .map(([key, config]) => ({ key, ...config, cities: filteredLocations.filter((l) => (l.country || "").toLowerCase() === key) }))
-        .filter((g) => g.cities.length > 0),
-    [countryTabs, filteredLocations],
+  const totalInitialCount = useMemo(() => {
+    let sum = 0;
+    for (const count of lettersWithCount.values()) sum += count;
+    return sum;
+  }, [lettersWithCount]);
+
+  const activeCountryGroup = useMemo(
+    () => allCountries.find((c) => c.key === activeCountry.toLowerCase()),
+    [allCountries, activeCountry],
   );
 
   if (list.length === 0) return null;
@@ -245,7 +308,7 @@ export function LocationDirectory({
                   : "bg-mist/60 text-ink-600 hover:bg-mist hover:text-ink"
               )}
             >
-              All ({filteredLocations.length})
+              All ({totalInitialCount})
             </button>
 
             {sortedLetters.map((letter) => {
@@ -286,7 +349,7 @@ export function LocationDirectory({
         {/* Content Area */}
         <div className="mt-5">
           <div>
-            {filteredLocations.length === 0 ? (
+            {(isCountryOnlyView ? visibleCountries.length === 0 : filteredLocations.length === 0) ? (
               <div className="rounded-2xl border border-dashed border-line bg-white p-8 text-center">
                 <p className="text-sm font-bold text-ink">No matching location found</p>
                 <p className="mt-1 text-xs text-ink-500">Try searching for a different city or reset the filters.</p>
@@ -302,29 +365,109 @@ export function LocationDirectory({
                   Show all {list.length} locations
                 </button>
               </div>
-            ) : activeCountry === "all" && currentLetter === "ALL" && !search ? (
-              /* COUNTRY → CITY VIEW */
-              <div className="grid gap-6">
-                {groupedByCountry.map((group, i) => (
-                  <div key={group.key} className={cn(i > 0 && "border-t border-line/70 pt-5")}>
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-base">{group.flag}</span>
-                      <h3 className="font-display text-sm font-bold text-ink">{group.label} — Major Cities & Metros</h3>
-                      <span className="text-xs text-ink-400">({group.cities.length} {group.cities.length === 1 ? "hub" : "hubs"})</span>
-                    </div>
-
-                    <CityGrid cities={group.cities} serviceName={serviceName} />
-                  </div>
-                ))}
-              </div>
+            ) : isCountryOnlyView ? (
+              /* ALL HUBS VIEW: Show only Country cards; single-clicking a Country opens its States */
+              <>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {visibleCountries.map((country) => (
+                    <CountryCard
+                      key={country.key}
+                      flag={country.flag}
+                      label={country.label}
+                      stateCount={country.stateCount}
+                      cityCount={country.cityCount || country.cities.length}
+                      onSelect={() => {
+                        setActiveCountry(country.key);
+                        setActiveLetter("ALL");
+                      }}
+                    />
+                  ))}
+                </div>
+                {/* Keep all location links in the HTML so they remain crawlable by search engines. */}
+                <div hidden aria-hidden="true">
+                  {allCountries.map((group) => (
+                    <CityGrid key={group.key} cities={group.cities} serviceName={serviceName} />
+                  ))}
+                </div>
+              </>
             ) : (
-              /* FILTERED GRID */
-              <CityGrid key={`${activeCountry}|${currentLetter}|${search}`} cities={filteredLocations} serviceName={serviceName} />
+              /* SELECTED COUNTRY (OR SEARCH) VIEW: Show State cards; hovering a State shows its Cities */
+              <div>
+                {activeCountryGroup && (
+                  <div className="mb-3 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">{activeCountryGroup.flag}</span>
+                      <h3 className="font-display text-sm font-bold text-ink">
+                        {activeCountryGroup.label} — {activeCountryGroup.stateCount > 0 ? "States & Regions" : "Hubs"}
+                      </h3>
+                      <span className="text-xs text-ink-400">
+                        ({activeCountryGroup.stateCount > 0
+                          ? `${activeCountryGroup.stateCount} ${activeCountryGroup.stateCount === 1 ? "state" : "states"}`
+                          : `${activeCountryGroup.cities.length} ${activeCountryGroup.cities.length === 1 ? "hub" : "hubs"}`})
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveCountry("all");
+                        setActiveLetter("ALL");
+                      }}
+                      className="cursor-pointer inline-flex items-center gap-1 text-xs font-semibold text-brand hover:underline"
+                    >
+                      ← All countries
+                    </button>
+                  </div>
+                )}
+                <CityGrid key={`${activeCountry}|${currentLetter}|${search}`} cities={filteredLocations} serviceName={serviceName} />
+              </div>
             )}
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+/** Country card shown in the "All Hubs" view; single-click opens that country's states. */
+function CountryCard({
+  flag,
+  label,
+  stateCount,
+  cityCount,
+  onSelect,
+}: {
+  flag: string;
+  label: string;
+  stateCount: number;
+  cityCount: number;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className="group cursor-pointer flex w-full items-center justify-between gap-2.5 rounded-xl border border-line bg-white px-3.5 py-2.5 text-left transition-all duration-200 hover:border-brand/50 hover:bg-brand-50/20 hover:shadow-sm"
+    >
+      <div className="flex min-w-0 items-center gap-2.5">
+        <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-base transition-colors duration-200 group-hover:bg-brand group-hover:text-white">
+          <span>{flag}</span>
+        </div>
+        <h4 className="truncate font-display text-[0.92rem] font-bold text-ink transition-colors group-hover:text-brand">
+          {label}
+        </h4>
+      </div>
+      <span className="flex shrink-0 items-center gap-1.5">
+        <span className="rounded-full bg-black/5 px-1.5 text-[0.65rem] font-semibold text-ink-500">
+          {stateCount > 0
+            ? `${stateCount} ${stateCount === 1 ? "state" : "states"}`
+            : `${cityCount} ${cityCount === 1 ? "hub" : "hubs"}`}
+        </span>
+        <Icon
+          name="chevron-right"
+          className="size-3.5 text-ink-400 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-brand"
+        />
+      </span>
+    </button>
   );
 }
 
@@ -336,8 +479,8 @@ function getFlag(country: string | null | undefined) {
   return "🌐";
 }
 
-/** Cities shown before "Show more". */
-const CITY_PREVIEW = 4;
+/** States/cards shown before "Show more". */
+const CITY_PREVIEW = 12;
 
 type GridItem = { kind: "place"; loc: LocationItem } | { kind: "state"; name: string; cities: LocationItem[] };
 
