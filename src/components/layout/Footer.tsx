@@ -84,17 +84,17 @@ export function Footer({ layout }: { layout: Layout }) {
         </div>
 
         <div className="grid gap-7 py-6 lg:grid-cols-12 lg:gap-8 lg:py-7">
-          <div className="lg:col-span-4">
+          <div className="max-sm:flex max-sm:flex-col max-sm:items-center max-sm:text-center lg:col-span-4">
             <Logo settings={s} dark />
             {s.footer_about && <p className="mt-3.5 max-w-sm text-[0.86rem] leading-relaxed">{s.footer_about}</p>}
             {s.full_address && (
-              <address className="mt-3 flex max-w-sm gap-2.5 text-[0.86rem] not-italic leading-relaxed">
+              <address className="mt-3 flex max-w-sm gap-2.5 text-[0.86rem] not-italic leading-relaxed max-sm:justify-center">
                 <Icon name="map-pin" className="mt-1 size-4 shrink-0 text-teal-200" />
                 {s.full_address}
               </address>
             )}
             {layout.socials.length > 0 && (
-              <ul className="mt-4 flex flex-wrap gap-2" role="list">
+              <ul className="mt-4 flex flex-wrap gap-2 max-sm:justify-center" role="list">
                 {layout.socials.map((so) => (
                   <li key={so.url}>
                     <a
@@ -112,11 +112,11 @@ export function Footer({ layout }: { layout: Layout }) {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3 lg:col-span-8">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-5 max-sm:text-center sm:grid-cols-3 lg:col-span-8">
             {columns.map((col) => (
-              <nav key={col.label} aria-label={col.label}>
+              <nav key={col.label} aria-label={col.label} className="max-sm:text-center">
                 <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-white">{col.label}</p>
-                <ul className="mt-2.5 grid gap-1.5 text-[0.83rem]" role="list">
+                <ul className="mt-2.5 grid gap-1.5 text-[0.83rem] max-sm:justify-items-center" role="list">
                   {col.items.slice(0, 8).map((item, i) =>
                     item.url ? (
                       <li key={i}>
@@ -140,10 +140,10 @@ export function Footer({ layout }: { layout: Layout }) {
         </p>
       </div>
 
-      <div className="relative border-t border-white/10">
-        <div className="container-x flex flex-col items-center justify-between gap-3 py-4 text-[0.8rem] text-white/45 sm:flex-row">
+      <div className="relative border-t border-white/10 pb-20 lg:pb-0">
+        <div className="container-x flex flex-col items-center justify-between gap-3 py-4 text-[0.8rem] text-white/45 max-sm:text-center sm:flex-row">
           <p>{s.copyright}</p>
-          <ul className="flex flex-wrap items-center gap-x-6 gap-y-2" role="list">
+          <ul className="flex flex-wrap items-center gap-x-6 gap-y-2 max-sm:justify-center" role="list">
             {legal.map((item, i) => (
               <li key={i}>
                 <Link href={item.url ?? "#"} className="transition hover:text-white">

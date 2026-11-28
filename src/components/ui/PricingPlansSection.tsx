@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Icon } from "@/components/ui/Icon";
+import { MobileCardCarousel } from "@/components/ui/MobileCardCarousel";
 import type { Block } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -82,8 +83,12 @@ export function PricingPlansSection({ pricingBlocks }: { pricingBlocks: Block[] 
           </div>
         )}
 
-        {/* Pricing Cards Grid */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-stretch max-w-6xl mx-auto">
+        {/* Pricing Cards Grid (Desktop/Tablet) & Auto-Moving Single Card Dock (Mobile) */}
+        <MobileCardCarousel
+          resetKey={activeTabIdx}
+          slideClassName="pt-4"
+          gridClassName="grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-stretch max-w-6xl mx-auto"
+        >
           {plans.map((plan, i) => {
             const hot = Boolean(plan.featured);
             const features = String(plan.features ?? "").split(/\r?\n/).filter(Boolean);
@@ -175,7 +180,7 @@ export function PricingPlansSection({ pricingBlocks }: { pricingBlocks: Block[] 
               </div>
             );
           })}
-        </div>
+        </MobileCardCarousel>
 
         <p className="mt-8 text-center text-xs text-ink-400">
           * All pricing excludes 18% GST. Custom plans and enterprise deliverables are available upon consultation.

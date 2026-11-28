@@ -91,8 +91,8 @@ export function SectionHeading({
   children?: ReactNode;
 }) {
   return (
-    <div className={cn(align === "center" ? "mx-auto max-w-2xl text-center" : "max-w-2xl", "mb-6")} data-reveal="">
-      {eyebrow && <p className={cn("eyebrow", dark && "eyebrow-dark", align === "center" && "justify-center")}>{eyebrow}</p>}
+    <div className={cn(align === "center" ? "mx-auto max-w-2xl text-center" : "max-w-2xl max-sm:mx-auto max-sm:text-center", "mb-6")} data-reveal="">
+      {eyebrow && <p className={cn("eyebrow", dark && "eyebrow-dark", align === "center" ? "justify-center" : "max-sm:justify-center")}>{eyebrow}</p>}
       {title && (
         <h2 id={id} className={cn("h-section mt-2", dark && "text-white")}>
           {title}

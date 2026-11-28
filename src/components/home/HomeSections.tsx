@@ -4,6 +4,7 @@ import { Icon } from "@/components/ui/Icon";
 import { Img } from "@/components/ui/Img";
 import { BrandSquares, Html, QUOTE_PATH, Stars } from "@/components/ui/basics";
 import { BlogCard, ServiceCard } from "@/components/ui/cards";
+import { MobileCardCarousel } from "@/components/ui/MobileCardCarousel";
 import { CountUp, TabButton, TabGroup, TabPanel } from "@/components/ui/interactive";
 import { EnquirySection, FaqSection } from "@/components/ui/sections";
 import { getLayout } from "@/lib/api";
@@ -81,7 +82,7 @@ function Hero({ section, data }: P) {
         </div>
 
         <div className="container-x grid items-center gap-8 py-5 sm:py-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,25rem)] lg:gap-10 lg:py-7">
-          <div className="max-w-[44rem]">
+          <div className="max-w-[44rem] max-sm:mx-auto max-sm:text-center">
             {hero.badge && (
               <span className="badge-pill border-ink/10 bg-white/95 py-1 pl-1 pr-3.5 text-ink-700 shadow-[var(--shadow-xs)]" data-aos="fade-down">
                 <span className="grid size-6 place-items-center rounded-full bg-night text-amber">
@@ -102,12 +103,12 @@ function Hero({ section, data }: P) {
             )}
 
             {hero.description && (
-              <p className="mt-3 max-w-xl text-base leading-relaxed text-ink-600 sm:text-[1.05rem]" data-aos="fade-up" data-aos-delay="250">
+              <p className="mt-3 max-w-xl text-base leading-relaxed text-ink-600 max-sm:mx-auto sm:text-[1.05rem]" data-aos="fade-up" data-aos-delay="250">
                 {hero.description}
               </p>
             )}
 
-            <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3" data-aos="fade-up" data-aos-delay="350">
+            <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3 max-sm:justify-center" data-aos="fade-up" data-aos-delay="350">
               {hero.cta_text && (
                 <a href={toPopup ? "#enquiry-popup" : hero.cta_url!} {...(toPopup ? { "data-enquiry": "hero" } : {})} className="btn btn-primary btn-lg group pr-2" data-cta="hero-primary" data-magnetic="">
                   {hero.cta_text}
@@ -135,7 +136,7 @@ function Hero({ section, data }: P) {
             </div>
 
             {hero.trust_text && (
-              <div className="mt-5 inline-flex items-center gap-3 rounded-full border border-line bg-white/95 py-1.5 pl-3 pr-4" data-aos="fade-up" data-aos-delay="450">
+              <div className="mt-5 inline-flex items-center gap-3 rounded-full border border-line bg-white/95 py-1.5 pl-3 pr-4 max-sm:mx-auto max-sm:flex-wrap max-sm:justify-center max-sm:rounded-2xl max-sm:px-4 max-sm:py-2" data-aos="fade-up" data-aos-delay="450">
                 <span className="flex gap-0.5 text-amber" aria-hidden="true">
                   <Stars rating={5} />
                 </span>
@@ -181,7 +182,7 @@ function Hero({ section, data }: P) {
           <div className="container-x pb-6 lg:pb-7" data-aos="fade-up" data-aos-delay="300">
             <dl className="grid grid-cols-2 gap-y-5 border-t border-ink/10 pt-5 lg:grid-cols-4">
               {stats.map((s, i) => (
-                <div key={i} className={cn("px-4 sm:px-6", i % 2 ? "border-l border-ink/10" : "pl-0 sm:pl-0", i > 0 && i % 2 === 0 && "lg:border-l lg:border-ink/10 lg:pl-6")}>
+                <div key={i} className={cn("px-4 max-sm:px-2 max-sm:text-center sm:px-6", i % 2 ? "border-l border-ink/10" : "pl-0 sm:pl-0", i > 0 && i % 2 === 0 && "lg:border-l lg:border-ink/10 lg:pl-6")}>
                   <dd className="font-display text-[2.4rem] font-bold leading-none tracking-[-0.05em] text-ink sm:text-5xl">
                     <CountUp value={s.value} />
                     <span className="text-brand">{s.suffix ?? ""}</span>
@@ -345,16 +346,16 @@ function Services({ section, data }: P) {
     <section className="section relative" aria-labelledby="services-heading">
       <TabGroup initial="0">
         <div className="container-x">
-          <div className="mb-6 flex flex-col items-start justify-between gap-5 lg:flex-row lg:items-end">
+          <div className="mb-6 flex flex-col items-start justify-between gap-5 max-sm:items-center max-sm:text-center lg:flex-row lg:items-end">
             <div className="max-w-2xl" data-reveal="">
               {section.eyebrow && <p className="eyebrow">{section.eyebrow}</p>}
               <h2 id="services-heading" className="h-section mt-2">
                 {highlight(section.title)}
               </h2>
-              {section.subtitle && <p className="mt-2.5 max-w-xl text-[1.02rem] leading-relaxed text-ink-500">{section.subtitle}</p>}
+              {section.subtitle && <p className="mt-2.5 max-w-xl text-[1.02rem] leading-relaxed text-ink-500 max-sm:mx-auto">{section.subtitle}</p>}
             </div>
             {cats.length > 1 && (
-              <div className="inline-flex max-w-full shrink-0 overflow-x-auto rounded-full border border-line bg-mist p-1.5" role="tablist" aria-label="Service categories" data-reveal="">
+              <div className="inline-flex max-w-full shrink-0 overflow-x-auto rounded-full border border-line bg-mist p-1.5 max-sm:mx-auto" role="tablist" aria-label="Service categories" data-reveal="">
                 {cats.map((cat, i) => (
                   <TabButton key={cat.slug} id={String(i)} className="flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition" activeClass="bg-night text-white shadow-md" inactiveClass="text-ink-500 hover:text-ink">
                     <Icon name={cat.icon || "layers"} className="size-4" /> {cat.menu_label || cat.name}
@@ -366,44 +367,43 @@ function Services({ section, data }: P) {
 
           {cats.map((cat, i) => {
             const tileImage = i === 0 ? (image ?? cat.image) : (cat.image ?? image);
+            const featureTile = (
+              <Link href={cat.url} className="group relative isolate flex min-h-[18rem] sm:min-h-[20rem] flex-col justify-end overflow-hidden rounded-[var(--radius-card)] bg-night p-6 text-white max-sm:items-center max-sm:text-center sm:col-span-2 lg:row-span-2 lg:p-8" data-aos="zoom-in">
+                {tileImage && <Img media={tileImage} sizes="(min-width:1024px) 600px, 100vw" className="absolute inset-0 -z-10 size-full object-cover opacity-55 transition duration-[1.2s] group-hover:scale-105 group-hover:opacity-65" alt="" />}
+                <div className="absolute inset-0 -z-10 bg-gradient-to-t from-night via-night/70 to-night/10" />
+                <div className="mesh opacity-80">
+                  <span className="-right-24 -top-24 size-80 bg-teal/40" />
+                  <span className="-bottom-24 left-10 size-72 bg-amber/20 [animation-delay:-8s]" />
+                </div>
+                <span className="absolute right-6 top-6 grid size-11 place-items-center rounded-full border border-white/20 bg-white/15 transition duration-500 group-hover:rotate-45 group-hover:bg-white group-hover:text-night sm:right-8 sm:top-8 sm:size-12 lg:right-10 lg:top-10">
+                  <Icon name="arrow-up-right" className="size-5" />
+                </span>
+                <div className="max-sm:flex max-sm:flex-col max-sm:items-center">
+                  <span className="badge-pill border-white/20 bg-white/15 text-white">
+                    <Icon name={cat.icon || "layers"} className="size-3.5" /> {cat.services_count} services
+                  </span>
+                  <h3 className="mt-5 font-display text-[1.85rem] font-bold leading-[1.05] text-white sm:text-[2.5rem]" style={{ letterSpacing: "-0.045em" }}>
+                    {highlight(cat.heading)}
+                  </h3>
+                  {cat.short_description && <p className="mt-4 max-w-md text-[0.95rem] leading-relaxed text-white/75 sm:text-[0.98rem]">{cat.short_description}</p>}
+                  <span className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-white sm:mt-7">
+                    Explore {cat.name}
+                    <span className="h-px w-8 bg-white/60 transition-all duration-500 group-hover:w-14 group-hover:bg-amber" />
+                  </span>
+                </div>
+              </Link>
+            );
             return (
               <TabPanel key={cat.slug} id={String(i)}>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                  {/* Feature tile (bento anchor) */}
-                  <Link href={cat.url} className="group relative isolate flex min-h-[20rem] flex-col justify-end overflow-hidden rounded-[var(--radius-card)] bg-night p-6 text-white sm:col-span-2 lg:row-span-2 lg:p-8" data-aos="zoom-in">
-                    {tileImage && <Img media={tileImage} sizes="(min-width:1024px) 600px, 100vw" className="absolute inset-0 -z-10 size-full object-cover opacity-55 transition duration-[1.2s] group-hover:scale-105 group-hover:opacity-65" alt="" />}
-                  <div className="absolute inset-0 -z-10 bg-gradient-to-t from-night via-night/70 to-night/10" />
-                  <div className="mesh opacity-80">
-                    <span className="-right-24 -top-24 size-80 bg-teal/40" />
-                    <span className="-bottom-24 left-10 size-72 bg-amber/20 [animation-delay:-8s]" />
-                  </div>
-                  <span className="absolute right-8 top-8 grid size-12 place-items-center rounded-full border border-white/20 bg-white/15 transition duration-500 group-hover:rotate-45 group-hover:bg-white group-hover:text-night lg:right-10 lg:top-10">
-                    <Icon name="arrow-up-right" className="size-5" />
-                  </span>
-                  <div>
-                    <span className="badge-pill border-white/20 bg-white/15 text-white">
-                      <Icon name={cat.icon || "layers"} className="size-3.5" /> {cat.services_count} services
-                    </span>
-                    <h3 className="mt-5 font-display text-[2.1rem] font-bold leading-[1.05] text-white sm:text-[2.5rem]" style={{ letterSpacing: "-0.045em" }}>
-                      {highlight(cat.heading)}
-                    </h3>
-                    {cat.short_description && <p className="mt-4 max-w-md text-[0.98rem] leading-relaxed text-white/75">{cat.short_description}</p>}
-                    <span className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-white">
-                      Explore {cat.name}
-                      <span className="h-px w-8 bg-white/60 transition-all duration-500 group-hover:w-14 group-hover:bg-amber" />
-                    </span>
-                  </div>
-                </Link>
+                <MobileCardCarousel leadingSlot={featureTile} gridClassName="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  {cat.services.map((service, j) => (
+                    <ServiceCard key={service.url} service={service} index={j} />
+                  ))}
+                </MobileCardCarousel>
 
-                {/* 8 cards = 4 beside the 2×2 feature tile + one full row below */}
-                {cat.services.map((service, j) => (
-                  <ServiceCard key={service.url} service={service} index={j} />
-                ))}
-              </div>
-
-              <div className="relative mt-5 flex flex-col items-start justify-between gap-4 overflow-hidden rounded-[var(--radius-card)] bg-night px-5 py-4 text-white sm:flex-row sm:items-center sm:px-6">
+              <div className="relative mt-5 flex flex-col items-start justify-between gap-4 overflow-hidden rounded-[var(--radius-card)] bg-night px-5 py-4 text-white max-sm:items-center max-sm:text-center sm:flex-row sm:items-center sm:px-6">
                 <div className="bg-dots-dark pointer-events-none absolute inset-0 opacity-60 [mask-image:linear-gradient(to_left,black,transparent_70%)]" />
-                <div className="relative flex items-center gap-4">
+                <div className="relative flex items-center gap-4 max-sm:flex-col max-sm:text-center">
                   <span className="icon-tile icon-grad">
                     <Icon name="message" className="size-5" />
                   </span>
@@ -412,7 +412,7 @@ function Services({ section, data }: P) {
                     <p className="text-sm text-white/60">{c.help_text || "Tell us your goal — we’ll recommend the right mix, free."}</p>
                   </div>
                 </div>
-                <div className="relative flex flex-wrap gap-3">
+                <div className="relative flex flex-wrap gap-3 max-sm:w-full max-sm:justify-center">
                   <button type="button" data-enquiry="services-help" className="btn btn-light group">
                     {c.help_button_text || "Get expert advice"} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
                   </button>
@@ -446,7 +446,7 @@ function Promo({ section, data }: P) {
           </div>
           <div className="bg-grid absolute inset-0 -z-10" />
 
-          <div className="relative grid items-center gap-8 p-6 sm:p-8 lg:grid-cols-[1.2fr_1fr] lg:p-10">
+          <div className="relative grid items-center gap-8 p-6 max-sm:text-center sm:p-8 lg:grid-cols-[1.2fr_1fr] lg:p-10">
             <div>
               {section.eyebrow && (
                 <span className="badge-pill border-amber/30 bg-amber/10 text-amber">
@@ -456,9 +456,9 @@ function Promo({ section, data }: P) {
               <h2 id="promo-heading" className="mt-4 font-display font-bold leading-[1.04]" style={{ fontSize: "clamp(2rem, 1.2rem + 2.4vw, 3.3rem)", letterSpacing: "-0.045em" }}>
                 {highlight(section.title)}
               </h2>
-              {section.subtitle && <p className="mt-3 max-w-xl text-[1.02rem] leading-relaxed text-white/65">{section.subtitle}</p>}
+              {section.subtitle && <p className="mt-3 max-w-xl text-[1.02rem] leading-relaxed text-white/65 max-sm:mx-auto">{section.subtitle}</p>}
               {points.length > 0 && (
-                <ul className="mt-5 grid gap-2.5 sm:grid-cols-2" role="list">
+                <ul className="mt-5 grid gap-2.5 text-left sm:grid-cols-2" role="list">
                   {points.map((p, i) => (
                     <li key={i} className="flex items-start gap-2.5 text-[0.95rem] font-medium text-white/85" data-aos="fade-up" data-aos-delay={String(i * 70)}>
                       <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-teal/20 text-teal-200 ring-1 ring-teal/40">
@@ -469,7 +469,7 @@ function Promo({ section, data }: P) {
                   ))}
                 </ul>
               )}
-              <div className="mt-6 flex flex-wrap items-center gap-4">
+              <div className="mt-6 flex flex-wrap items-center gap-4 max-sm:justify-center">
                 {useLink ? (
                   <Link href={btnUrl} className="btn btn-light btn-lg group" data-cta="promo-banner">
                     {c.button_text || "Claim my free audit"} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
@@ -566,15 +566,15 @@ function About({ section, data }: P) {
             </div>
           )}
         </div>
-        <div className="order-1 lg:order-2" data-reveal="">
+        <div className="order-1 max-sm:text-center lg:order-2" data-reveal="">
           {section.eyebrow && <p className="eyebrow">{section.eyebrow}</p>}
           <h2 id="about-heading" className="h-section mt-2.5">
             {highlight(section.title)}
           </h2>
           {section.subtitle && <p className="mt-3 text-lg font-medium leading-relaxed text-ink-700">{section.subtitle}</p>}
-          <Html html={c.text} className="prose-content mt-3 !text-ink-500" />
+          <Html html={c.text} className="prose-content mt-3 !text-ink-500 max-sm:text-left" />
           {points.length > 0 && (
-            <ul className="mt-5 grid gap-x-6 gap-y-3 sm:grid-cols-2" role="list">
+            <ul className="mt-5 grid gap-x-6 gap-y-3 text-left sm:grid-cols-2" role="list">
               {points.map((p, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-brand-50 text-brand">
@@ -586,7 +586,7 @@ function About({ section, data }: P) {
             </ul>
           )}
           {c.cta_text && (
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap gap-3 max-sm:justify-center">
               <Link href={c.cta_url || data.links.about} className="btn btn-dark btn-lg group" data-cta="home-about">
                 {c.cta_text} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
               </Link>
@@ -607,7 +607,7 @@ function Showreel({ section, data }: P) {
   return (
     <section className="section relative overflow-hidden bg-white" aria-labelledby="showreel-heading">
       <div className="container-x relative">
-        <div className="mb-7 grid items-end gap-6 lg:grid-cols-[1.3fr_1fr]">
+        <div className="mb-7 grid items-end gap-6 max-sm:text-center lg:grid-cols-[1.3fr_1fr]">
           <div data-reveal="" data-aos="fade-right">
             {section.eyebrow && <p className="eyebrow">{section.eyebrow}</p>}
             <h2 id="showreel-heading" className="h-section mt-4">
@@ -615,7 +615,7 @@ function Showreel({ section, data }: P) {
             </h2>
           </div>
           {section.subtitle && (
-            <p className="max-w-md text-[1.05rem] leading-relaxed text-ink-500 lg:justify-self-end" data-reveal="" data-aos="fade-left">
+            <p className="max-w-md text-[1.05rem] leading-relaxed text-ink-500 max-sm:mx-auto lg:justify-self-end" data-reveal="" data-aos="fade-left">
               {section.subtitle}
             </p>
           )}
@@ -671,7 +671,7 @@ function Process({ section }: P) {
       <div className="bg-grid absolute inset-0 -z-10" />
 
       <div className="container-x">
-        <div className="mb-6 grid items-end gap-5 lg:grid-cols-[1.2fr_1fr]">
+        <div className="mb-6 grid items-end gap-5 max-sm:text-center lg:grid-cols-[1.2fr_1fr]">
           <div data-reveal="">
             {section.eyebrow && <p className="eyebrow">{section.eyebrow}</p>}
             <h2 id="process-heading" className="h-section mt-2">
@@ -679,7 +679,7 @@ function Process({ section }: P) {
             </h2>
           </div>
           {section.subtitle && (
-            <p className="max-w-md text-[1.02rem] leading-relaxed text-white/60 lg:justify-self-end" data-reveal="">
+            <p className="max-w-md text-[1.02rem] leading-relaxed text-white/60 max-sm:mx-auto lg:justify-self-end" data-reveal="">
               {section.subtitle}
             </p>
           )}
@@ -691,16 +691,16 @@ function Process({ section }: P) {
             <div className="scroll-fill h-full w-full bg-gradient-to-r from-teal via-teal-200 to-amber" />
           </div>
 
-          <ol className={cn("grid gap-5 md:grid-cols-2 lg:gap-6", cols)} role="list">
+          <MobileCardCarousel as="ol" dark gridClassName={cn("grid gap-5 md:grid-cols-2 lg:gap-6", cols)}>
             {steps.map((step, i) => (
               <li key={i} className="relative" data-reveal="stagger">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 max-sm:justify-center">
                   <span className="relative z-10 grid size-12 place-items-center rounded-full bg-night-800 text-teal-200 ring-1 ring-white/15">
                     <Icon name={step.icon ?? "sparkles"} className="size-5" />
                   </span>
                   <span className="relative z-10 rounded-full border border-white/10 bg-night-800 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-white/60">Step {String(i + 1).padStart(2, "0")}</span>
                 </div>
-                <div className="card-dark spotlight mt-4 overflow-hidden">
+                <div className="card-dark spotlight mt-4 overflow-hidden max-sm:text-center">
                   <span className="text-outline pointer-events-none absolute -right-2 -top-4 font-display text-[6.5rem] font-bold leading-none" style={{ "--stroke": "rgb(255 255 255 / 0.05)" } as React.CSSProperties} aria-hidden="true">
                     {i + 1}
                   </span>
@@ -709,10 +709,10 @@ function Process({ section }: P) {
                 </div>
               </li>
             ))}
-          </ol>
+          </MobileCardCarousel>
         </div>
 
-        <div className="mt-7 flex flex-wrap items-center gap-4" data-reveal="">
+        <div className="mt-7 flex flex-wrap items-center gap-4 max-sm:justify-center max-sm:text-center" data-reveal="">
           {section.content.cta_url && !String(section.content.cta_url).endsWith("#enquiry-popup") && section.content.cta_url !== "#enquire" ? (
             <Link href={String(section.content.cta_url)} className="btn btn-light btn-lg group">
               {section.content.cta_text || "Start with a free consultation"} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
@@ -735,7 +735,7 @@ function Industries({ section, data }: P) {
     <section className="section relative overflow-hidden bg-white" aria-labelledby="industries-heading">
       <div className="bg-dots pointer-events-none absolute inset-0 opacity-70 [mask-image:radial-gradient(ellipse_70%_60%_at_50%_100%,black,transparent)]" />
       <div className="container-x relative">
-        <div className="mb-6 grid items-end gap-5 lg:grid-cols-[1.2fr_1fr]">
+        <div className="mb-6 grid items-end gap-5 max-sm:text-center lg:grid-cols-[1.2fr_1fr]">
           <div data-reveal="" data-aos="fade-right">
             {section.eyebrow && <p className="eyebrow">{section.eyebrow}</p>}
             <h2 id="industries-heading" className="h-section mt-2">
@@ -743,7 +743,7 @@ function Industries({ section, data }: P) {
             </h2>
           </div>
           {section.subtitle && (
-            <p className="max-w-md text-[1.02rem] leading-relaxed text-ink-500 lg:justify-self-end lg:text-right" data-reveal="" data-aos="fade-left">
+            <p className="max-w-md text-[1.02rem] leading-relaxed text-ink-500 max-sm:mx-auto lg:justify-self-end lg:text-right" data-reveal="" data-aos="fade-left">
               {section.subtitle}
             </p>
           )}
@@ -751,12 +751,12 @@ function Industries({ section, data }: P) {
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5" role="list">
           {data.industries.map((industry) => (
             <li key={industry.id} data-reveal="stagger" data-aos="zoom-in">
-              <Link href={industry.url || data.links.industries} className="spotlight group flex h-full flex-col justify-between gap-6 rounded-2xl border border-line bg-white p-4 transition duration-300 hover:-translate-y-1 hover:border-transparent hover:shadow-[var(--shadow-lift)]">
-                <span className="flex items-start justify-between">
+              <Link href={industry.url || data.links.industries} className="spotlight group flex h-full flex-col justify-between gap-6 rounded-2xl border border-line bg-white p-4 transition duration-300 max-sm:items-center max-sm:gap-3 max-sm:text-center hover:-translate-y-1 hover:border-transparent hover:shadow-[var(--shadow-lift)]">
+                <span className="flex w-full items-start justify-between max-sm:justify-center max-sm:relative">
                   <span className="grid size-10 place-items-center rounded-xl bg-mist text-ink-700 transition group-hover:bg-night group-hover:text-teal-200">
                     <Icon name={industry.icon || "building"} className="size-5" />
                   </span>
-                  <Icon name="arrow-up-right" className="size-4 text-ink/20 transition duration-300 group-hover:rotate-45 group-hover:text-brand" />
+                  <Icon name="arrow-up-right" className="size-4 text-ink/20 transition duration-300 group-hover:rotate-45 group-hover:text-brand max-sm:hidden" />
                 </span>
                 <span className="font-display text-[1.02rem] font-semibold leading-snug tracking-[-0.02em] text-ink">{industry.name}</span>
               </Link>
@@ -783,13 +783,13 @@ function Technologies({ section }: P) {
       <TabGroup initial="0">
         <div className="container-x">
           <div className="grid gap-8 rounded-[2rem] border border-line bg-cloud p-6 sm:p-8 lg:grid-cols-[0.9fr_1.4fr] lg:p-10">
-            <div data-reveal="">
+            <div className="max-sm:text-center" data-reveal="">
               {section.eyebrow && <p className="eyebrow">{section.eyebrow}</p>}
               <h2 id="tech-heading" className="h-section mt-2">
                 {highlight(section.title)}
               </h2>
               {section.subtitle && <p className="mt-3 text-[1.02rem] leading-relaxed text-ink-500">{section.subtitle}</p>}
-              <div className="mt-5 flex flex-wrap gap-2" role="tablist">
+              <div className="mt-5 flex flex-wrap gap-2 max-sm:justify-center" role="tablist">
                 {[...groups.keys()].map((name, i) => (
                   <TabButton key={name} id={String(i)} className="rounded-full border px-4 py-2 text-sm font-semibold transition" activeClass="border-night bg-night text-white" inactiveClass="border-line bg-white text-ink-600 hover:border-ink/30">
                     {name}
@@ -825,8 +825,8 @@ function Portfolio({ section, data }: P) {
   return (
     <section className="section" aria-labelledby="work-heading">
       <div className="container-x">
-        <div className="mb-8 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
-          <div className="max-w-2xl" data-reveal="">
+        <div className="mb-8 flex flex-col items-start justify-between gap-6 max-sm:items-center max-sm:text-center md:flex-row md:items-end">
+          <div className="max-w-2xl max-sm:mx-auto" data-reveal="">
             {section.eyebrow && <p className="eyebrow">{section.eyebrow}</p>}
             <h2 id="work-heading" className="h-section mt-4">
               {highlight(section.title)}
@@ -841,40 +841,42 @@ function Portfolio({ section, data }: P) {
         {studies.length > 0 && <CaseStudyCards studies={studies} />}
 
         {portfolio.length > 0 && (
-          <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {portfolio.slice(0, studies.length ? 3 : 6).map((item) => {
-              const cat = (item.category ?? "").toLowerCase();
-              return (
-                <Link key={item.url} href={item.url} className="group relative block overflow-hidden rounded-[var(--radius-card)] bg-night ring-1 ring-ink/5" data-reveal="stagger" data-aos="zoom-in">
-                  <div className="aspect-[4/3]">
-                    {item.featured_image ? (
-                      <Img media={item.featured_image} sizes="(min-width:1024px) 400px, 50vw" className="size-full object-cover transition duration-700 group-hover:scale-105" />
-                    ) : (
-                      /* Branded placeholder until project images are uploaded */
-                      <div className="relative isolate size-full overflow-hidden bg-night">
-                        <div className="bg-grid absolute inset-0" />
-                        <div className="mesh">
-                          <span className="-right-12 -top-12 size-64 bg-teal/35 transition duration-700 group-hover:scale-125" />
-                          <span className="-bottom-16 -left-10 size-56 bg-amber/20" />
+          <div className="mt-6">
+            <MobileCardCarousel gridClassName="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {portfolio.slice(0, studies.length ? 3 : 6).map((item) => {
+                const cat = (item.category ?? "").toLowerCase();
+                return (
+                  <Link key={item.url} href={item.url} className="group relative block overflow-hidden rounded-[var(--radius-card)] bg-night ring-1 ring-ink/5" data-reveal="stagger" data-aos="zoom-in">
+                    <div className="aspect-[4/3]">
+                      {item.featured_image ? (
+                        <Img media={item.featured_image} sizes="(min-width:1024px) 400px, 50vw" className="size-full object-cover transition duration-700 group-hover:scale-105" />
+                      ) : (
+                        /* Branded placeholder until project images are uploaded */
+                        <div className="relative isolate size-full overflow-hidden bg-night">
+                          <div className="bg-grid absolute inset-0" />
+                          <div className="mesh">
+                            <span className="-right-12 -top-12 size-64 bg-teal/35 transition duration-700 group-hover:scale-125" />
+                            <span className="-bottom-16 -left-10 size-56 bg-amber/20" />
+                          </div>
+                          <div className="absolute left-6 top-6 grid size-12 place-items-center rounded-2xl border border-white/15 bg-white/10 text-teal-200 backdrop-blur">
+                            <Icon name={cat.includes("app") ? "smartphone" : cat.includes("seo") ? "trending-up" : "layout"} className="size-6" />
+                          </div>
                         </div>
-                        <div className="absolute left-6 top-6 grid size-12 place-items-center rounded-2xl border border-white/15 bg-white/10 text-teal-200 backdrop-blur">
-                          <Icon name={cat.includes("app") ? "smartphone" : cat.includes("seo") ? "trending-up" : "layout"} className="size-6" />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 bg-gradient-to-t from-night/90 via-night/50 to-transparent p-6 pt-20">
-                    <div className="transition duration-500 group-hover:-translate-y-1">
-                      <p className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-amber">{item.category}</p>
-                      <p className="mt-1 font-display text-xl font-bold leading-snug tracking-[-0.03em] text-white">{item.title}</p>
+                      )}
                     </div>
-                    <span className="grid size-11 shrink-0 place-items-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur transition duration-500 group-hover:rotate-45 group-hover:bg-white group-hover:text-night">
-                      <Icon name="arrow-up-right" className="size-4" />
-                    </span>
-                  </div>
-                </Link>
-              );
-            })}
+                    <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 bg-gradient-to-t from-night/90 via-night/50 to-transparent p-6 pt-20">
+                      <div className="transition duration-500 group-hover:-translate-y-1">
+                        <p className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-amber">{item.category}</p>
+                        <p className="mt-1 font-display text-xl font-bold leading-snug tracking-[-0.03em] text-white">{item.title}</p>
+                      </div>
+                      <span className="grid size-11 shrink-0 place-items-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur transition duration-500 group-hover:rotate-45 group-hover:bg-white group-hover:text-night">
+                        <Icon name="arrow-up-right" className="size-4" />
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </MobileCardCarousel>
           </div>
         )}
       </div>
@@ -887,12 +889,12 @@ export function CaseStudyCards({ studies }: { studies: CaseStudyCard[] }) {
   const count = studies.length;
   const solo = count === 1;
   return (
-    <div className={cn("grid gap-6", count === 2 ? "lg:grid-cols-2" : "lg:grid-cols-3")}>
+    <MobileCardCarousel gridClassName={cn("grid gap-6", count === 2 ? "lg:grid-cols-2" : "lg:grid-cols-3")}>
       {studies.map((study, i) => (
         <article
           key={study.url}
           className={cn(
-            "spotlight group flex flex-col overflow-hidden rounded-[var(--radius-card)] transition duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]",
+            "spotlight group relative flex flex-col overflow-hidden rounded-[var(--radius-card)] transition duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]",
             i === 0 && "section-dark",
             i === 0 && count > 2 && "lg:row-span-2",
             solo && "lg:col-span-3 lg:flex-row",
@@ -926,7 +928,7 @@ export function CaseStudyCards({ studies }: { studies: CaseStudyCard[] }) {
           </div>
         </article>
       ))}
-    </div>
+    </MobileCardCarousel>
   );
 }
 
@@ -943,14 +945,14 @@ function Testimonials({ section, data }: P) {
       </div>
 
       <div className="container-x">
-        <div className="mb-6 grid items-end gap-6 lg:grid-cols-[1.2fr_1fr]">
+        <div className="mb-6 grid items-end gap-6 max-sm:text-center lg:grid-cols-[1.2fr_1fr]">
           <div data-reveal="">
             {section.eyebrow && <p className="eyebrow">{section.eyebrow}</p>}
             <h2 id="testimonials-heading" className="h-section mt-2">
               {highlight(section.title)}
             </h2>
           </div>
-          <div className="lg:justify-self-end" data-reveal="">
+          <div className="max-sm:flex max-sm:flex-col max-sm:items-center lg:justify-self-end" data-reveal="">
             {section.subtitle && <p className="max-w-md text-[1.02rem] leading-relaxed text-white/60">{section.subtitle}</p>}
             {section.content.cta_url && !String(section.content.cta_url).endsWith("#enquiry-popup") && section.content.cta_url !== "#enquire" ? (
               <Link href={String(section.content.cta_url)} className="btn btn-light group mt-4">
@@ -1026,8 +1028,8 @@ function Blogs({ section, data }: P) {
   return (
     <section className="section" aria-labelledby="blogs-heading">
       <div className="container-x">
-        <div className="mb-8 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
-          <div className="max-w-2xl" data-reveal="">
+        <div className="mb-8 flex flex-col items-start justify-between gap-6 max-sm:items-center max-sm:text-center md:flex-row md:items-end">
+          <div className="max-w-2xl max-sm:mx-auto" data-reveal="">
             {section.eyebrow && <p className="eyebrow">{section.eyebrow}</p>}
             <h2 id="blogs-heading" className="h-section mt-4">
               {highlight(section.title)}
@@ -1038,11 +1040,11 @@ function Blogs({ section, data }: P) {
             {section.content.cta_text || "All articles"} <Icon name="arrow-right" className="size-4" />
           </Link>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <MobileCardCarousel gridClassName="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {data.blogs.map((post) => (
             <BlogCard key={post.url} post={post} />
           ))}
-        </div>
+        </MobileCardCarousel>
       </div>
     </section>
   );
@@ -1060,7 +1062,7 @@ function Stats({ section }: P) {
       <div className="container-x">
         <dl className="grid grid-cols-2 gap-y-10 lg:grid-cols-4">
           {items.map((s, i) => (
-            <div key={i} className={cn("px-4 sm:px-8", i % 2 && "border-l border-white/10", i > 0 && i % 2 === 0 && "lg:border-l lg:border-white/10")} data-reveal="stagger">
+            <div key={i} className={cn("px-4 max-sm:px-2 max-sm:text-center sm:px-8", i % 2 && "border-l border-white/10", i > 0 && i % 2 === 0 && "lg:border-l lg:border-white/10")} data-reveal="stagger">
               <dd className="h-mega text-[clamp(2.75rem,1.6rem+3.6vw,5rem)]">
                 <CountUp value={s.value} />
                 <span className="text-teal-200">{s.suffix}</span>

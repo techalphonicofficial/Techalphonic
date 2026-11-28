@@ -3,6 +3,7 @@ import { Icon } from "@/components/ui/Icon";
 import { Img } from "@/components/ui/Img";
 import { Html } from "@/components/ui/basics";
 import { BlogCard, ServiceCard, TestimonialCard } from "@/components/ui/cards";
+import { MobileCardCarousel } from "@/components/ui/MobileCardCarousel";
 import { CountUp } from "@/components/ui/interactive";
 import { Cta, EnquirySection, FaqSection } from "@/components/ui/sections";
 import type { Block, CaseStudyCard, Item } from "@/lib/types";
@@ -60,7 +61,7 @@ function BlockSection({ block }: { block: Block }) {
       )}
       <div className="container-x relative">
         {d.heading && !["hero", "image_text"].includes(block.type) && (
-          <div className={cn(center || CENTERED_TYPES.includes(block.type) ? "mx-auto max-w-3xl text-center" : "max-w-3xl", "mb-8")} data-reveal="">
+          <div className={cn(center || CENTERED_TYPES.includes(block.type) ? "mx-auto max-w-3xl text-center" : "max-w-3xl max-sm:mx-auto max-sm:text-center", "mb-8")} data-reveal="">
             {d.eyebrow && <p className={cn("eyebrow", dark && "eyebrow-dark")}>{d.eyebrow}</p>}
             <h2 className={cn("h-section mt-2.5", dark && "text-white")}>{highlight(d.heading)}</h2>
             {d.subheading && <p className={cn("mt-3 text-lg", dark ? "text-white/65" : "text-ink-500")}>{d.subheading}</p>}
@@ -80,13 +81,13 @@ export const BODIES: Record<string, (p: { block: Block }) => React.ReactNode> = 
     const img = media[d.image_id];
     return (
       <div className={cn("grid items-center gap-12", img && "lg:grid-cols-2", center && "text-center")}>
-        <div className={cn(center && !img && "mx-auto max-w-3xl")} data-reveal="">
+        <div className={cn(center ? "text-center" : "max-sm:text-center", center && !img && "mx-auto max-w-3xl")} data-reveal="">
           {d.eyebrow && <p className={cn("eyebrow", dark && "eyebrow-dark")}>{d.eyebrow}</p>}
           {d.heading && <h2 className={cn("h-display mt-4", dark && "text-white")}>{highlight(d.heading)}</h2>}
           {d.subheading && <p className={cn("mt-5 text-lg", dark ? "text-white/75" : "text-ink-600/80")}>{d.subheading}</p>}
-          <Html html={d.content} className={cn("prose-content mt-4", dark && "!text-white/80")} />
+          <Html html={d.content} className={cn("prose-content mt-4 max-sm:text-left", dark && "!text-white/80")} />
           {d.cta_text && (
-            <div className={cn("mt-8 flex flex-wrap gap-3", center && "justify-center")}>
+            <div className={cn("mt-8 flex flex-wrap gap-3", center ? "justify-center" : "max-sm:justify-center")}>
               <Link href={d.cta_url ?? "/contact/"} className="btn btn-primary btn-lg" data-cta="block-hero">
                 {d.cta_text} <Icon name="arrow-right" className="size-4" />
               </Link>
@@ -141,13 +142,13 @@ export const BODIES: Record<string, (p: { block: Block }) => React.ReactNode> = 
             </div>
           )}
         </div>
-        <div data-reveal="">
+        <div className="max-sm:text-center" data-reveal="">
           {d.eyebrow && <p className={cn("eyebrow", dark && "eyebrow-dark")}>{d.eyebrow}</p>}
           {d.heading && <h2 className={cn("h-section mt-4", dark && "text-white")}>{highlight(d.heading)}</h2>}
           {d.subheading && <p className={cn("mt-3 text-lg font-medium", dark ? "text-amber" : "text-ink")}>{d.subheading}</p>}
-          <Html html={d.content} className={cn("prose-content mt-4", dark && "!text-white/80")} />
+          <Html html={d.content} className={cn("prose-content mt-4 max-sm:text-left", dark && "!text-white/80")} />
           {points.length > 0 && (
-            <ul className="mt-6 grid gap-3" role="list">
+            <ul className="mt-6 grid gap-3 text-left" role="list">
               {points.map((p, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-brand text-white">
@@ -202,9 +203,9 @@ export const BODIES: Record<string, (p: { block: Block }) => React.ReactNode> = 
     const items = (d.items ?? []) as Item[];
     const cols = items.length % 3 === 0 ? "lg:grid-cols-3" : "lg:grid-cols-4";
     return (
-      <div className={cn("grid gap-5 sm:grid-cols-2", cols)}>
+      <MobileCardCarousel dark={dark} gridClassName={cn("grid gap-5 sm:grid-cols-2", cols)}>
         {items.map((item, i) => (
-          <div key={i} className={cn(dark ? "card-dark" : "card card-hover", "spotlight group")} data-reveal="stagger">
+          <div key={i} className={cn(dark ? "card-dark" : "card card-hover", "spotlight group max-sm:flex max-sm:flex-col max-sm:items-center max-sm:text-center")} data-reveal="stagger">
             <span className={cn("icon-tile", ["bg-brand-50 text-brand", "bg-teal-50 text-teal-700", "bg-amber-50 text-amber-600", "bg-mist text-ink"][i % 4])}>
               <Icon name={item.icon ?? "sparkles"} className="size-6" />
             </span>
@@ -217,7 +218,7 @@ export const BODIES: Record<string, (p: { block: Block }) => React.ReactNode> = 
             )}
           </div>
         ))}
-      </div>
+      </MobileCardCarousel>
     );
   },
 
@@ -255,15 +256,15 @@ export const BODIES: Record<string, (p: { block: Block }) => React.ReactNode> = 
   },
 
   process: ({ block: { data: d, dark } }) => (
-    <ol className="grid gap-6 md:grid-cols-2 lg:grid-cols-4" role="list">
+    <MobileCardCarousel as="ol" dark={dark} gridClassName="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
       {((d.items ?? []) as Item[]).map((step, i) => (
-        <li key={i} className={cn("spotlight rounded-2xl p-6", dark ? "border border-white/10 bg-white/5" : "border border-line bg-white")} data-reveal="stagger">
+        <li key={i} className={cn("spotlight rounded-2xl p-6 max-sm:text-center", dark ? "border border-white/10 bg-white/5" : "border border-line bg-white")} data-reveal="stagger">
           <span className={cn("font-display text-5xl font-extrabold", ["text-brand/20", "text-teal/25", "text-amber/30", "text-steel/25"][i % 4])}>{pad2(i + 1)}</span>
           <h3 className={cn("mt-2 text-lg font-bold", dark && "text-white")}>{step.title}</h3>
           <p className={cn("mt-2 text-[0.95rem]", dark ? "text-white/70" : "text-ink-600/80")}>{step.text}</p>
         </li>
       ))}
-    </ol>
+    </MobileCardCarousel>
   ),
 
   timeline: ({ block: { data: d, dark } }) => (
@@ -280,11 +281,11 @@ export const BODIES: Record<string, (p: { block: Block }) => React.ReactNode> = 
   ),
 
   testimonials: ({ block }) => (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <MobileCardCarousel dark={block.dark} gridClassName="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {(block.extra.testimonials ?? []).map((t: never, i: number) => (
         <TestimonialCard key={i} testimonial={t} />
       ))}
-    </div>
+    </MobileCardCarousel>
   ),
 
   case_studies: ({ block }) => <CaseStudyBlockCards studies={block.extra.studies ?? []} />,
@@ -475,11 +476,11 @@ export const BODIES: Record<string, (p: { block: Block }) => React.ReactNode> = 
 
   related_blogs: ({ block }) =>
     block.extra.posts?.length ? (
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <MobileCardCarousel dark={block.dark} gridClassName="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {block.extra.posts.map((post: never, i: number) => (
           <BlogCard key={i} post={post} />
         ))}
-      </div>
+      </MobileCardCarousel>
     ) : null,
 
   related_locations: ({ block: { extra, dark } }) =>
@@ -498,18 +499,18 @@ export const BODIES: Record<string, (p: { block: Block }) => React.ReactNode> = 
 
 function ServiceGrid({ services }: { services: { name: string; url: string; description: string | null; icon: string | null }[] }) {
   return (
-    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    <MobileCardCarousel gridClassName="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
       {services.map((s, i) => (
         <ServiceCard key={s.url} service={s} index={i} />
       ))}
-    </div>
+    </MobileCardCarousel>
   );
 }
 
 /** blocks/case_studies.blade.php */
 export function CaseStudyBlockCards({ studies }: { studies: CaseStudyCard[] }) {
   return (
-    <div className="grid gap-6 md:grid-cols-3">
+    <MobileCardCarousel gridClassName="grid gap-6 md:grid-cols-3">
       {studies.map((study) => (
         <Link key={study.url} href={study.url} className="card card-hover group flex flex-col" data-reveal="stagger">
           {study.featured_image && (
@@ -531,7 +532,7 @@ export function CaseStudyBlockCards({ studies }: { studies: CaseStudyCard[] }) {
           )}
         </Link>
       ))}
-    </div>
+    </MobileCardCarousel>
   );
 }
 

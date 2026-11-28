@@ -8,6 +8,7 @@ import { Icon } from "./Icon";
 import { Img } from "./Img";
 import { Breadcrumb, Html } from "./basics";
 import { FaqList } from "./interactive";
+import { MobileCardCarousel } from "./MobileCardCarousel";
 
 /** <x-cta>: dark | brand | light band */
 export async function Cta({
@@ -55,14 +56,14 @@ export async function Cta({
           ) : (
             <div className="bg-dots pointer-events-none absolute inset-0 opacity-60 [mask-image:linear-gradient(to_left,black,transparent_70%)]" />
           )}
-          <div className="relative flex flex-col items-start justify-between gap-10 lg:flex-row lg:items-center">
+          <div className="relative flex flex-col items-start justify-between gap-10 max-sm:items-center max-sm:text-center lg:flex-row lg:items-center">
             <div className="max-w-2xl">
               <h2 className={cn("font-display font-bold leading-[1.05]", dark ? "text-white" : "text-ink")} style={{ fontSize: "clamp(1.9rem, 1.2rem + 2vw, 3rem)", letterSpacing: "-0.045em" }}>
                 {highlight(resolvedHeading)}
               </h2>
               <p className={cn("mt-4 text-[1.075rem] leading-relaxed", dark ? "text-white/65" : "text-ink-500")}>{resolvedText}</p>
             </div>
-            <div className="flex w-full shrink-0 flex-col gap-3 sm:w-auto sm:flex-row">
+            <div className="flex w-full shrink-0 flex-col gap-3 max-sm:items-center sm:w-auto sm:flex-row">
               {toPopup ? (
                 <a href="#enquiry-popup" data-enquiry="cta-band" className={cn("btn btn-lg group", dark ? "btn-light" : "btn-primary")} data-cta="cta-band" data-magnetic="">
                   {buttonText} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
@@ -92,7 +93,7 @@ export async function FaqSection({ faqs, title = "Frequently asked questions", e
   return (
     <section className="section" aria-labelledby="faq-heading" id="faq">
       <div className="container-x grid gap-8 lg:grid-cols-[0.85fr_1.4fr] lg:gap-12">
-        <div className="lg:sticky lg:top-32 lg:self-start" data-reveal="">
+        <div className="max-sm:text-center lg:sticky lg:top-32 lg:self-start" data-reveal="">
           <p className="eyebrow">{eyebrow}</p>
           <h2 id="faq-heading" className="h-section mt-2.5">
             {highlight(title)}
@@ -101,7 +102,7 @@ export async function FaqSection({ faqs, title = "Frequently asked questions", e
           <div className="mt-5 rounded-2xl border border-line bg-cloud p-4">
             <p className="font-semibold text-ink">Still have questions?</p>
             <p className="mt-1 text-sm text-ink-500">Speak directly with a specialist.</p>
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="mt-4 flex flex-wrap gap-2 max-sm:justify-center">
               <a href="#enquire" className="btn btn-primary" data-cta="faq-ask">
                 Ask a question
               </a>
@@ -148,12 +149,12 @@ export async function EnquirySection({
       </div>
 
       <div className="container-x relative grid items-center gap-10 lg:grid-cols-[1fr_minmax(0,34rem)] lg:gap-12">
-        <div data-reveal="" data-aos="fade-right">
+        <div className="max-sm:text-center" data-reveal="" data-aos="fade-right">
           <p className="eyebrow">{eyebrow}</p>
           <h2 className="h-section mt-3">{highlight(heading || "Tell us about your project")}</h2>
-          <p className="mt-3.5 max-w-xl text-lg leading-relaxed text-ink-600">{text || "Get a free, no-obligation consultation. We’ll review your goals and come back with a clear plan, timeline and estimate."}</p>
+          <p className="mt-3.5 max-w-xl text-lg leading-relaxed text-ink-600 max-sm:mx-auto">{text || "Get a free, no-obligation consultation. We’ll review your goals and come back with a clear plan, timeline and estimate."}</p>
 
-          <ul className="mt-6 grid gap-3.5" role="list">
+          <ul className="mt-6 grid gap-3.5 text-left" role="list">
             {[
               ["Free strategy call with a specialist", "A 30-minute session focused on your goals."],
               ["Clear proposal within 48 hours", "Scope, timeline and transparent pricing."],
@@ -251,8 +252,8 @@ export function RelatedLinks({ groups }: { groups: LinkGroup[] }) {
     >
       <div className="container-x grid gap-8">
         {featuredGroup && (
-          <nav aria-label={featuredGroup.title} data-reveal="">
-            <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <nav className="min-w-0" aria-label={featuredGroup.title} data-reveal="">
+            <div className="mb-6 flex flex-wrap items-end justify-between gap-4 max-sm:flex-col max-sm:items-center max-sm:text-center">
               <div>
                 <p className="eyebrow">Explore More</p>
                 <h2 className="mt-2 font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">
@@ -265,7 +266,7 @@ export function RelatedLinks({ groups }: { groups: LinkGroup[] }) {
                   )}
                 </h2>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 max-sm:justify-center">
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-brand/20 bg-brand-50/80 px-3 py-1 text-xs font-bold text-brand">
                   <span className="size-1.5 rounded-full bg-brand" />
                   {featuredGroup.links.length} {featuredGroup.links.length === 1 ? "Service" : "Services"}
@@ -279,12 +280,12 @@ export function RelatedLinks({ groups }: { groups: LinkGroup[] }) {
               </div>
             </div>
 
-            <ul
-              className={cn(
+            <MobileCardCarousel
+              as="ul"
+              gridClassName={cn(
                 "grid gap-4 sm:grid-cols-2",
                 featuredGroup.links.length === 3 ? "lg:grid-cols-3" : "lg:grid-cols-4",
               )}
-              role="list"
             >
               {featuredGroup.links.map((link) => {
                 const iconName = inferLinkIcon(link, featuredGroup.title);
@@ -320,7 +321,7 @@ export function RelatedLinks({ groups }: { groups: LinkGroup[] }) {
                   </li>
                 );
               })}
-            </ul>
+            </MobileCardCarousel>
           </nav>
         )}
 
@@ -451,10 +452,10 @@ export async function PageHero({
       {!dark && <div className="absolute inset-x-0 bottom-0 -z-10 h-24 bg-gradient-to-t from-white/80 to-transparent" />}
 
       <div className={cn("container-x relative", lay === "minimal" ? "py-5 sm:py-7" : "py-6 sm:py-8 lg:py-9")}>
-        <Breadcrumb items={breadcrumbs} dark={dark} className="mb-4" />
+        <Breadcrumb items={breadcrumbs} dark={dark} className="mb-4 max-sm:[&_ol]:justify-center" />
 
-        <div className={cn("grid items-center gap-8", twoCol && "lg:grid-cols-[minmax(0,1.1fr)_minmax(0,28rem)] lg:gap-10", lay === "centered" && "mx-auto max-w-3xl text-center")}>
-          <div className={lay === "minimal" ? "max-w-3xl" : ""}>
+        <div className={cn("grid items-center gap-8", twoCol && "lg:grid-cols-[minmax(0,1.1fr)_minmax(0,28rem)] lg:gap-10", lay === "centered" ? "mx-auto max-w-3xl text-center" : "max-sm:text-center")}>
+          <div className={lay === "minimal" ? "max-w-3xl max-sm:mx-auto" : ""}>
             {eyebrow && (
               <p className={cn("eyebrow", dark && "eyebrow-dark", lay === "centered" && "justify-center")} data-aos="fade-down">
                 {eyebrow}
@@ -471,12 +472,12 @@ export async function PageHero({
             {intro && (
               <Html
                 html={intro}
-                className={cn("mt-3.5 max-w-2xl text-[1.075rem] leading-relaxed [&_a]:underline [&_p]:mb-3 [&_p:last-child]:mb-0", lay === "centered" && "mx-auto", dark ? "text-white/65" : "text-ink-500")}
+                className={cn("mt-3.5 max-w-2xl text-[1.075rem] leading-relaxed [&_a]:underline [&_p]:mb-3 [&_p:last-child]:mb-0 max-sm:mx-auto", lay === "centered" && "mx-auto", dark ? "text-white/65" : "text-ink-500")}
                 data-aos="fade-up"
                 data-aos-delay="200"
               />
             )}
-            <div className={cn("mt-6 flex flex-wrap gap-3", lay === "centered" && "justify-center")} data-aos="fade-up" data-aos-delay="280">
+            <div className={cn("mt-6 flex flex-wrap gap-3 max-sm:justify-center", lay === "centered" && "justify-center")} data-aos="fade-up" data-aos-delay="280">
               {hasActions ? (
                 actions || null
               ) : (
@@ -493,7 +494,7 @@ export async function PageHero({
               )}
             </div>
             {rich && !hasActions && lay !== "centered" && (
-              <ul className={cn("mt-6 flex flex-wrap gap-x-6 gap-y-3 text-sm", dark ? "text-white/60" : "text-ink-600")} role="list" data-aos="fade-up" data-aos-delay="340">
+              <ul className={cn("mt-6 flex flex-wrap gap-x-6 gap-y-3 text-sm max-sm:justify-center", dark ? "text-white/60" : "text-ink-600")} role="list" data-aos="fade-up" data-aos-delay="340">
                 {["Free consultation", "Transparent pricing", "Reply within 1 business day"].map((t) => (
                   <li key={t} className="flex items-center gap-2">
                     <Icon name="check-circle" className={cn("size-4", dark ? "text-teal-200" : "text-teal")} /> {t}

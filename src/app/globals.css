@@ -99,7 +99,7 @@
     .section-sm { @apply py-5 sm:py-6 lg:py-7; }
 
     /* Eyebrow: small label with a brand dash — calmer than a pill badge. */
-    .eyebrow { @apply inline-flex items-center gap-2.5 text-[0.75rem] font-bold uppercase tracking-[0.18em] text-brand-600; }
+    .eyebrow { @apply inline-flex items-center gap-2.5 text-[0.75rem] font-bold uppercase tracking-[0.18em] text-brand-600 max-sm:justify-center; }
     .eyebrow::before { content: ""; @apply h-[2px] w-6 rounded-full bg-gradient-to-r from-brand via-teal to-amber; }
     .eyebrow-dark { @apply text-teal-200; }
     .badge-pill { @apply inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold; }
@@ -252,6 +252,12 @@
     .fade-x::after { right: 0; background: linear-gradient(to left, #fff, transparent); }
     .animate-marquee,
     .animate-marquee-reverse { will-change: transform; backface-visibility: hidden; transform: translateZ(0); }
+
+    /* Mobile GPU carousel slides stay visible without reveal fade/jump during horizontal glide */
+    .mobile-carousel-track [data-reveal],
+    .mobile-carousel-track [data-aos] { opacity: 1 !important; transform: none !important; animation: none !important; }
+    .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
 }
 
 /*

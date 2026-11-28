@@ -3,6 +3,7 @@ import { Blocks } from "@/components/blocks/Blocks";
 import { Html } from "@/components/ui/basics";
 import { Icon } from "@/components/ui/Icon";
 import { Img } from "@/components/ui/Img";
+import { MobileCardCarousel } from "@/components/ui/MobileCardCarousel";
 import { PricingPlansSection } from "@/components/ui/PricingPlansSection";
 import { FaqSection } from "@/components/ui/sections";
 import { getLayout } from "@/lib/api";
@@ -180,11 +181,11 @@ export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
               </p>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
+            <MobileCardCarousel gridClassName="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
               {addOns.map((addon, i) => (
                 <div
                   key={i}
-                  className="group rounded-xl border border-line bg-white p-4.5 sm:p-5 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-sm"
+                  className="group rounded-xl border border-line bg-white p-4.5 sm:p-5 shadow-xs transition-all duration-200 max-sm:flex max-sm:flex-col max-sm:items-center max-sm:text-center hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-sm"
                 >
                   <div className="flex size-9 items-center justify-center rounded-lg bg-brand-50 text-brand group-hover:bg-brand group-hover:text-white transition-colors duration-200">
                     <Icon name={addon.icon || "sparkles"} className="size-4" />
@@ -195,7 +196,7 @@ export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
                   <p className="mt-1 text-xs text-ink-500 leading-snug">{addon.text}</p>
                 </div>
               ))}
-            </div>
+            </MobileCardCarousel>
           </div>
         </section>
       )}
@@ -217,11 +218,11 @@ export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
               </p>
             </div>
 
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
+            <MobileCardCarousel gridClassName="grid gap-5 sm:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
               {processSteps.map((step, i) => (
                 <div
                   key={i}
-                  className="relative rounded-2xl border border-line bg-white p-5 shadow-xs transition hover:border-brand/30"
+                  className="relative rounded-2xl border border-line bg-white p-5 shadow-xs transition max-sm:text-center hover:border-brand/30"
                 >
                   <span className="inline-flex size-8 items-center justify-center rounded-full bg-brand-50 text-xs font-extrabold text-brand mb-3">
                     0{i + 1}
@@ -230,7 +231,7 @@ export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
                   <p className="mt-1.5 text-xs text-ink-500 leading-relaxed">{step.text}</p>
                 </div>
               ))}
-            </div>
+            </MobileCardCarousel>
           </div>
         </section>
       )}
@@ -252,9 +253,9 @@ export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
               </p>
             </div>
 
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
+            <MobileCardCarousel gridClassName="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
               {trustPoints.map((pt, i) => (
-                <div key={i} className="rounded-2xl border border-line bg-white p-5 sm:p-6 shadow-xs">
+                <div key={i} className="rounded-2xl border border-line bg-white p-5 sm:p-6 shadow-xs max-sm:flex max-sm:flex-col max-sm:items-center max-sm:text-center">
                   <div className="flex size-9 items-center justify-center rounded-lg bg-brand-50 text-brand mb-3.5">
                     <Icon name={pt.icon || "shield-check"} className="size-4.5" />
                   </div>
@@ -262,7 +263,7 @@ export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
                   <p className="mt-1.5 text-xs text-ink-600 leading-relaxed">{pt.text}</p>
                 </div>
               ))}
-            </div>
+            </MobileCardCarousel>
           </div>
         </section>
       )}
@@ -293,7 +294,7 @@ export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
               </p>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-3 max-w-6xl mx-auto">
+            <MobileCardCarousel gridClassName="grid gap-6 md:grid-cols-3 max-w-6xl mx-auto">
               {testimonials.slice(0, testimonialLimit).map((t, i) => (
                 <div key={i} className="flex flex-col justify-between rounded-2xl border border-line bg-white p-6 shadow-xs">
                   <div>
@@ -319,7 +320,7 @@ export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
                   </div>
                 </div>
               ))}
-            </div>
+            </MobileCardCarousel>
           </div>
         </section>
       )}

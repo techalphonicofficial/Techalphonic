@@ -10,20 +10,20 @@ export function ServiceCard({ service, index = 0 }: { service: Service; index?: 
   return (
     <Link
       href={service.url}
-      className="spotlight group flex h-full flex-col rounded-[var(--radius-card)] border border-line bg-white p-5 sm:p-6 transition duration-300 hover:-translate-y-1 hover:border-transparent hover:shadow-[var(--shadow-lift)]"
+      className="spotlight group flex h-full flex-col rounded-[var(--radius-card)] border border-line bg-white p-5 sm:p-6 transition duration-300 max-sm:items-center max-sm:text-center hover:-translate-y-1 hover:border-transparent hover:shadow-[var(--shadow-lift)]"
       data-reveal="stagger"
     >
-      <span className="flex items-start justify-between">
+      <span className="flex w-full items-start justify-between max-sm:justify-center max-sm:relative">
         <span className="icon-tile bg-mist text-ink-700 transition duration-300 group-hover:bg-night group-hover:text-teal-200 group-hover:shadow-[0_10px_22px_-10px_rgb(6_20_24/0.6)]">
           <Icon name={service.icon || "sparkles"} className="size-[22px]" />
         </span>
-        <span className="font-display text-sm font-bold tabular-nums text-ink/20 transition group-hover:text-brand">{pad2(index + 1)}</span>
+        <span className="font-display text-sm font-bold tabular-nums text-ink/20 transition group-hover:text-brand max-sm:absolute max-sm:right-0 max-sm:top-0">{pad2(index + 1)}</span>
       </span>
       <h3 className="mt-4 text-[1.15rem] font-bold leading-snug tracking-[-0.03em]">{service.name}</h3>
       {service.description && <p className="mt-2 flex-1 text-[0.9rem] leading-relaxed text-ink-500">{limit(service.description, 120)}</p>}
       <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-ink transition group-hover:text-brand">
         Learn more
-        <Icon name="arrow-right" className="size-4 -translate-x-1 opacity-0 transition duration-300 group-hover:translate-x-0 group-hover:opacity-100" />
+        <Icon name="arrow-right" className="size-4 -translate-x-1 opacity-0 transition duration-300 group-hover:translate-x-0 group-hover:opacity-100 max-sm:translate-x-0 max-sm:opacity-100" />
       </span>
     </Link>
   );
