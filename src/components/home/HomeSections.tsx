@@ -228,57 +228,108 @@ function resolveClientUrl(raw?: string): string | null {
 function Clients({ section, data }: P) {
   const logos = (section.content.items ?? []) as { name?: string; logo_id?: number; url?: string }[];
   if (!logos.length) return null;
+
+  const hasCustomEyebrow = Boolean(section.eyebrow?.trim());
+  const eyebrow = hasCustomEyebrow ? section.eyebrow!.trim() : section.title?.trim() || "Our Valued Clients";
+  const heading = hasCustomEyebrow
+    ? section.title
+    : section.title?.trim().toLowerCase() === "our valued clients"
+      ? "Trusted by Industry Leaders"
+      : section.title;
+  const subtitle = section.subtitle?.trim();
+
   return (
-    <section className="border-b border-line bg-white py-4 sm:py-5" aria-label={section.title || "Clients"}>
+    <section className="border-b border-line/70 bg-white pt-8 pb-6 sm:pt-10 sm:pb-8" aria-label={eyebrow || heading || "Clients"}>
       <div className="container-x">
-        {section.title && (
-          <p className="flex items-center justify-center gap-4 text-center text-xs font-bold uppercase tracking-[0.2em] text-ink-500">
-            <span className="h-px w-10 bg-line" />
-            {section.title}
-            <span className="h-px w-10 bg-line" />
-          </p>
-        )}
-        <div className="fade-x relative mt-3 overflow-hidden">
-          <ul className="flex w-max animate-marquee items-center gap-14 py-2.5 hover:[animation-play-state:paused] motion-reduce:animate-none" role="list">
-            {[0, 1].map((pass) =>
-              logos.map((logo, i) => {
-                const m = media(data, logo.logo_id);
-                const href = resolveClientUrl(logo.url);
-                const external = Boolean(href && /^https?:\/\//i.test(href));
-                const inner = m ? (
-                  <Img
-                    media={m}
-                    alt={logo.name ?? ""}
-                    className="h-9 w-auto origin-center opacity-65 grayscale transition-all duration-300 ease-out group-hover:scale-125 group-hover:opacity-100 group-hover:grayscale-0"
-                    sizes="160px"
-                  />
-                ) : (
-                  <span className="font-display text-2xl font-bold tracking-[-0.04em] text-ink/35 transition-all duration-300 ease-out group-hover:scale-110 group-hover:text-ink">
-                    {logo.name}
-                  </span>
-                );
-                return (
-                  <li key={`${pass}-${i}`} aria-hidden={pass ? true : undefined} className="shrink-0">
-                    {href ? (
-                      <a
-                        href={href}
-                        target={external ? "_blank" : undefined}
-                        rel={external ? "noopener noreferrer" : undefined}
-                        tabIndex={pass ? -1 : undefined}
-                        aria-label={logo.name ? `Visit ${logo.name}` : "Visit client website"}
-                        title={logo.name || undefined}
-                        className="group inline-flex cursor-pointer items-center rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand"
-                      >
-                        {inner}
-                      </a>
-                    ) : (
-                      <span className="group inline-flex items-center">{inner}</span>
-                    )}
-                  </li>
-                );
-              }),
-            )}
-          </ul>
+        <div className="mx-auto max-w-2xl text-center">
+          {eyebrow && (
+            <p className="flex items-center justify-center gap-3.5 text-xs font-bold uppercase tracking-[0.2em] text-ink-600 sm:gap-4">
+              <span className="h-[2px] w-10 rounded-full bg-emerald-500/80 sm:w-14" aria-hidden="true" />
+              <span>{eyebrow}</span>
+              <span className="h-[2px] w-10 rounded-full bg-emerald-500/80 sm:w-14" aria-hidden="true" />
+            </p>
+          )}
+          {heading && (
+            <h2 className="mt-2.5 font-display text-2xl font-extrabold tracking-tight text-ink sm:text-[2.1rem]">
+              {highlight(heading)}
+            </h2>
+          )}
+          {subtitle && (
+            <p className="mt-1.5 text-sm font-medium text-ink-500 sm:text-[0.98rem]">
+              {subtitle}
+            </p>
+          )}
+        </div>
+
+        {/* Concave mint tray + floating white logo marquee bar */}
+        <div className="relative mt-6 px-3 pt-4 pb-3 sm:mt-7 sm:px-6 sm:pt-5 sm:pb-4">
+          <svg
+            className="pointer-events-none absolute inset-0 size-full"
+            viewBox="0 0 1200 120"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <defs>
+              <linearGradient id="clients-mint-tray" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#CBEFDF" />
+                <stop offset="22%" stopColor="#E4F8EF" />
+                <stop offset="50%" stopColor="#F1FCF7" />
+                <stop offset="78%" stopColor="#E4F8EF" />
+                <stop offset="100%" stopColor="#CBEFDF" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M 16,2 C 360,22 840,22 1184,2 C 1193,2 1200,9 1200,18 L 1200,94 C 1200,108 1190,116 1176,116 C 840,121 360,121 24,116 C 10,116 0,108 0,94 L 0,18 C 0,9 7,2 16,2 Z"
+              fill="url(#clients-mint-tray)"
+            />
+          </svg>
+
+          <div className="fade-x relative z-10 overflow-hidden rounded-2xl border border-emerald-100/90 bg-white/95 shadow-[0_12px_30px_-10px_rgb(16_38_46/0.12)]">
+            <ul className="flex w-max animate-marquee items-center py-3.5 hover:[animation-play-state:paused] motion-reduce:animate-none sm:py-4" role="list">
+              {[0, 1].map((pass) =>
+                logos.map((logo, i) => {
+                  const m = media(data, logo.logo_id);
+                  const href = resolveClientUrl(logo.url);
+                  const external = Boolean(href && /^https?:\/\//i.test(href));
+                  const inner = m ? (
+                    <Img
+                      media={m}
+                      alt={logo.name ?? ""}
+                      className="h-8 w-auto origin-center opacity-90 grayscale contrast-125 brightness-75 transition-all duration-300 ease-out group-hover:scale-125 group-hover:opacity-100 group-hover:grayscale-0 group-hover:contrast-100 group-hover:brightness-100 sm:h-9"
+                      sizes="160px"
+                    />
+                  ) : (
+                    <span className="font-display text-xl font-bold tracking-[-0.04em] text-ink-600 transition-all duration-300 ease-out group-hover:scale-110 group-hover:text-brand sm:text-2xl">
+                      {logo.name}
+                    </span>
+                  );
+                  return (
+                    <li
+                      key={`${pass}-${i}`}
+                      aria-hidden={pass ? true : undefined}
+                      className="flex shrink-0 items-center border-r border-line/80 px-7 sm:px-9"
+                    >
+                      {href ? (
+                        <a
+                          href={href}
+                          target={external ? "_blank" : undefined}
+                          rel={external ? "noopener noreferrer" : undefined}
+                          tabIndex={pass ? -1 : undefined}
+                          aria-label={logo.name ? `Visit ${logo.name}` : "Visit client website"}
+                          title={logo.name || undefined}
+                          className="group inline-flex cursor-pointer items-center rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand"
+                        >
+                          {inner}
+                        </a>
+                      ) : (
+                        <span className="group inline-flex items-center">{inner}</span>
+                      )}
+                    </li>
+                  );
+                }),
+              )}
+            </ul>
+          </div>
         </div>
       </div>
     </section>
