@@ -377,7 +377,7 @@ export const BODIES: Record<string, (p: { block: Block }) => React.ReactNode> = 
             media={logo}
             alt={item.title ?? ""}
             sizes="160px"
-            className="h-10 w-auto opacity-60 grayscale transition-all duration-300 hover:scale-110 hover:opacity-100 hover:grayscale-0"
+            className="h-10 w-auto transition-transform duration-300 hover:scale-110"
           />
         ) : (
           <span className="font-display text-lg font-bold text-steel/70 transition hover:text-brand">{item.title}</span>

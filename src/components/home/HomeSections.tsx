@@ -296,7 +296,7 @@ function Clients({ section, data }: P) {
                     <Img
                       media={m}
                       alt={logo.name ?? ""}
-                      className="h-8 w-auto origin-center opacity-90 grayscale contrast-125 brightness-75 transition-all duration-300 ease-out group-hover:scale-125 group-hover:opacity-100 group-hover:grayscale-0 group-hover:contrast-100 group-hover:brightness-100 sm:h-9"
+                      className="h-8 w-auto origin-center transition-transform duration-300 ease-out group-hover:scale-125 sm:h-9"
                       sizes="160px"
                     />
                   ) : (
