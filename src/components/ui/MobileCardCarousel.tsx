@@ -118,7 +118,6 @@ export function MobileCardCarousel({
     const t = e.touches[0];
     if (!t) return;
     touchStartRef.current = { x: t.clientX, y: t.clientY, lock: null };
-    setDragging(true);
     pauseTemporarily(8500);
   };
 
@@ -135,11 +134,12 @@ export function MobileCardCarousel({
     }
 
     if (start.lock === "y") {
-      setDragging(false);
-      setDragX(0);
+      if (dragging) setDragging(false);
+      if (dragX !== 0) setDragX(0);
       return;
     }
 
+    if (!dragging) setDragging(true);
     // Dampen rubber-band edges on first/last slide
     const isEdge = (safeActive === 0 && dx > 0) || (safeActive === total - 1 && dx < 0);
     setDragX(isEdge ? dx * 0.25 : dx);

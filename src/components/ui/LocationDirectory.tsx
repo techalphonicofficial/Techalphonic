@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import type { LocationItem } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -569,23 +569,85 @@ function StateCard({
   index: number;
   hidden?: boolean;
 }) {
-  // The city under the mouse; its places show in the right-hand panel.
+  // Desktop opens on mouse hover; touch opens on tap and highlights a city on 1st tap before navigating on 2nd tap.
+  const [open, setOpen] = useState(false);
   const [activeCity, setActiveCity] = useState<string | null>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const hasPlaces = cities.some((loc) => (loc.areas ?? []).length > 0);
 
+  useEffect(() => {
+    if (!open) return;
+    const handlePointerDown = (e: PointerEvent) => {
+      if (cardRef.current && !cardRef.current.contains(e.target as Node)) {
+        setOpen(false);
+        setActiveCity(null);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        setActiveCity(null);
+      }
+    };
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
+
   return (
-    <div hidden={hidden} onMouseLeave={() => setActiveCity(null)} className="group relative hover:z-40 focus-within:z-40">
+    <div
+      ref={cardRef}
+      hidden={hidden}
+      onPointerEnter={(e) => {
+        if (e.pointerType === "mouse") setOpen(true);
+      }}
+      onPointerLeave={(e) => {
+        if (e.pointerType === "mouse") {
+          setOpen(false);
+          setActiveCity(null);
+        }
+      }}
+      className={cn("group relative focus-within:z-40", open && "z-40")}
+    >
       {/* Compact State Name Trigger */}
       <button
         type="button"
+        aria-expanded={open}
         aria-haspopup="true"
-        className="cursor-pointer flex w-full items-center justify-between gap-2.5 rounded-xl border border-line bg-white px-3.5 py-2.5 text-left transition-all duration-200 group-hover:border-brand/50 group-hover:bg-brand-50/20 group-hover:shadow-sm"
+        onClick={() =>
+          setOpen((prev) => {
+            const next = !prev;
+            if (!next) setActiveCity(null);
+            return next;
+          })
+        }
+        className={cn(
+          "cursor-pointer flex w-full items-center justify-between gap-2.5 rounded-xl border bg-white px-3.5 py-2.5 text-left transition-all duration-200",
+          open
+            ? "border-brand/50 bg-brand-50/20 shadow-sm"
+            : "border-line hover:border-brand/50 hover:bg-brand-50/20 hover:shadow-sm",
+        )}
       >
         <div className="flex min-w-0 items-center gap-2.5">
-          <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand transition-colors duration-200 group-hover:bg-brand group-hover:text-white">
+          <div
+            className={cn(
+              "flex size-7 shrink-0 items-center justify-center rounded-lg transition-colors duration-200",
+              open ? "bg-brand text-white" : "bg-brand-50 text-brand group-hover:bg-brand group-hover:text-white",
+            )}
+          >
             <Icon name="map-pin" className="size-3.5" />
           </div>
-          <h4 className="truncate font-display text-[0.92rem] font-bold text-ink transition-colors group-hover:text-brand">{name}</h4>
+          <h4
+            className={cn(
+              "truncate font-display text-[0.92rem] font-bold transition-colors",
+              open ? "text-brand" : "text-ink group-hover:text-brand",
+            )}
+          >
+            {name}
+          </h4>
         </div>
         <span className="flex shrink-0 items-center gap-1.5">
           <span className="rounded-full bg-black/5 px-1.5 text-[0.65rem] font-semibold text-ink-500">
@@ -593,7 +655,10 @@ function StateCard({
           </span>
           <Icon
             name="chevron-down"
-            className="size-3.5 text-ink-400 transition-transform duration-200 group-hover:rotate-180 group-hover:text-brand"
+            className={cn(
+              "size-3.5 transition-transform duration-200",
+              open ? "rotate-180 text-brand" : "text-ink-400 group-hover:text-brand",
+            )}
           />
         </span>
       </button>
@@ -601,9 +666,11 @@ function StateCard({
       {/* Big dropdown: the cities inside this state */}
       <div
         className={cn(
-          "pointer-events-none invisible absolute left-0 right-0 top-full z-40 pt-1.5 opacity-0 translate-y-1 transition-all duration-200 sm:max-w-[calc(100vw-2.5rem)]",
+          "absolute left-0 right-0 top-full z-40 pt-1.5 transition-all duration-200 sm:max-w-[calc(100vw-2.5rem)]",
           hasPlaces ? "sm:w-[38rem]" : "sm:w-[20rem]",
-          "group-hover:pointer-events-auto group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100",
+          open
+            ? "pointer-events-auto visible translate-y-0 opacity-100"
+            : "pointer-events-none invisible translate-y-1 opacity-0 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100",
           dropdownSide(index),
         )}
       >
@@ -627,8 +694,16 @@ function StateCard({
                   <li key={loc.url + loc.name}>
                     <Link
                       href={loc.url}
-                      onMouseEnter={() => setActiveCity(key)}
-                      onFocus={() => setActiveCity(key)}
+                      aria-current={isActive ? "true" : undefined}
+                      onPointerEnter={(e) => {
+                        if (e.pointerType === "mouse") setActiveCity(key);
+                      }}
+                      onClick={(e) => {
+                        if (count > 0 && activeCity !== key) {
+                          e.preventDefault();
+                          setActiveCity(key);
+                        }
+                      }}
                       className={cn(
                         "flex items-center gap-2 rounded-lg border px-2.5 py-2 transition",
                         isActive ? "border-brand/40 bg-brand-50 text-brand" : "border-transparent text-ink hover:bg-mist/70",
@@ -636,7 +711,16 @@ function StateCard({
                     >
                       <Icon name="map-pin" className="size-3.5 shrink-0 text-brand" />
                       <span className="min-w-0 flex-1 truncate font-display text-[0.88rem] font-bold">{loc.name}</span>
-                      {count > 0 && <span className="shrink-0 rounded-full bg-black/5 px-1.5 text-[0.62rem] font-semibold text-ink-500">{count}</span>}
+                      {count > 0 && (
+                        <span
+                          className={cn(
+                            "shrink-0 rounded-full px-1.5 text-[0.62rem] font-semibold",
+                            isActive ? "bg-brand/15 text-brand" : "bg-black/5 text-ink-500",
+                          )}
+                        >
+                          {count}
+                        </span>
+                      )}
                       <Icon name={count > 0 ? "chevron-right" : "arrow-right"} className={cn("size-3.5 shrink-0", isActive ? "text-brand" : "text-ink-400")} />
                     </Link>
                   </li>
@@ -644,20 +728,29 @@ function StateCard({
               })}
             </ul>
 
-            {/* Places of the hovered city, big. Every city's list stays in the HTML (crawlable); only the hovered one shows. */}
+            {/* Places of the highlighted/hovered city, big. Every city's list stays in the HTML (crawlable); only the active one shows. */}
             {hasPlaces && (
               <div className="min-h-40 min-w-0 flex-1 border-line/70 sm:border-l sm:pl-4">
                 {!cities.some((loc) => (loc.slug ?? loc.name) === activeCity) && (
                   <div className="flex min-h-40 flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-line p-4 text-center">
                     <Icon name="map-pin" className="size-5 text-ink-400" />
-                    <p className="text-xs text-ink-500">Hover a city to see its places.</p>
+                    <p className="text-xs text-ink-500">Tap or hover a city to see its places.</p>
                   </div>
                 )}
                 {cities.map((loc) => {
                   const areas = loc.areas ?? [];
                   return (
                     <div key={loc.url + loc.name} hidden={activeCity !== (loc.slug ?? loc.name)}>
-                      <p className="mb-2 text-[0.68rem] font-bold uppercase tracking-wide text-ink-500">Places in {loc.name}</p>
+                      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-[0.68rem] font-bold uppercase tracking-wide text-ink-500">Places in {loc.name}</p>
+                        <Link
+                          href={loc.url}
+                          className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2 py-0.5 text-[0.65rem] font-semibold text-brand transition hover:bg-brand hover:text-white"
+                        >
+                          <span>Tap again or open {loc.name} page</span>
+                          <Icon name="arrow-right" className="size-3" />
+                        </Link>
+                      </div>
                       {areas.length > 0 ? (
                         <ul role="list" className="grid grid-cols-2 gap-1.5">
                           {areas.map((area) => (
@@ -692,38 +785,104 @@ function StateCard({
 const AREA_PREVIEW = 4;
 
 function CityCard({ loc, serviceName, hidden }: { loc: LocationItem; serviceName: string; hidden?: boolean }) {
+  const [open, setOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
   const badge = REGION_BADGES[loc.name.toLowerCase()] || [loc.state, loc.country].filter(Boolean).join(" · ");
   const areas = loc.areas ?? [];
+  const hasDetails = areas.length > 0 || (loc.pages?.length ?? 0) > 0;
   const visibleAreas = showAll ? areas : areas.slice(0, AREA_PREVIEW);
+
+  useEffect(() => {
+    if (!open) return;
+    const handlePointerDown = (e: PointerEvent) => {
+      if (cardRef.current && !cardRef.current.contains(e.target as Node)) {
+        setOpen(false);
+        setShowAll(false);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        setShowAll(false);
+      }
+    };
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
 
   return (
     <div
+      ref={cardRef}
       hidden={hidden}
-      onMouseLeave={() => setShowAll(false)}
-      className="group relative hover:z-40 focus-within:z-40"
+      onPointerEnter={(e) => {
+        if (e.pointerType === "mouse") setOpen(true);
+      }}
+      onPointerLeave={(e) => {
+        if (e.pointerType === "mouse") {
+          setOpen(false);
+          setShowAll(false);
+        }
+      }}
+      className={cn("group relative focus-within:z-40", open && "z-40")}
     >
       {/* Compact City Name Trigger */}
       <Link
         href={loc.url}
-        className="flex items-center justify-between gap-2.5 rounded-xl border border-line bg-white px-3.5 py-2.5 transition-all duration-200 group-hover:border-brand/50 group-hover:bg-brand-50/20 group-hover:shadow-sm"
+        aria-expanded={hasDetails ? open : undefined}
+        onClick={(e) => {
+          if (!open && hasDetails) {
+            e.preventDefault();
+            setOpen(true);
+          }
+        }}
+        className={cn(
+          "flex items-center justify-between gap-2.5 rounded-xl border bg-white px-3.5 py-2.5 transition-all duration-200",
+          open
+            ? "border-brand/50 bg-brand-50/20 shadow-sm"
+            : "border-line hover:border-brand/50 hover:bg-brand-50/20 hover:shadow-sm",
+        )}
       >
         <div className="flex min-w-0 items-center gap-2.5">
-          <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand transition-colors duration-200 group-hover:bg-brand group-hover:text-white">
+          <div
+            className={cn(
+              "flex size-7 shrink-0 items-center justify-center rounded-lg transition-colors duration-200",
+              open ? "bg-brand text-white" : "bg-brand-50 text-brand group-hover:bg-brand group-hover:text-white",
+            )}
+          >
             <Icon name="map-pin" className="size-3.5" />
           </div>
-          <h4 className="truncate font-display text-[0.92rem] font-bold text-ink transition-colors group-hover:text-brand">
+          <h4
+            className={cn(
+              "truncate font-display text-[0.92rem] font-bold transition-colors",
+              open ? "text-brand" : "text-ink group-hover:text-brand",
+            )}
+          >
             {loc.name}
           </h4>
         </div>
         <Icon
           name="chevron-down"
-          className="size-3.5 shrink-0 text-ink-400 transition-transform duration-200 group-hover:rotate-180 group-hover:text-brand"
+          className={cn(
+            "size-3.5 shrink-0 transition-transform duration-200",
+            open ? "rotate-180 text-brand" : "text-ink-400 group-hover:text-brand",
+          )}
         />
       </Link>
 
-      {/* Hover Popover Box with Other Details */}
-      <div className="pointer-events-none invisible absolute left-0 right-0 top-full z-40 pt-1.5 opacity-0 translate-y-1 transition-all duration-200 group-hover:pointer-events-auto group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
+      {/* Hover / Tap Popover Box with Other Details */}
+      <div
+        className={cn(
+          "absolute left-0 right-0 top-full z-40 pt-1.5 transition-all duration-200",
+          open
+            ? "pointer-events-auto visible translate-y-0 opacity-100"
+            : "pointer-events-none invisible translate-y-1 opacity-0 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100",
+        )}
+      >
         <div className="rounded-xl border border-brand/25 bg-white p-3.5 shadow-[var(--shadow-lift)] ring-1 ring-black/5">
           {/* Top Badges */}
           <div className="flex items-center justify-between gap-1.5 mb-2">

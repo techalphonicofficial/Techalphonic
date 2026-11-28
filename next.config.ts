@@ -1,4 +1,10 @@
+import { networkInterfaces } from "node:os";
 import type { NextConfig } from "next";
+
+const lanHosts = Object.values(networkInterfaces())
+  .flat()
+  .filter((n): n is NonNullable<typeof n> => Boolean(n && n.family === "IPv4" && !n.internal))
+  .map((n) => n.address);
 
 /**
  * Next.js serves the public website; Laravel (../backend) is the backend + admin panel.
@@ -15,6 +21,7 @@ const BACKEND = process.env.BACKEND_URL.trim().replace(/\/$/, "");
 const ADMIN_PATH = process.env.ADMIN_PATH?.trim() || "admin";
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ["localhost", "127.0.0.1", "192.168.*", ...lanHosts],
   experimental: {
     agentUpgrade: "security",
   },
