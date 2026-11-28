@@ -172,7 +172,7 @@
     .section-dark .spotlight::after { background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), color-mix(in oklab, var(--color-teal) 85%, transparent), transparent 70%); }
 
     /* Ambient colour mesh for heroes and dark panels: radial-gradient mask avoids heavy GPU blur-3xl shaders during scroll. */
-    .mesh { @apply pointer-events-none absolute inset-0 -z-10 overflow-hidden; }
+    .mesh { @apply pointer-events-none absolute inset-0 -z-10 overflow-hidden; contain: strict; transform: translateZ(0); }
     .mesh > span {
         position: absolute;
         display: block;
@@ -221,12 +221,16 @@
             linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
         background-size: 64px 64px;
         mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, #000 40%, transparent 100%);
+        contain: strict;
+        transform: translateZ(0);
     }
     .bg-grid-light {
         background-image: linear-gradient(to right, rgb(22 123 139 / 0.06) 1px, transparent 1px),
             linear-gradient(to bottom, rgb(22 123 139 / 0.06) 1px, transparent 1px);
         background-size: 56px 56px;
         mask-image: radial-gradient(ellipse 80% 70% at 50% 0%, #000 30%, transparent 100%);
+        contain: strict;
+        transform: translateZ(0);
     }
     .bg-dots { background-image: radial-gradient(rgb(10 12 18 / 0.08) 1px, transparent 1px); background-size: 22px 22px; }
     .bg-dots-dark { background-image: radial-gradient(rgb(255 255 255 / 0.09) 1px, transparent 1px); background-size: 22px 22px; }
@@ -240,8 +244,14 @@
     .ring-gradient { position: relative; }
     .ring-gradient::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; background: linear-gradient(140deg, rgb(22 123 139 / .5), rgb(83 175 190 / .3) 45%, rgb(254 180 73 / .35)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
 
-    /* Edge fade for horizontal marquees */
-    .fade-x { mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent); }
+    /* Edge fade for horizontal marquees (edge overlays avoid per-frame full-track alpha masking) */
+    .fade-x { position: relative; }
+    .fade-x::before,
+    .fade-x::after { content: ""; position: absolute; top: 0; bottom: 0; width: 3.5rem; pointer-events: none; z-index: 2; }
+    .fade-x::before { left: 0; background: linear-gradient(to right, #fff, transparent); }
+    .fade-x::after { right: 0; background: linear-gradient(to left, #fff, transparent); }
+    .animate-marquee,
+    .animate-marquee-reverse { will-change: transform; backface-visibility: hidden; transform: translateZ(0); }
 }
 
 /*

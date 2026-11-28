@@ -84,7 +84,7 @@ export function Header({ pathname }: { pathname: string }) {
     <header className="sticky top-0 z-50 h-[68px] lg:h-[110px] pointer-events-none">
       <div
         className={cn(
-          "will-change-transform transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          "transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
           scrolled ? "lg:-translate-y-[30px]" : "lg:translate-y-0",
         )}
       >
@@ -134,12 +134,12 @@ export function Header({ pathname }: { pathname: string }) {
           </div>
         </div>
 
-        {/* Main bar: single morphing container (concrete 100vw → 1240px and 0px → 35px radius so CSS interpolates smoothly) */}
+        {/* Main bar: omit max-width from CSS transitions to prevent scroll-start layout reflows */}
         <div
           className={cn(
-            "pointer-events-auto mx-auto transition-[max-width,border-radius,background-color,border-color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+            "pointer-events-auto mx-auto transition-[border-radius,background-color,border-color,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
             scrolled
-              ? "max-w-[100vw] border-b border-line/80 bg-white/95 shadow-[0_10px_28px_-14px_rgb(6_20_24/0.18)] backdrop-blur-md lg:max-w-[min(1240px,calc(100vw-2rem))] lg:rounded-[35px] lg:border lg:border-ink/[0.08] lg:bg-white/95 lg:shadow-[0_16px_36px_-16px_rgb(6_20_24/0.26)]"
+              ? "max-w-[100vw] border-b border-line/80 bg-white/[0.98] shadow-[0_10px_28px_-14px_rgb(6_20_24/0.18)] lg:max-w-[min(1240px,calc(100vw-2rem))] lg:rounded-[35px] lg:border lg:border-ink/[0.08] lg:bg-white/[0.98] lg:shadow-[0_16px_36px_-16px_rgb(6_20_24/0.26)]"
               : "max-w-[100vw] rounded-none border-b border-line/60 bg-white shadow-none",
           )}
         >

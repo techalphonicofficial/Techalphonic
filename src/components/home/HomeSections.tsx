@@ -63,10 +63,10 @@ function Hero({ section, data }: P) {
     <>
       <section className="relative isolate overflow-hidden bg-white text-ink" aria-labelledby="hero-title">
         {/* Background: optional poster/video washed out to white, a drifting colour mesh and a fine grid */}
-        <div className="absolute inset-0 -z-10">
+        <div className="absolute inset-0 -z-10 [contain:paint] transform-gpu">
           {poster && <Img media={poster} priority sizes="100vw" className="absolute inset-0 size-full object-cover" alt="" />}
           {video && (
-            <video className="absolute inset-0 size-full object-cover motion-reduce:hidden" autoPlay muted loop playsInline preload="metadata" poster={poster ? poster.webp || poster.url : undefined} aria-hidden="true">
+            <video data-hero-video="" className="absolute inset-0 size-full object-cover motion-reduce:hidden" autoPlay muted loop playsInline preload="metadata" poster={poster ? poster.webp || poster.url : undefined} aria-hidden="true">
               <source src={video.url} type={video.mime ?? undefined} />
             </video>
           )}
@@ -83,7 +83,7 @@ function Hero({ section, data }: P) {
         <div className="container-x grid items-center gap-8 py-5 sm:py-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,25rem)] lg:gap-10 lg:py-7">
           <div className="max-w-[44rem]">
             {hero.badge && (
-              <span className="badge-pill border-ink/10 bg-white/80 py-1 pl-1 pr-3.5 text-ink-700 shadow-[var(--shadow-xs)] backdrop-blur" data-aos="fade-down">
+              <span className="badge-pill border-ink/10 bg-white/95 py-1 pl-1 pr-3.5 text-ink-700 shadow-[var(--shadow-xs)]" data-aos="fade-down">
                 <span className="grid size-6 place-items-center rounded-full bg-night text-amber">
                   <Icon name="sparkles" className="size-3.5" />
                 </span>
@@ -135,7 +135,7 @@ function Hero({ section, data }: P) {
             </div>
 
             {hero.trust_text && (
-              <div className="mt-5 inline-flex items-center gap-3 rounded-full border border-line bg-white/70 py-1.5 pl-3 pr-4 backdrop-blur" data-aos="fade-up" data-aos-delay="450">
+              <div className="mt-5 inline-flex items-center gap-3 rounded-full border border-line bg-white/95 py-1.5 pl-3 pr-4" data-aos="fade-up" data-aos-delay="450">
                 <span className="flex gap-0.5 text-amber" aria-hidden="true">
                   <Stars rating={5} />
                 </span>
@@ -148,8 +148,8 @@ function Hero({ section, data }: P) {
           {/* Compact enquiry card */}
           {hero.show_form ? (
             <div id="hero-enquiry" className="relative w-full lg:justify-self-end" data-aos="fade-left" data-aos-delay="200">
-              <div className="absolute -inset-4 rounded-[2.25rem] bg-gradient-to-br from-teal/45 via-amber/25 to-brand/35 opacity-60 blur-2xl" />
-              <div className="ring-gradient relative overflow-hidden rounded-[1.75rem] bg-white/95 text-ink shadow-[0_40px_80px_-30px_rgb(6_20_24/0.45)] backdrop-blur-xl">
+              <div className="pointer-events-none absolute -inset-6 rounded-[2.25rem]" style={{ background: "radial-gradient(closest-side, rgb(83 175 190 / 0.35), rgb(254 180 73 / 0.18), transparent 100%)" }} />
+              <div className="ring-gradient relative overflow-hidden rounded-[1.75rem] bg-white text-ink shadow-[0_40px_80px_-30px_rgb(6_20_24/0.45)]">
                 <div className="flex items-center justify-between gap-3 border-b border-line px-6 py-3.5">
                   <span className="flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-brand-700">
                     <span className="relative flex size-2">
@@ -171,7 +171,7 @@ function Hero({ section, data }: P) {
             </div>
           ) : hero.image ? (
             <div className="relative" data-aos="zoom-in" data-aos-delay="150">
-              <div className="absolute -inset-6 rounded-[2.5rem] bg-gradient-to-br from-teal/35 via-transparent to-amber/30 blur-3xl" />
+              <div className="pointer-events-none absolute -inset-8 rounded-[2.5rem]" style={{ background: "radial-gradient(closest-side, rgb(83 175 190 / 0.32), rgb(254 180 73 / 0.18), transparent 100%)" }} />
               <Img media={hero.image} priority sizes="(min-width:1024px) 400px, 100vw" className="relative w-full rounded-[2rem] border border-white shadow-2xl" />
             </div>
           ) : null}
@@ -326,11 +326,11 @@ function Services({ section, data }: P) {
                     <span className="-right-24 -top-24 size-80 bg-teal/40" />
                     <span className="-bottom-24 left-10 size-72 bg-amber/20 [animation-delay:-8s]" />
                   </div>
-                  <span className="absolute right-8 top-8 grid size-12 place-items-center rounded-full border border-white/20 bg-white/10 backdrop-blur transition duration-500 group-hover:rotate-45 group-hover:bg-white group-hover:text-night lg:right-10 lg:top-10">
+                  <span className="absolute right-8 top-8 grid size-12 place-items-center rounded-full border border-white/20 bg-white/15 transition duration-500 group-hover:rotate-45 group-hover:bg-white group-hover:text-night lg:right-10 lg:top-10">
                     <Icon name="arrow-up-right" className="size-5" />
                   </span>
                   <div>
-                    <span className="badge-pill border-white/20 bg-white/10 text-white backdrop-blur">
+                    <span className="badge-pill border-white/20 bg-white/15 text-white">
                       <Icon name={cat.icon || "layers"} className="size-3.5" /> {cat.services_count} services
                     </span>
                     <h3 className="mt-5 font-display text-[2.1rem] font-bold leading-[1.05] text-white sm:text-[2.5rem]" style={{ letterSpacing: "-0.045em" }}>
@@ -439,7 +439,7 @@ function Promo({ section, data }: P) {
                 </div>
               )}
               {(c.price_new || c.price_old) && (
-                <div className="absolute -bottom-6 left-0 rounded-2xl border border-white/15 bg-night-800/80 p-4 shadow-xl backdrop-blur-xl">
+                <div className="absolute -bottom-6 left-0 rounded-2xl border border-white/15 bg-night-800/95 p-4 shadow-xl">
                   <p className="text-xs font-semibold uppercase tracking-wider text-white/50">{c.price_label || "Offer value"}</p>
                   <p className="font-display text-2xl font-bold">
                     {c.price_old && <span className="text-white/40 line-through decoration-coral decoration-2">{c.price_old}</span>} <span className="text-amber">{c.price_new || "FREE"}</span>
@@ -506,7 +506,7 @@ function About({ section, data }: P) {
             </div>
           )}
           {c.badge_value && (
-            <div className="absolute -top-6 right-6 rounded-2xl border border-white/80 bg-white/85 px-5 py-4 shadow-[var(--shadow-lift)] backdrop-blur-xl sm:right-10">
+            <div className="absolute -top-6 right-6 rounded-2xl border border-white/80 bg-white/95 px-5 py-4 shadow-[var(--shadow-lift)] sm:right-10">
               <p className="font-display text-4xl font-bold tracking-[-0.05em] text-ink">
                 <CountUp value={c.badge_value} />
                 <span className="text-gradient">{c.badge_suffix}</span>
@@ -576,7 +576,7 @@ function Showreel({ section, data }: P) {
 
           {videoUrl && (
             <button type="button" data-video={videoUrl} className="absolute inset-0 grid place-items-center" aria-label="Play video">
-              <span className="relative grid size-24 place-items-center rounded-full bg-white/30 backdrop-blur-md transition duration-300 group-hover:scale-110 sm:size-28">
+              <span className="relative grid size-24 place-items-center rounded-full bg-white/35 transition duration-300 group-hover:scale-110 sm:size-28">
                 <span className="absolute inset-0 animate-ping rounded-full bg-white/30 motion-reduce:hidden" />
                 <span className="grid size-16 place-items-center rounded-full bg-white text-brand shadow-xl sm:size-20">
                   <Icon name="play" className="ml-1 size-7 fill-current" />
@@ -590,7 +590,7 @@ function Showreel({ section, data }: P) {
             {stats.length > 0 && (
               <dl className="flex gap-3">
                 {stats.map((s, i) => (
-                  <div key={i} className="rounded-2xl border border-white/15 bg-white/10 px-5 py-3 backdrop-blur-xl">
+                  <div key={i} className="rounded-2xl border border-white/15 bg-night-800/90 px-5 py-3">
                     <dd className="font-display text-2xl font-bold tracking-[-0.04em] text-white">
                       {s.value}
                       <span className="text-amber">{s.suffix}</span>

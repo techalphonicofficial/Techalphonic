@@ -108,6 +108,25 @@ export function Runtime() {
     window.__taReady = true;
   }, []);
 
+  // Pause decorative hero background videos when scrolled off-screen to keep main/compositor threads light.
+  useEffect(() => {
+    if (!("IntersectionObserver" in window)) return;
+    const videos = document.querySelectorAll<HTMLVideoElement>("video[data-hero-video]");
+    if (!videos.length) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const vid = entry.target as HTMLVideoElement;
+          if (entry.isIntersecting) vid.play().catch(() => {});
+          else vid.pause();
+        });
+      },
+      { threshold: 0.01 },
+    );
+    videos.forEach((v) => io.observe(v));
+    return () => io.disconnect();
+  }, []);
+
   // Spotlight + magnetic buttons (fine pointers only, paused during active scroll to avoid layout/paint lag).
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !window.matchMedia("(pointer: fine)").matches) return;
