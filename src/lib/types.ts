@@ -304,7 +304,7 @@ export type ServiceData = Common & {
   case_studies: CaseStudyCard[];
   testimonials: Testimonial[];
   blogs: BlogCard[];
-  children: { name: string; url: string }[];
+  children: { name: string; url: string; icon?: string | null; description?: string | null }[];
 };
 
 export type CategoryData = Common & {

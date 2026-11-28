@@ -5,7 +5,7 @@ import { Img } from "@/components/ui/Img";
 import { BrandSquares, Breadcrumb, Html, SectionHeading } from "@/components/ui/basics";
 import { BlogCard, ServiceCard, TestimonialCard } from "@/components/ui/cards";
 import { TabButton, TabFilter, TabGroup } from "@/components/ui/interactive";
-import { Cta, FaqSection, PageHero, Pagination } from "@/components/ui/sections";
+import { Cta, FaqSection, PageHero, Pagination, RelatedLinks } from "@/components/ui/sections";
 import { getLayout } from "@/lib/api";
 import type { BlogData, BlogIndexData, CaseStudyCard, CaseStudyData, Industry, PortfolioCard, PortfolioData, SearchResult, Seo } from "@/lib/types";
 import { cn, formatDate, limit, stripTags } from "@/lib/utils";
@@ -184,13 +184,25 @@ export function BlogPost({ data, seo }: { data: BlogData; seo: Seo }) {
               </Link>
             </div>
             {related && related.links.length > 0 && (
-              <nav className="rounded-3xl border border-line p-6" aria-label="Related services">
-                <p className="font-display font-bold text-ink">Related services</p>
-                <ul className="mt-3 grid gap-1" role="list">
+              <nav className="rounded-3xl border border-line bg-white p-6 shadow-xs" aria-label="Related services">
+                <div className="flex items-center justify-between gap-2 border-b border-line/70 pb-3.5">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-brand">Related services</p>
+                  <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[0.7rem] font-bold text-brand">{related.links.length}</span>
+                </div>
+                <ul className="mt-3.5 grid gap-1.5" role="list">
                   {related.links.map((link) => (
                     <li key={link.url}>
-                      <Link href={link.url} className="flex items-center justify-between rounded-lg px-2 py-2 text-sm hover:bg-mist hover:text-brand">
-                        {link.name} <Icon name="chevron-right" className="size-4" />
+                      <Link
+                        href={link.url}
+                        className="group flex items-center justify-between gap-2.5 rounded-xl border border-transparent bg-mist/40 px-3 py-2.5 text-sm font-semibold text-ink-700 transition hover:border-brand/30 hover:bg-white hover:text-brand hover:shadow-2xs"
+                      >
+                        <span className="flex min-w-0 items-center gap-2.5">
+                          <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand transition-colors group-hover:bg-brand group-hover:text-white">
+                            <Icon name={link.icon || "sparkles"} className="size-3.5" />
+                          </span>
+                          <span className="truncate">{link.name}</span>
+                        </span>
+                        <Icon name="arrow-up-right" className="size-4 shrink-0 text-steel transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-brand" />
                       </Link>
                     </li>
                   ))}
@@ -216,6 +228,7 @@ export function BlogPost({ data, seo }: { data: BlogData; seo: Seo }) {
         </section>
       )}
 
+      <RelatedLinks groups={data.related} />
       <Cta />
     </>
   );
@@ -345,6 +358,7 @@ export function PortfolioShow({ data, seo }: { data: PortfolioData; seo: Seo }) 
           </div>
         </section>
       )}
+      <RelatedLinks groups={data.related} />
       <Cta />
     </>
   );
@@ -472,6 +486,7 @@ export function CaseStudyShow({ data, seo }: { data: CaseStudyData; seo: Seo }) 
           </div>
         </section>
       )}
+      <RelatedLinks groups={data.related} />
       <Cta />
     </>
   );

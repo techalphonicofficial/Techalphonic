@@ -215,27 +215,166 @@ export async function EnquirySection({
   );
 }
 
+function inferLinkIcon(link: { name: string; icon?: string | null }, groupTitle: string): string {
+  if (link.icon) return link.icon;
+  const g = groupTitle.toLowerCase();
+  const n = link.name.toLowerCase();
+  if (g.includes("location") || g.includes("cities") || g.includes("area")) return "map-pin";
+  if (g.includes("industr")) return "building";
+  if (n.includes("local seo") || n.includes(" in ")) return "map-pin";
+  if (n.includes("ecommerce") || n.includes("shopify") || n.includes("store")) return "shopping-cart";
+  if (n.includes("ai seo") || n.includes("aeo") || n.includes("geo")) return "sparkles";
+  if (n.includes("technical")) return "cpu";
+  if (n.includes("app") || n.includes("aso") || n.includes("mobile")) return "smartphone";
+  if (n.includes("ppc") || n.includes("pay per click") || n.includes("ads")) return "target";
+  if (n.includes("social") || n.includes("smo") || n.includes("smm")) return "share-2";
+  if (n.includes("content") || n.includes("copy") || n.includes("blog")) return "file-text";
+  if (n.includes("brand") || n.includes("design") || n.includes("ui")) return "layers";
+  if (n.includes("web") || n.includes("laravel") || n.includes("wordpress") || n.includes("custom") || n.includes("dev")) return "code";
+  if (n.includes("seo") || n.includes("search")) return "search";
+  return "sparkles";
+}
+
 /** <x-related-links> */
 export function RelatedLinks({ groups }: { groups: LinkGroup[] }) {
-  if (!groups?.length) return null;
+  const visible = (groups ?? []).filter((g) => g.links && g.links.length > 0);
+  if (!visible.length) return null;
+
+  const primaryIdx = visible.findIndex((g) => /related services/i.test(g.title) || g.links.some((l) => Boolean(l.description)));
+  const featuredGroup = primaryIdx >= 0 ? visible[primaryIdx] : visible.length === 1 ? visible[0] : null;
+  const secondaryGroups = visible.filter((_, idx) => idx !== (primaryIdx >= 0 ? primaryIdx : visible.length === 1 ? 0 : -1));
+
   return (
-    <section className="section-sm border-t border-line" aria-label="Related pages">
-      <div className="container-x grid gap-10 md:grid-cols-2 lg:grid-cols-3">
-        {groups.map((g) => (
-          <nav key={g.title} aria-label={g.title} data-reveal="">
-            <h2 className="font-display text-base font-bold uppercase tracking-[0.1em] text-ink">{g.title}</h2>
-            <ul className="mt-4 grid gap-2" role="list">
-              {g.links.map((link) => (
-                <li key={link.url}>
-                  <Link href={link.url} className="group flex items-center gap-2 text-[0.95rem] text-ink-600 hover:text-brand">
-                    <Icon name="chevron-right" className="size-4 text-brand transition-transform group-hover:translate-x-0.5" />
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
+    <section
+      className="relative overflow-hidden border-t border-line/80 bg-gradient-to-b from-mist/60 via-mist/30 to-white py-10 sm:py-14"
+      aria-label="Related pages"
+    >
+      <div className="container-x grid gap-8">
+        {featuredGroup && (
+          <nav aria-label={featuredGroup.title} data-reveal="">
+            <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <p className="eyebrow">Explore More</p>
+                <h2 className="mt-2 font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">
+                  {featuredGroup.title.toLowerCase() === "related services" ? (
+                    <>
+                      Related <span className="text-brand">Services</span>
+                    </>
+                  ) : (
+                    highlight(featuredGroup.title)
+                  )}
+                </h2>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-brand/20 bg-brand-50/80 px-3 py-1 text-xs font-bold text-brand">
+                  <span className="size-1.5 rounded-full bg-brand" />
+                  {featuredGroup.links.length} {featuredGroup.links.length === 1 ? "Service" : "Services"}
+                </span>
+                <Link
+                  href="/packages/"
+                  className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-ink-600 transition hover:text-brand"
+                >
+                  View packages <Icon name="arrow-right" className="size-3.5" />
+                </Link>
+              </div>
+            </div>
+
+            <ul
+              className={cn(
+                "grid gap-4 sm:grid-cols-2",
+                featuredGroup.links.length === 3 ? "lg:grid-cols-3" : "lg:grid-cols-4",
+              )}
+              role="list"
+            >
+              {featuredGroup.links.map((link) => {
+                const iconName = inferLinkIcon(link, featuredGroup.title);
+                return (
+                  <li key={link.url}>
+                    <Link
+                      href={link.url}
+                      className="spotlight group flex h-full flex-col justify-between rounded-2xl border border-line bg-white p-5 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-brand/40 hover:shadow-[var(--shadow-lift)]"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand transition-colors duration-300 group-hover:bg-brand group-hover:text-white">
+                            <Icon name={iconName} className="size-5" />
+                          </span>
+                          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-mist text-steel transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:bg-brand-50 group-hover:text-brand">
+                            <Icon name="arrow-up-right" className="size-4" />
+                          </span>
+                        </div>
+                        <h3 className="mt-4 font-display text-[1rem] font-bold leading-snug text-ink transition-colors group-hover:text-brand">
+                          {link.name}
+                        </h3>
+                        {link.description && (
+                          <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-ink-500">
+                            {link.description}
+                          </p>
+                        )}
+                      </div>
+                      <span className="mt-4 inline-flex items-center gap-1.5 border-t border-line/60 pt-3 text-xs font-bold text-ink-600 transition-colors group-hover:text-brand">
+                        Explore service
+                        <Icon name="arrow-right" className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
-        ))}
+        )}
+
+        {secondaryGroups.length > 0 && (
+          <div className={cn("grid gap-6", secondaryGroups.length > 1 && "lg:grid-cols-2")}>
+            {secondaryGroups.map((g) => (
+              <nav
+                key={g.title}
+                aria-label={g.title}
+                data-reveal=""
+                className="rounded-[1.75rem] border border-line bg-white p-6 shadow-[var(--shadow-card)] sm:p-7"
+              >
+                <div className="flex items-center justify-between gap-3 border-b border-line/70 pb-4">
+                  <div className="flex items-center gap-2.5">
+                    <span className="flex size-8 items-center justify-center rounded-lg bg-brand-50 text-brand">
+                      <Icon name={inferLinkIcon({ name: g.title }, g.title)} className="size-4" />
+                    </span>
+                    <h2 className="font-display text-base font-bold tracking-tight text-ink">{g.title}</h2>
+                  </div>
+                  <span className="rounded-full bg-mist px-2.5 py-0.5 text-xs font-bold text-ink-600">
+                    {g.links.length}
+                  </span>
+                </div>
+                <ul
+                  className={cn(
+                    "mt-4 grid gap-2.5 sm:grid-cols-2",
+                    secondaryGroups.length === 1 && "lg:grid-cols-3 xl:grid-cols-4",
+                  )}
+                  role="list"
+                >
+                  {g.links.map((link) => {
+                    const iconName = inferLinkIcon(link, g.title);
+                    return (
+                      <li key={link.url}>
+                        <Link
+                          href={link.url}
+                          className="group flex h-full items-center justify-between gap-2.5 rounded-xl border border-line/80 bg-mist/40 px-3.5 py-2.5 text-xs sm:text-[0.86rem] font-semibold text-ink transition-all duration-200 hover:-translate-y-0.5 hover:border-brand/40 hover:bg-white hover:text-brand hover:shadow-xs"
+                        >
+                          <span className="flex min-w-0 items-center gap-2.5">
+                            <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-white text-brand shadow-2xs transition-colors group-hover:bg-brand group-hover:text-white">
+                              <Icon name={iconName} className="size-3.5" />
+                            </span>
+                            <span className="leading-snug">{link.name}</span>
+                          </span>
+                          <Icon name="arrow-up-right" className="size-3.5 shrink-0 text-steel transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-brand" />
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </nav>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

@@ -102,6 +102,7 @@ function AboutPage({ data, seo }: { data: PageData; seo: Seo }) {
       )}
       <Blocks blocks={blocks} />
       {!hasType(blocks, "faq") && <FaqSection faqs={data.faqs} />}
+      <RelatedLinks groups={data.related} />
       <Cta />
     </>
   );
@@ -399,13 +400,25 @@ export async function ServicePage({ data, seo }: { data: ServiceData; seo: Seo }
                     )}
                   </div>
                   {data.children.length > 0 && (
-                    <nav className="rounded-[1.75rem] border border-line bg-white p-6" aria-label={`${service.name} services`}>
-                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-ink-500">{service.name} services</p>
-                      <ul className="mt-3 grid gap-0.5" role="list">
+                    <nav className="rounded-[1.75rem] border border-line bg-white p-6 shadow-xs" aria-label={`${service.name} services`}>
+                      <div className="flex items-center justify-between gap-2 border-b border-line/70 pb-3.5">
+                        <p className="text-xs font-bold uppercase tracking-[0.16em] text-brand">{service.name} services</p>
+                        <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[0.7rem] font-bold text-brand">{data.children.length}</span>
+                      </div>
+                      <ul className="mt-3.5 grid gap-1.5" role="list">
                         {data.children.map((c) => (
                           <li key={c.url}>
-                            <Link href={c.url} className="group flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium text-ink-700 transition hover:bg-mist hover:text-ink">
-                              {c.name} <Icon name="arrow-right" className="size-4 opacity-40 transition group-hover:translate-x-0.5 group-hover:opacity-100" />
+                            <Link
+                              href={c.url}
+                              className="group flex items-center justify-between gap-2.5 rounded-xl border border-transparent bg-mist/40 px-3 py-2.5 text-sm font-semibold text-ink-700 transition hover:border-brand/30 hover:bg-white hover:text-brand hover:shadow-2xs"
+                            >
+                              <span className="flex min-w-0 items-center gap-2.5">
+                                <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand transition-colors group-hover:bg-brand group-hover:text-white">
+                                  <Icon name={c.icon || "sparkles"} className="size-3.5" />
+                                </span>
+                                <span className="truncate">{c.name}</span>
+                              </span>
+                              <Icon name="arrow-up-right" className="size-4 shrink-0 text-steel transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-brand" />
                             </Link>
                           </li>
                         ))}
@@ -558,6 +571,7 @@ export function CategoryPage({ data, seo }: { data: CategoryData; seo: Seo }) {
       {data.locations && data.locations.length > 0 && (
         <LocationDirectory locations={data.locations} serviceName={category.name} />
       )}
+      <RelatedLinks groups={data.related} />
       <Cta />
     </>
   );

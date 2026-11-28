@@ -10,7 +10,7 @@ import type { PageData, Seo } from "@/lib/types";
 import { cn, highlight } from "@/lib/utils";
 
 const DEFAULT_STATS = [
-  { value: "7+", label: "Years of Experience" },
+  { value: "10+", label: "Years of Experience" },
   { value: "1.5k", label: "Projects Completed" },
   { value: "60+", label: "Team of Experts" },
   { value: "100%", label: "Satisfied Clients" },
@@ -45,7 +45,7 @@ const DEFAULT_TRUST_POINTS = [
   {
     icon: "award",
     title: "Industry Expertise",
-    text: "7+ years across 20+ industries — healthcare, e-commerce, real estate, finance, education, logistics, and SaaS.",
+    text: "10+ years across 20+ industries — healthcare, e-commerce, real estate, finance, education, logistics, and SaaS.",
   },
 ];
 
