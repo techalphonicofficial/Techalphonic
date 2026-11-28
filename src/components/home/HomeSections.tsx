@@ -211,8 +211,15 @@ function Hero({ section, data }: P) {
   );
 }
 
+function resolveClientUrl(raw?: string): string | null {
+  const url = (raw ?? "").trim();
+  if (!url) return null;
+  if (/^(https?:\/\/|\/|#|mailto:|tel:)/i.test(url)) return url;
+  return `https://${url}`;
+}
+
 function Clients({ section, data }: P) {
-  const logos = (section.content.items ?? []) as { name?: string; logo_id?: number }[];
+  const logos = (section.content.items ?? []) as { name?: string; logo_id?: number; url?: string }[];
   if (!logos.length) return null;
   return (
     <section className="border-b border-line bg-white py-4 sm:py-5" aria-label={section.title || "Clients"}>
@@ -225,16 +232,40 @@ function Clients({ section, data }: P) {
           </p>
         )}
         <div className="fade-x relative mt-3 overflow-hidden">
-          <ul className="flex w-max animate-marquee items-center gap-14 hover:[animation-play-state:paused] motion-reduce:animate-none" role="list">
+          <ul className="flex w-max animate-marquee items-center gap-14 py-2.5 hover:[animation-play-state:paused] motion-reduce:animate-none" role="list">
             {[0, 1].map((pass) =>
               logos.map((logo, i) => {
                 const m = media(data, logo.logo_id);
+                const href = resolveClientUrl(logo.url);
+                const external = Boolean(href && /^https?:\/\//i.test(href));
+                const inner = m ? (
+                  <Img
+                    media={m}
+                    alt={logo.name ?? ""}
+                    className="h-9 w-auto origin-center opacity-65 grayscale transition-all duration-300 ease-out group-hover:scale-125 group-hover:opacity-100 group-hover:grayscale-0"
+                    sizes="160px"
+                  />
+                ) : (
+                  <span className="font-display text-2xl font-bold tracking-[-0.04em] text-ink/35 transition-all duration-300 ease-out group-hover:scale-110 group-hover:text-ink">
+                    {logo.name}
+                  </span>
+                );
                 return (
                   <li key={`${pass}-${i}`} aria-hidden={pass ? true : undefined} className="shrink-0">
-                    {m ? (
-                      <Img media={m} alt={logo.name ?? ""} className="h-9 w-auto opacity-60 grayscale transition hover:opacity-100 hover:grayscale-0" sizes="160px" />
+                    {href ? (
+                      <a
+                        href={href}
+                        target={external ? "_blank" : undefined}
+                        rel={external ? "noopener noreferrer" : undefined}
+                        tabIndex={pass ? -1 : undefined}
+                        aria-label={logo.name ? `Visit ${logo.name}` : "Visit client website"}
+                        title={logo.name || undefined}
+                        className="group inline-flex cursor-pointer items-center rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand"
+                      >
+                        {inner}
+                      </a>
                     ) : (
-                      <span className="font-display text-2xl font-bold tracking-[-0.04em] text-ink/35 transition hover:text-ink">{logo.name}</span>
+                      <span className="group inline-flex items-center">{inner}</span>
                     )}
                   </li>
                 );
