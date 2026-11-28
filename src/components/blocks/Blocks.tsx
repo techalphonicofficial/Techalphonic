@@ -295,10 +295,35 @@ export const BODIES: Record<string, (p: { block: Block }) => React.ReactNode> = 
     <ul className="flex flex-wrap justify-center gap-3" role="list">
       {((d.items ?? []) as Item[]).map((t, i) => {
         const logo = media[t.image_id];
+        const href = typeof t.url === "string" && t.url.trim() ? t.url.trim() : null;
+        const inner = (
+          <>
+            {logo ? (
+              <Img media={logo} className="size-6 object-contain" sizes="24px" alt={t.title ?? ""} />
+            ) : t.icon ? (
+              <Icon name={t.icon} className="size-5 text-brand" />
+            ) : (
+              <span className={cn("size-2.5 rounded-sm", ["bg-brand", "bg-teal", "bg-amber", "bg-steel"][i % 4])} />
+            )}
+            <span>{t.title ?? t.name ?? ""}</span>
+          </>
+        );
         return (
-          <li key={i} className={cn("flex items-center gap-2.5 rounded-2xl px-5 py-3 font-semibold", dark ? "border border-white/10 bg-white/5 text-white" : "border border-line bg-white text-ink shadow-[var(--shadow-card)]")} data-reveal="stagger">
-            {logo ? <Img media={logo} className="size-6 object-contain" sizes="24px" alt={t.title ?? ""} /> : <span className={cn("size-2.5 rounded-sm", ["bg-brand", "bg-teal", "bg-amber", "bg-steel"][i % 4])} />}
-            {t.title ?? t.name ?? ""}
+          <li
+            key={i}
+            className={cn(
+              "rounded-2xl font-semibold",
+              dark ? "border border-white/10 bg-white/5 text-white" : "border border-line bg-white text-ink shadow-[var(--shadow-card)]"
+            )}
+            data-reveal="stagger"
+          >
+            {href ? (
+              <Link href={href} className="flex items-center gap-2.5 px-5 py-3 transition hover:text-brand">
+                {inner}
+              </Link>
+            ) : (
+              <div className="flex items-center gap-2.5 px-5 py-3">{inner}</div>
+            )}
           </li>
         );
       })}
@@ -314,7 +339,7 @@ export const BODIES: Record<string, (p: { block: Block }) => React.ReactNode> = 
           const features = String(plan.features ?? "").split(/\r?\n/).filter(Boolean);
           return (
             <div key={i} className={cn("relative flex flex-col rounded-[1.75rem] p-8", hot ? "border-2 border-brand bg-gradient-to-b from-brand-50 to-white shadow-[var(--shadow-lift)] lg:-my-4 lg:py-12" : "border border-line bg-white")} data-reveal="stagger">
-              {hot && <span className="absolute -top-3 left-8 rounded-full bg-brand px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">Most popular</span>}
+              {hot && <span className="absolute -top-3 left-8 rounded-full bg-brand px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">{plan.badge || "Most popular"}</span>}
               <h3 className={cn("text-xl font-bold", hot && "text-brand-700")}>{plan.title}</h3>
               {plan.text && <p className={cn("mt-2 text-sm", hot ? "text-ink-600" : "text-steel")}>{plan.text}</p>}
               <p className="mt-6 flex items-baseline gap-1">
@@ -343,9 +368,34 @@ export const BODIES: Record<string, (p: { block: Block }) => React.ReactNode> = 
     <ul className="grid grid-cols-2 items-center gap-8 sm:grid-cols-3 lg:grid-cols-6" role="list">
       {((d.items ?? []) as Item[]).map((item, i) => {
         const logo = media[item.image_id];
+        const rawUrl = typeof item.url === "string" ? item.url.trim() : "";
+        const href = /^https?:\/\/|^\//i.test(rawUrl) ? rawUrl : "";
+        const isExternal = /^https?:\/\//i.test(href);
+        const content = logo ? (
+          <Img
+            media={logo}
+            alt={item.title ?? ""}
+            sizes="160px"
+            className="h-10 w-auto opacity-60 grayscale transition-all duration-300 hover:scale-110 hover:opacity-100 hover:grayscale-0"
+          />
+        ) : (
+          <span className="font-display text-lg font-bold text-steel/70 transition hover:text-brand">{item.title}</span>
+        );
         return (
           <li key={i} className="flex justify-center">
-            {logo ? <Img media={logo} alt={item.title ?? ""} sizes="160px" className="h-10 w-auto opacity-60 grayscale transition hover:opacity-100 hover:grayscale-0" /> : <span className="font-display text-lg font-bold text-steel/70">{item.title}</span>}
+            {href ? (
+              isExternal ? (
+                <a href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center transition-transform duration-300 hover:scale-110" aria-label={item.title || "Partner"}>
+                  {content}
+                </a>
+              ) : (
+                <Link href={href} className="inline-flex items-center justify-center transition-transform duration-300 hover:scale-110" aria-label={item.title || "Partner"}>
+                  {content}
+                </Link>
+              )
+            ) : (
+              content
+            )}
           </li>
         );
       })}

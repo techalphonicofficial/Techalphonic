@@ -463,6 +463,15 @@ export function CaseStudyShow({ data, seo }: { data: CaseStudyData; seo: Seo }) 
           </div>
         </section>
       )}
+      {study.gallery && study.gallery.length > 0 && (
+        <section className="section-sm bg-mist">
+          <div className="container-x grid gap-4 sm:grid-cols-2">
+            {study.gallery.map((img) => (
+              <Img key={img.id} media={img} sizes="(min-width:640px) 50vw, 100vw" className="w-full rounded-2xl" />
+            ))}
+          </div>
+        </section>
+      )}
       <Cta />
     </>
   );
@@ -478,10 +487,16 @@ export function IndustriesPage({ data, seo }: { data: { industries: Industry[] }
         <div className="container-x grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {data.industries.map((industry, i) => (
             <div key={industry.id} className="card flex flex-col" data-reveal="stagger">
-              <span className={cn("icon-tile", ["bg-brand-50 text-brand", "bg-teal-50 text-teal-700", "bg-amber-50 text-amber-600"][i % 3])}>
-                <Icon name={industry.icon || "building"} className="size-6" />
-              </span>
-              <h2 className="mt-5 text-xl font-bold">{industry.name}</h2>
+              {industry.image ? (
+                <div className="mb-5 aspect-[16/9] overflow-hidden rounded-xl bg-mist">
+                  <Img media={industry.image} sizes="(min-width:1024px) 380px, 100vw" className="size-full object-cover" />
+                </div>
+              ) : (
+                <span className={cn("icon-tile", ["bg-brand-50 text-brand", "bg-teal-50 text-teal-700", "bg-amber-50 text-amber-600"][i % 3])}>
+                  <Icon name={industry.icon || "building"} className="size-6" />
+                </span>
+              )}
+              <h2 className={cn("text-xl font-bold", !industry.image && "mt-5")}>{industry.name}</h2>
               {industry.description && <p className="mt-2 flex-1 text-[0.95rem] text-ink-600/80">{limit(stripTags(industry.description), 150)}</p>}
               {industry.pages && industry.pages.length > 0 && (
                 <ul className="mt-5 grid gap-1 border-t border-line pt-4" role="list">

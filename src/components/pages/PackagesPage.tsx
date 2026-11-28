@@ -1,18 +1,22 @@
 import Link from "next/link";
+import { Blocks } from "@/components/blocks/Blocks";
+import { Html } from "@/components/ui/basics";
 import { Icon } from "@/components/ui/Icon";
-import { FaqSection } from "@/components/ui/sections";
+import { Img } from "@/components/ui/Img";
 import { PricingPlansSection } from "@/components/ui/PricingPlansSection";
+import { FaqSection } from "@/components/ui/sections";
+import { getLayout } from "@/lib/api";
 import type { PageData, Seo } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { cn, highlight } from "@/lib/utils";
 
-const STATS = [
-  { value: "10+", label: "Years of Experience" },
+const DEFAULT_STATS = [
+  { value: "7+", label: "Years of Experience" },
   { value: "1.5k", label: "Projects Completed" },
   { value: "60+", label: "Team of Experts" },
   { value: "100%", label: "Satisfied Clients" },
 ];
 
-const TRUST_POINTS = [
+const DEFAULT_TRUST_POINTS = [
   {
     icon: "trending-up",
     title: "Proven ROI Results",
@@ -46,25 +50,58 @@ const TRUST_POINTS = [
 ];
 
 export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
-  const { blocks, faqs = [], testimonials = [] } = data;
+  const { page, blocks, faqs = [], testimonials = [], links } = data;
+  const { settings } = await getLayout();
 
-  // Extract all pricing blocks
+  // Structured blocks mapped directly from Admin Page Builder
   const pricingBlocks = blocks.filter((b) => b.type === "pricing");
+  const statsBlock = blocks.find((b) => b.type === "statistics");
+  const featureBlocks = blocks.filter((b) => b.type === "feature_cards");
+  const addOnsBlock = featureBlocks[0];
+  const trustBlock = featureBlocks[1];
+  const processBlock = blocks.find((b) => b.type === "process");
+  const testimonialsBlock = blocks.find((b) => b.type === "testimonials");
+  const ctaBlock = blocks.find((b) => b.type === "cta");
+  const handledTypes = new Set(["pricing", "statistics", "feature_cards", "process", "testimonials", "cta"]);
+  const extraBlocks = blocks.filter((b) => !handledTypes.has(b.type));
 
-  // Extract add-ons block
-  const addOnsBlock = blocks.find((b) => b.type === "feature_cards");
+  const rawStats = (statsBlock?.data?.items ?? []) as Array<{ value?: string; suffix?: string; title?: string; label?: string }>;
+  const stats =
+    rawStats.length > 0
+      ? rawStats.map((st) => ({
+          value: `${st.value ?? ""}${st.suffix ?? ""}`,
+          label: st.title ?? st.label ?? "",
+        }))
+      : DEFAULT_STATS;
+
   const addOns = (addOnsBlock?.data?.items ?? []) as Array<{
     title: string;
     text: string;
     icon?: string;
   }>;
 
-  // Extract process block
-  const processBlock = blocks.find((b) => b.type === "process");
   const processSteps = (processBlock?.data?.items ?? []) as Array<{
     title: string;
     text: string;
   }>;
+
+  const rawTrustPoints = (trustBlock?.data?.items ?? []) as Array<{
+    icon?: string;
+    title: string;
+    text: string;
+  }>;
+  const trustPoints = rawTrustPoints.length > 0 ? rawTrustPoints : DEFAULT_TRUST_POINTS;
+
+  const testimonialLimit = Math.max(1, Number(testimonialsBlock?.data?.limit) || 3);
+  const ctaEyebrow = ctaBlock?.data?.eyebrow || "Fast Consultation";
+  const ctaHeading = ctaBlock?.data?.heading || "Ready to Build Your Dream Project?";
+  const ctaText =
+    ctaBlock?.data?.text ||
+    ctaBlock?.data?.subheading ||
+    "Book a free 30-minute consultation call with our solution architect and get a tailored growth strategy.";
+  const ctaButtonText = ctaBlock?.data?.cta_text || ctaBlock?.data?.primary_text || "Book a Free Consultation";
+  const ctaButtonUrl = ctaBlock?.data?.cta_url || ctaBlock?.data?.primary_url || links.contact || "/contact/";
+  const contactHref = links.contact || "/contact/";
 
   return (
     <div className="bg-white">
@@ -83,44 +120,43 @@ export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
                 <span className="absolute inline-flex size-full animate-ping rounded-full bg-brand opacity-60" />
                 <span className="relative inline-flex size-1.5 rounded-full bg-brand" />
               </span>
-              Transparent & Honest Pricing
+              {page.hero_subheading || "Transparent & Honest Pricing"}
             </span>
 
             <h1 className="font-display text-3xl font-extrabold tracking-tight text-ink sm:text-5xl sm:leading-[1.15]">
-              Affordable Packages for{" "}
-              <span className="bg-gradient-to-r from-brand to-teal bg-clip-text text-transparent">
-                Every Business Goal
-              </span>
+              {highlight(page.heading || "Affordable Packages for [[Every Business Goal]]")}
             </h1>
 
             <p className="mt-4 text-sm leading-relaxed text-ink-600 sm:text-base max-w-2xl mx-auto">
-              Transparent, results-oriented pricing — choose the best plan across SEO, Social Media, Website
-              Development, Paid Ads, or custom hybrid packages. Switch or cancel anytime.
+              {page.excerpt ||
+                "Transparent, results-oriented pricing — choose the best plan across SEO, Social Media, Website Development, Paid Ads, or custom hybrid packages. Switch or cancel anytime."}
             </p>
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <a href="#plans" className="btn btn-primary">
                 View All Packages <Icon name="arrow-right" className="size-4" />
               </a>
-              <Link href="/contact/" className="btn btn-secondary">
+              <Link href={contactHref} className="btn btn-secondary">
                 Talk to an Expert
               </Link>
             </div>
           </div>
 
           {/* 2. Stats Bar */}
-          <div className="mt-8 sm:mt-10 rounded-2xl border border-line bg-white/90 p-5 sm:p-6 shadow-xs backdrop-blur-sm">
-            <div className="grid grid-cols-2 gap-6 divide-y sm:divide-y-0 sm:divide-x divide-line sm:grid-cols-4">
-              {STATS.map((st, i) => (
-                <div key={i} className={cn("text-center", i > 1 ? "pt-4 sm:pt-0" : "")}>
-                  <p className="font-display text-3xl sm:text-4xl font-extrabold text-ink tracking-tight">
-                    <span className="text-brand">{st.value}</span>
-                  </p>
-                  <p className="mt-1 text-xs sm:text-sm font-medium text-ink-500">{st.label}</p>
-                </div>
-              ))}
+          {stats.length > 0 && (
+            <div className="mt-8 sm:mt-10 rounded-2xl border border-line bg-white/90 p-5 sm:p-6 shadow-xs backdrop-blur-sm">
+              <div className="grid grid-cols-2 gap-6 divide-y sm:divide-y-0 sm:divide-x divide-line sm:grid-cols-4">
+                {stats.map((st, i) => (
+                  <div key={i} className={cn("text-center", i > 1 ? "pt-4 sm:pt-0" : "")}>
+                    <p className="font-display text-3xl sm:text-4xl font-extrabold text-ink tracking-tight">
+                      <span className="text-brand">{st.value}</span>
+                    </p>
+                    <p className="mt-1 text-xs sm:text-sm font-medium text-ink-500">{st.label}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
@@ -133,13 +169,14 @@ export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
           <div className="container-x">
             <div className="mx-auto max-w-2xl text-center mb-6">
               <span className="text-xs font-bold uppercase tracking-[0.18em] text-brand">
-                Customize Your Plan
+                {addOnsBlock?.data?.eyebrow || "Customize Your Plan"}
               </span>
               <h2 className="mt-1.5 font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">
-                Optional <span className="text-brand">Add-Ons</span>
+                {highlight(addOnsBlock?.data?.heading || "Optional [[Add-Ons]]")}
               </h2>
               <p className="mt-2 text-xs sm:text-sm text-ink-600">
-                Enhance your core package with powerful add-on capabilities tailored to your specific business requirements.
+                {addOnsBlock?.data?.subheading ||
+                  "Enhance your core package with powerful add-on capabilities tailored to your specific business requirements."}
               </p>
             </div>
 
@@ -169,13 +206,14 @@ export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
           <div className="container-x">
             <div className="mx-auto max-w-2xl text-center mb-6">
               <span className="text-xs font-bold uppercase tracking-[0.18em] text-brand">
-                Simple Workflow
+                {processBlock?.data?.eyebrow || "Simple Workflow"}
               </span>
               <h2 className="mt-1.5 font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">
-                Get Started in <span className="text-brand">4 Simple Steps</span>
+                {highlight(processBlock?.data?.heading || "Get Started in [[4 Simple Steps]]")}
               </h2>
               <p className="mt-2 text-xs sm:text-sm text-ink-600">
-                From consultation to real outcomes — transparent onboarding with no friction.
+                {processBlock?.data?.subheading ||
+                  "From consultation to real outcomes — transparent onboarding with no friction."}
               </p>
             </div>
 
@@ -197,34 +235,47 @@ export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
         </section>
       )}
 
-      {/* 6. Why 1000+ Clients Trust Us */}
-      <section className="py-8 sm:py-10 bg-mist/40 border-t border-line/80">
-        <div className="container-x">
-          <div className="mx-auto max-w-2xl text-center mb-6">
-            <span className="text-xs font-bold uppercase tracking-[0.18em] text-brand">
-              Why TechAlphonic
-            </span>
-            <h2 className="mt-1.5 font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">
-              Why <span className="text-brand">1000+ Clients</span> Trust Us
-            </h2>
-            <p className="mt-2 text-xs sm:text-sm text-ink-600">
-              We’re not just an agency — we’re your long-term digital growth and engineering partner.
-            </p>
-          </div>
+      {/* 6. Why Clients Trust Us */}
+      {trustPoints.length > 0 && (
+        <section className="py-8 sm:py-10 bg-mist/40 border-t border-line/80">
+          <div className="container-x">
+            <div className="mx-auto max-w-2xl text-center mb-6">
+              <span className="text-xs font-bold uppercase tracking-[0.18em] text-brand">
+                {trustBlock?.data?.eyebrow || "Why TechAlphonic"}
+              </span>
+              <h2 className="mt-1.5 font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">
+                {highlight(trustBlock?.data?.heading || "Why [[1000+ Clients]] Trust Us")}
+              </h2>
+              <p className="mt-2 text-xs sm:text-sm text-ink-600">
+                {trustBlock?.data?.subheading ||
+                  "We’re not just an agency — we’re your long-term digital growth and engineering partner."}
+              </p>
+            </div>
 
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
-            {TRUST_POINTS.map((pt, i) => (
-              <div key={i} className="rounded-2xl border border-line bg-white p-5 sm:p-6 shadow-xs">
-                <div className="flex size-9 items-center justify-center rounded-lg bg-brand-50 text-brand mb-3.5">
-                  <Icon name={pt.icon} className="size-4.5" />
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
+              {trustPoints.map((pt, i) => (
+                <div key={i} className="rounded-2xl border border-line bg-white p-5 sm:p-6 shadow-xs">
+                  <div className="flex size-9 items-center justify-center rounded-lg bg-brand-50 text-brand mb-3.5">
+                    <Icon name={pt.icon || "shield-check"} className="size-4.5" />
+                  </div>
+                  <h3 className="font-display text-base font-bold text-ink">{pt.title}</h3>
+                  <p className="mt-1.5 text-xs text-ink-600 leading-relaxed">{pt.text}</p>
                 </div>
-                <h3 className="font-display text-base font-bold text-ink">{pt.title}</h3>
-                <p className="mt-1.5 text-xs text-ink-600 leading-relaxed">{pt.text}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+
+      {/* Extra Page Builder blocks & rich body if configured in Admin */}
+      {extraBlocks.length > 0 && <Blocks blocks={extraBlocks} />}
+      {page.content && page.content.trim().length > 0 && (
+        <section className="py-8 sm:py-10 border-t border-line/80">
+          <div className="container-x max-w-4xl">
+            <Html html={page.content} className="prose-content" />
+          </div>
+        </section>
+      )}
 
       {/* 7. What Our Clients Say (Testimonials) */}
       {testimonials.length > 0 && (
@@ -232,22 +283,22 @@ export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
           <div className="container-x">
             <div className="mx-auto max-w-2xl text-center mb-6">
               <span className="text-xs font-bold uppercase tracking-[0.18em] text-brand">
-                Client Testimonials
+                {testimonialsBlock?.data?.eyebrow || "Client Testimonials"}
               </span>
               <h2 className="mt-1.5 font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">
-                What Our <span className="text-brand">Clients Say</span>
+                {highlight(testimonialsBlock?.data?.heading || "What Our [[Clients Say]]")}
               </h2>
               <p className="mt-2 text-xs sm:text-sm text-ink-600">
-                Real feedback from businesses scaling with TechAlphonic.
+                {testimonialsBlock?.data?.subheading || "Real feedback from businesses scaling with TechAlphonic."}
               </p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-3 max-w-6xl mx-auto">
-              {testimonials.slice(0, 3).map((t, i) => (
+              {testimonials.slice(0, testimonialLimit).map((t, i) => (
                 <div key={i} className="flex flex-col justify-between rounded-2xl border border-line bg-white p-6 shadow-xs">
                   <div>
                     <div className="flex items-center gap-1 text-amber mb-3">
-                      {[...Array(5)].map((_, starIdx) => (
+                      {[...Array(Math.max(1, Math.min(5, t.rating || 5)))].map((_, starIdx) => (
                         <Icon key={starIdx} name="star" className="size-3.5 fill-current" />
                       ))}
                     </div>
@@ -255,9 +306,16 @@ export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
                       &ldquo;{t.review}&rdquo;
                     </p>
                   </div>
-                  <div className="mt-5 border-t border-line/60 pt-3">
-                    <p className="font-bold text-xs text-ink">{t.name}</p>
-                    <p className="text-[0.7rem] text-ink-400">{[t.designation, t.company].filter(Boolean).join(" · ")}</p>
+                  <div className="mt-5 flex items-center gap-3 border-t border-line/60 pt-3">
+                    {t.photo && (
+                      <Img media={t.photo} sizes="36px" className="size-9 rounded-full object-cover shrink-0" />
+                    )}
+                    <div className="min-w-0">
+                      <p className="font-bold text-xs text-ink truncate">{t.name}</p>
+                      <p className="text-[0.7rem] text-ink-400 truncate">
+                        {[t.designation, t.company].filter(Boolean).join(" · ")}
+                      </p>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -274,21 +332,29 @@ export async function PackagesPage({ data }: { data: PageData; seo: Seo }) {
         </div>
         <div className="container-x relative text-center">
           <span className="badge-pill w-max mx-auto border-white/15 bg-white/10 text-amber mb-3">
-            <Icon name="sparkles" className="size-3.5" /> Fast Consultation
+            <Icon name="sparkles" className="size-3.5" /> {ctaEyebrow}
           </span>
           <h2 className="font-display text-2xl sm:text-4xl font-bold text-white tracking-tight">
-            Ready to Build Your Dream Project?
+            {highlight(ctaHeading)}
           </h2>
           <p className="mt-2 text-xs sm:text-sm text-white/70 max-w-xl mx-auto">
-            Book a free 30-minute consultation call with our solution architect and get a tailored growth strategy.
+            {ctaText}
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-            <Link href="/contact/" className="btn btn-light">
-              Book a Free Consultation <Icon name="arrow-right" className="size-3.5" />
-            </Link>
-            <a href="tel:+919899184918" className="btn btn-ghost text-white border-white/20 hover:bg-white/10">
-              <Icon name="phone" className="size-3.5" /> Call Sales
-            </a>
+            {ctaButtonUrl === "#enquiry-popup" ? (
+              <button type="button" className="btn btn-light" data-enquiry="packages-cta">
+                {ctaButtonText} <Icon name="arrow-right" className="size-3.5" />
+              </button>
+            ) : (
+              <Link href={ctaButtonUrl} className="btn btn-light">
+                {ctaButtonText} <Icon name="arrow-right" className="size-3.5" />
+              </Link>
+            )}
+            {settings.phone_href && (
+              <a href={settings.phone_href} className="btn btn-ghost text-white border-white/20 hover:bg-white/10">
+                <Icon name="phone" className="size-3.5" /> Call Sales
+              </a>
+            )}
           </div>
         </div>
       </section>

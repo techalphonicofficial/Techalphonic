@@ -34,7 +34,10 @@ export type Settings = {
   secondary_color: string | null;
   accent_color: string | null;
   phone: string | null;
+  phone_secondary: string | null;
+  phone_secondary_href: string | null;
   email: string | null;
+  sales_email: string | null;
   map_embed_url: string | null;
   business_hours: string | null;
   whatsapp_enabled: boolean;
@@ -80,6 +83,7 @@ export type Social = { platform: string; url: string; icon: string };
 export type Layout = {
   settings: Settings;
   menus: Record<string, MenuItem[]>;
+  menu_titles?: Record<string, string>;
   socials: Social[];
   popular_services: ServiceCard[];
   home_url: string;
@@ -140,8 +144,10 @@ export type Industry = {
   plural_name: string | null;
   description: string | null;
   icon: string | null;
+  image?: Media | null;
   challenges: (string | { title?: string })[];
   solutions: (string | { title?: string })[];
+  benefits?: Item[];
   url?: string | null;
   pages?: { name: string; url: string }[];
 };
@@ -211,6 +217,7 @@ export type HomeData = {
     heading: string;
     short_description: string | null;
     icon: string | null;
+    image?: Media | null;
     url: string;
     services_count: number;
     services: ServiceCard[];
@@ -312,7 +319,16 @@ export type LandingData = Common & {
   page: { hero_layout: string; faq_enabled: boolean; faq_title: string | null; featured_image: Media | null };
   service: { name: string } | null;
   /** city_slug: the directory entry (city) whose areas this page belongs to. */
-  location: { name: string; slug?: string; city_slug?: string | null } | null;
+  location: {
+    name: string;
+    slug?: string;
+    city_slug?: string | null;
+    description?: string | null;
+    address?: string | null;
+    postal_code?: string | null;
+    phone?: string | null;
+    email?: string | null;
+  } | null;
   industry: Industry | null;
   site_name: string;
   h1: string;
@@ -323,7 +339,7 @@ export type LandingData = Common & {
   benefits: Item[];
   process: Item[];
   why_choose_us: Item[];
-  cta: { heading?: string | null; text?: string | null };
+  cta: { heading?: string | null; text?: string | null; button_text?: string | null; button_url?: string | null };
   local_facts: (string | { text?: string })[];
   industries: Industry[];
   testimonials: Testimonial[];
@@ -372,6 +388,7 @@ export type CaseStudyData = Common & {
     results: string | null;
     technologies: string[];
     testimonial: Testimonial | null;
+    gallery?: Media[];
   };
   contact_url: string;
 };

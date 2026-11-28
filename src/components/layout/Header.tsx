@@ -228,89 +228,14 @@ export function Header({ pathname }: { pathname: string }) {
 }
 
 function organizeMenuItems(rawItems: MenuItem[], devChildren: MenuItem[] = []): MenuItem[] {
-  const packagesItem: MenuItem = {
-    label: "Packages",
-    url: "/packages/",
-    icon: null,
-    description: null,
-    mega: false,
-    new_tab: false,
-    is_heading: false,
-    children: [],
-  };
-
-  let devItem: MenuItem | null = null;
-  let hasPackages = false;
-  const list: MenuItem[] = [];
-
-  for (const item of rawItems) {
+  return rawItems.map((item) => {
     const label = item.label?.trim().toLowerCase();
     const url = item.url?.trim().replace(/\/$/, "");
-
-    // 1. Remove "Home" and "Blog"
-    if (label === "home" || label === "blog" || url === "" || url === "/blog") continue;
-
-    // 2. Capture "Development" so it always sits first with dropdown items
-    if (label === "development") {
-      devItem = item.children.length > 0 ? item : { ...item, mega: false, children: devChildren };
-      continue;
+    if ((label === "development" || url === "/development") && item.children.length === 0 && devChildren.length > 0) {
+      return { ...item, mega: false, children: devChildren };
     }
-
-    // 3. Replace "Portfolio" with "Packages"
-    if (label === "portfolio") {
-      if (!hasPackages) {
-        list.push(packagesItem);
-        hasPackages = true;
-      }
-      continue;
-    }
-
-    if (label === "packages") {
-      hasPackages = true;
-    }
-
-    list.push(item);
-  }
-
-  // Place "Development" at the very beginning of the navbar
-  if (!devItem && devChildren.length > 0) {
-    devItem = {
-      label: "Development",
-      url: "/development/",
-      icon: null,
-      description: null,
-      mega: false,
-      new_tab: false,
-      is_heading: false,
-      children: devChildren,
-    };
-  }
-  if (devItem) {
-    list.unshift(devItem);
-  }
-
-  if (!hasPackages) {
-    const insertIdx = list.findIndex((item) => {
-      const l = item.label?.trim().toLowerCase();
-      return l === "blog" || l === "about" || l === "contact";
-    });
-    if (insertIdx !== -1) list.splice(insertIdx, 0, packagesItem);
-    else list.push(packagesItem);
-  }
-
-  // 4. Extract "About" and shift immediately before "Contact"
-  const aboutIdx = list.findIndex((item) => item.label?.trim().toLowerCase() === "about");
-  if (aboutIdx === -1) return list;
-
-  const [aboutItem] = list.splice(aboutIdx, 1);
-  const contactIdx = list.findIndex((item) => item.label?.trim().toLowerCase() === "contact");
-  if (contactIdx !== -1) {
-    list.splice(contactIdx, 0, aboutItem);
-  } else {
-    list.push(aboutItem);
-  }
-
-  return list;
+    return item;
+  });
 }
 
 function capitalize(s: string) {

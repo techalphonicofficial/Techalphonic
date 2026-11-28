@@ -25,7 +25,10 @@ export async function Cta({
 }) {
   const { settings } = await getLayout();
   const dark = variant === "dark";
-  const wa = settings.whatsapp_url;
+  const wa = settings.whatsapp_enabled ? settings.whatsapp_url : null;
+  const resolvedHeading = heading || settings.footer_cta_heading || "Let’s build something that grows your business";
+  const resolvedText = text || settings.footer_cta_text || "Talk to our specialists today — free consultation, honest advice and a clear plan.";
+  const toPopup = Boolean(buttonUrl && (buttonUrl.endsWith("#enquiry-popup") || buttonUrl === "#enquire"));
   return (
     <section className="py-5 sm:py-6">
       <div className="container-x">
@@ -55,14 +58,20 @@ export async function Cta({
           <div className="relative flex flex-col items-start justify-between gap-10 lg:flex-row lg:items-center">
             <div className="max-w-2xl">
               <h2 className={cn("font-display font-bold leading-[1.05]", dark ? "text-white" : "text-ink")} style={{ fontSize: "clamp(1.9rem, 1.2rem + 2vw, 3rem)", letterSpacing: "-0.045em" }}>
-                {heading || "Let’s build something that grows your business"}
+                {highlight(resolvedHeading)}
               </h2>
-              <p className={cn("mt-4 text-[1.075rem] leading-relaxed", dark ? "text-white/65" : "text-ink-500")}>{text || "Talk to our specialists today — free consultation, honest advice and a clear plan."}</p>
+              <p className={cn("mt-4 text-[1.075rem] leading-relaxed", dark ? "text-white/65" : "text-ink-500")}>{resolvedText}</p>
             </div>
             <div className="flex w-full shrink-0 flex-col gap-3 sm:w-auto sm:flex-row">
-              <Link href={buttonUrl || "/contact/"} className={cn("btn btn-lg group", dark ? "btn-light" : "btn-primary")} data-cta="cta-band" data-magnetic="">
-                {buttonText} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
-              </Link>
+              {toPopup ? (
+                <a href="#enquiry-popup" data-enquiry="cta-band" className={cn("btn btn-lg group", dark ? "btn-light" : "btn-primary")} data-cta="cta-band" data-magnetic="">
+                  {buttonText} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
+                </a>
+              ) : (
+                <Link href={buttonUrl || "/contact/"} className={cn("btn btn-lg group", dark ? "btn-light" : "btn-primary")} data-cta="cta-band" data-magnetic="">
+                  {buttonText} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
+                </Link>
+              )}
               {wa && (
                 <a href={wa} target="_blank" rel="noopener" className={cn("btn btn-lg", dark ? "btn-ghost-dark" : "btn-secondary")}>
                   <Icon name="whatsapp" className="size-[18px]" /> WhatsApp
@@ -86,7 +95,7 @@ export async function FaqSection({ faqs, title = "Frequently asked questions", e
         <div className="lg:sticky lg:top-32 lg:self-start" data-reveal="">
           <p className="eyebrow">{eyebrow}</p>
           <h2 id="faq-heading" className="h-section mt-2.5">
-            {title}
+            {highlight(title)}
           </h2>
           <p className="mt-3 text-[1.02rem] leading-relaxed text-ink-500">{subtitle ?? "Can’t find what you’re looking for? Our team is happy to help."}</p>
           <div className="mt-5 rounded-2xl border border-line bg-cloud p-4">
@@ -118,6 +127,7 @@ export async function EnquirySection({
   location,
   formName = "enquiry",
   eyebrow = "Let’s talk",
+  buttonText,
 }: {
   heading?: string | null;
   text?: string | null;
@@ -125,6 +135,7 @@ export async function EnquirySection({
   location?: string | null;
   formName?: string;
   eyebrow?: string;
+  buttonText?: string | null;
 }) {
   const { settings: s } = await getLayout();
   const wa = s.whatsapp_enabled ? s.whatsapp_url : null;
@@ -197,7 +208,7 @@ export async function EnquirySection({
         </div>
 
         <div className="lg:justify-self-end" data-reveal="" data-aos="fade-left">
-          <LeadForm service={service} location={location} formName={formName} compact title="Request a free consultation" subtitle="Average response time: under 4 business hours." />
+          <LeadForm service={service} location={location} formName={formName} compact title="Request a free consultation" subtitle="Average response time: under 4 business hours." button={buttonText || "Get my free consultation"} />
         </div>
       </div>
     </section>

@@ -43,8 +43,8 @@ const SECTIONS: Record<string, (p: P) => React.ReactNode> = {
   portfolio: Portfolio,
   testimonials: Testimonials,
   blogs: Blogs,
-  faq: ({ section, data }) => <FaqSection faqs={data.faqs} title={stripHighlight(section.title || "Frequently asked questions")} eyebrow={section.eyebrow || "FAQ"} subtitle={section.subtitle} />,
-  enquiry: ({ section }) => <EnquirySection heading={section.title} text={section.subtitle} eyebrow={section.eyebrow || "Let’s talk"} formName="home-enquiry" />,
+  faq: ({ section, data }) => <FaqSection faqs={data.faqs} title={section.title || "Frequently asked questions"} eyebrow={section.eyebrow || "FAQ"} subtitle={section.subtitle} />,
+  enquiry: ({ section }) => <EnquirySection heading={section.title} text={section.subtitle} eyebrow={section.eyebrow || "Let’s talk"} formName="home-enquiry" buttonText={section.content.button_text} />,
   cta: FinalCta,
   stats: Stats,
 };
@@ -52,8 +52,9 @@ const SECTIONS: Record<string, (p: P) => React.ReactNode> = {
 function Hero({ section, data }: P) {
   const hero = data.hero;
   if (!hero) return null;
-  const stats = ((section.content.stats ?? []) as Item[]).slice(0, 4);
-  const ticker = ((section.content.ticker ?? []) as string[]).filter(Boolean);
+  const hc = section.content;
+  const stats = ((hc.stats ?? []) as Item[]).slice(0, 4);
+  const ticker = ((hc.ticker ?? []) as string[]).filter(Boolean);
   const poster = hero.background;
   const video = hero.background_video;
   const toPopup = !hero.cta_url || hero.cta_url.endsWith("#enquiry-popup") || hero.cta_url === "#enquire";
@@ -94,6 +95,12 @@ function Hero({ section, data }: P) {
               {splitWords(hero.heading)}
             </h1>
 
+            {hero.subheading && (
+              <p className="mt-2 text-sm font-semibold uppercase tracking-[0.14em] text-brand-700" data-aos="fade-up" data-aos-delay="180">
+                {hero.subheading}
+              </p>
+            )}
+
             {hero.description && (
               <p className="mt-3 max-w-xl text-base leading-relaxed text-ink-600 sm:text-[1.05rem]" data-aos="fade-up" data-aos-delay="250">
                 {hero.description}
@@ -117,7 +124,7 @@ function Hero({ section, data }: P) {
                   </span>
                   <span>
                     <span className="block text-sm font-bold text-ink">{hero.secondary_cta_text || "Watch video"}</span>
-                    <span className="block text-xs text-ink-500">1 min overview</span>
+                    <span className="block text-xs text-ink-500">{hc.video_caption || "1 min overview"}</span>
                   </span>
                 </button>
               ) : hero.secondary_cta_text ? (
@@ -149,16 +156,16 @@ function Hero({ section, data }: P) {
                       <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-60 motion-reduce:hidden" />
                       <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
                     </span>
-                    Free consultation
+                    {hc.form_badge || "Free consultation"}
                   </span>
-                  <span className="rounded-full bg-mist px-2.5 py-1 text-[0.7rem] font-semibold text-ink-600">Reply within 24h</span>
+                  <span className="rounded-full bg-mist px-2.5 py-1 text-[0.7rem] font-semibold text-ink-600">{hc.form_reply_badge || "Reply within 24h"}</span>
                 </div>
                 <div className="p-6 sm:p-7">
                   <p className="font-display text-[1.5rem] font-bold leading-tight" style={{ letterSpacing: "-0.035em" }}>
-                    Get your free growth plan
+                    {hc.form_title || "Get your free growth plan"}
                   </p>
-                  <p className="mt-1.5 text-sm text-ink-500">Tell us what you need — a specialist will call you back.</p>
-                  <LeadForm mini bare title="" formName="home-hero" button="Get free consultation" className="mt-5" />
+                  <p className="mt-1.5 text-sm text-ink-500">{hc.form_subtitle || "Tell us what you need — a specialist will call you back."}</p>
+                  <LeadForm mini bare title="" formName="home-hero" button={hc.form_button || "Get free consultation"} className="mt-5" />
                 </div>
               </div>
             </div>
@@ -281,7 +288,8 @@ function Clients({ section, data }: P) {
 function Services({ section, data }: P) {
   const cats = data.categories;
   if (!cats.length) return null;
-  const image = media(data, section.content.image_id);
+  const c = section.content;
+  const image = media(data, c.image_id);
   return (
     <section className="section relative" aria-labelledby="services-heading">
       <TabGroup initial="0">
@@ -305,12 +313,14 @@ function Services({ section, data }: P) {
             )}
           </div>
 
-          {cats.map((cat, i) => (
-            <TabPanel key={cat.slug} id={String(i)}>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {/* Feature tile (bento anchor) */}
-                <Link href={cat.url} className="group relative isolate flex min-h-[20rem] flex-col justify-end overflow-hidden rounded-[var(--radius-card)] bg-night p-6 text-white sm:col-span-2 lg:row-span-2 lg:p-8" data-aos="zoom-in">
-                  {image && <Img media={image} sizes="(min-width:1024px) 600px, 100vw" className="absolute inset-0 -z-10 size-full object-cover opacity-55 transition duration-[1.2s] group-hover:scale-105 group-hover:opacity-65" alt="" />}
+          {cats.map((cat, i) => {
+            const tileImage = i === 0 ? (image ?? cat.image) : (cat.image ?? image);
+            return (
+              <TabPanel key={cat.slug} id={String(i)}>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  {/* Feature tile (bento anchor) */}
+                  <Link href={cat.url} className="group relative isolate flex min-h-[20rem] flex-col justify-end overflow-hidden rounded-[var(--radius-card)] bg-night p-6 text-white sm:col-span-2 lg:row-span-2 lg:p-8" data-aos="zoom-in">
+                    {tileImage && <Img media={tileImage} sizes="(min-width:1024px) 600px, 100vw" className="absolute inset-0 -z-10 size-full object-cover opacity-55 transition duration-[1.2s] group-hover:scale-105 group-hover:opacity-65" alt="" />}
                   <div className="absolute inset-0 -z-10 bg-gradient-to-t from-night via-night/70 to-night/10" />
                   <div className="mesh opacity-80">
                     <span className="-right-24 -top-24 size-80 bg-teal/40" />
@@ -324,7 +334,7 @@ function Services({ section, data }: P) {
                       <Icon name={cat.icon || "layers"} className="size-3.5" /> {cat.services_count} services
                     </span>
                     <h3 className="mt-5 font-display text-[2.1rem] font-bold leading-[1.05] text-white sm:text-[2.5rem]" style={{ letterSpacing: "-0.045em" }}>
-                      {cat.heading}
+                      {highlight(cat.heading)}
                     </h3>
                     {cat.short_description && <p className="mt-4 max-w-md text-[0.98rem] leading-relaxed text-white/75">{cat.short_description}</p>}
                     <span className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-white">
@@ -347,13 +357,13 @@ function Services({ section, data }: P) {
                     <Icon name="message" className="size-5" />
                   </span>
                   <div>
-                    <p className="font-display text-lg font-bold tracking-[-0.02em] text-white">Not sure which service you need?</p>
-                    <p className="text-sm text-white/60">Tell us your goal — we’ll recommend the right mix, free.</p>
+                    <p className="font-display text-lg font-bold tracking-[-0.02em] text-white">{c.help_title || "Not sure which service you need?"}</p>
+                    <p className="text-sm text-white/60">{c.help_text || "Tell us your goal — we’ll recommend the right mix, free."}</p>
                   </div>
                 </div>
                 <div className="relative flex flex-wrap gap-3">
                   <button type="button" data-enquiry="services-help" className="btn btn-light group">
-                    Get expert advice <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
+                    {c.help_button_text || "Get expert advice"} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
                   </button>
                   <Link href={cat.url} className="btn btn-ghost-dark" data-cta={`home-all-${cat.slug}`}>
                     All {cat.name} services
@@ -361,7 +371,8 @@ function Services({ section, data }: P) {
                 </div>
               </div>
             </TabPanel>
-          ))}
+          );
+          })}
         </div>
       </TabGroup>
     </section>
@@ -372,6 +383,8 @@ function Promo({ section, data }: P) {
   const c = section.content;
   const image = media(data, c.image_id);
   const points = (c.points ?? []) as string[];
+  const btnUrl = (c.button_url ?? "").trim();
+  const useLink = Boolean(btnUrl && !btnUrl.endsWith("#enquiry-popup") && btnUrl !== "#enquire");
   return (
     <section className="pb-7 pt-1 sm:pb-8 sm:pt-2" aria-labelledby="promo-heading">
       <div className="container-x">
@@ -406,9 +419,15 @@ function Promo({ section, data }: P) {
                 </ul>
               )}
               <div className="mt-6 flex flex-wrap items-center gap-4">
-                <button type="button" data-enquiry="promo-banner" className="btn btn-light btn-lg group" data-magnetic="">
-                  {c.button_text || "Claim my free audit"} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
-                </button>
+                {useLink ? (
+                  <Link href={btnUrl} className="btn btn-light btn-lg group" data-cta="promo-banner">
+                    {c.button_text || "Claim my free audit"} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
+                  </Link>
+                ) : (
+                  <button type="button" data-enquiry="promo-banner" className="btn btn-light btn-lg group" data-magnetic="">
+                    {c.button_text || "Claim my free audit"} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
+                  </button>
+                )}
                 {c.note && <span className="text-sm font-medium text-white/50">{c.note}</span>}
               </div>
             </div>
@@ -567,7 +586,7 @@ function Showreel({ section, data }: P) {
           )}
 
           <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-start justify-between gap-5 p-6 sm:flex-row sm:items-end sm:p-10">
-            <p className="max-w-md font-display text-xl font-bold leading-tight tracking-[-0.03em] text-white sm:text-[1.85rem]">Strategy, design and engineering — under one roof.</p>
+            <p className="max-w-md font-display text-xl font-bold leading-tight tracking-[-0.03em] text-white sm:text-[1.85rem]">{c.caption || "Strategy, design and engineering — under one roof."}</p>
             {stats.length > 0 && (
               <dl className="flex gap-3">
                 {stats.map((s, i) => (
@@ -643,10 +662,16 @@ function Process({ section }: P) {
         </div>
 
         <div className="mt-7 flex flex-wrap items-center gap-4" data-reveal="">
-          <button type="button" data-enquiry="process" className="btn btn-light btn-lg group">
-            Start with a free consultation <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
-          </button>
-          <span className="text-sm text-white/50">No obligation · Reply within one business day</span>
+          {section.content.cta_url && !String(section.content.cta_url).endsWith("#enquiry-popup") && section.content.cta_url !== "#enquire" ? (
+            <Link href={String(section.content.cta_url)} className="btn btn-light btn-lg group">
+              {section.content.cta_text || "Start with a free consultation"} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
+            </Link>
+          ) : (
+            <button type="button" data-enquiry="process" className="btn btn-light btn-lg group">
+              {section.content.cta_text || "Start with a free consultation"} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
+            </button>
+          )}
+          <span className="text-sm text-white/50">{section.content.note || "No obligation · Reply within one business day"}</span>
         </div>
       </div>
     </section>
@@ -688,8 +713,8 @@ function Industries({ section, data }: P) {
           ))}
         </ul>
         <div className="mt-7 text-center" data-aos="fade-up">
-          <Link href={data.links.industries} className="btn btn-secondary btn-lg group" data-cta="home-industries">
-            See all industries <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
+          <Link href={section.content.cta_url || data.links.industries} className="btn btn-secondary btn-lg group" data-cta="home-industries">
+            {section.content.cta_text || "See all industries"} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
           </Link>
         </div>
       </div>
@@ -757,8 +782,8 @@ function Portfolio({ section, data }: P) {
             </h2>
             {section.subtitle && <p className="lead mt-4">{section.subtitle}</p>}
           </div>
-          <Link href={data.links.portfolio} className="btn btn-secondary" data-cta="home-portfolio">
-            View portfolio <Icon name="arrow-right" className="size-4" />
+          <Link href={section.content.cta_url || data.links.portfolio} className="btn btn-secondary" data-cta="home-portfolio">
+            {section.content.cta_text || "View portfolio"} <Icon name="arrow-right" className="size-4" />
           </Link>
         </div>
 
@@ -876,9 +901,15 @@ function Testimonials({ section, data }: P) {
           </div>
           <div className="lg:justify-self-end" data-reveal="">
             {section.subtitle && <p className="max-w-md text-[1.02rem] leading-relaxed text-white/60">{section.subtitle}</p>}
-            <button type="button" data-enquiry="testimonials" className="btn btn-light group mt-4">
-              Become our next success story <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
-            </button>
+            {section.content.cta_url && !String(section.content.cta_url).endsWith("#enquiry-popup") && section.content.cta_url !== "#enquire" ? (
+              <Link href={String(section.content.cta_url)} className="btn btn-light group mt-4">
+                {section.content.cta_text || "Become our next success story"} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
+              </Link>
+            ) : (
+              <button type="button" data-enquiry="testimonials" className="btn btn-light group mt-4">
+                {section.content.cta_text || "Become our next success story"} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -952,8 +983,8 @@ function Blogs({ section, data }: P) {
             </h2>
             {section.subtitle && <p className="lead mt-4">{section.subtitle}</p>}
           </div>
-          <Link href={data.links.blog} className="btn btn-secondary" data-cta="home-blog">
-            All articles <Icon name="arrow-right" className="size-4" />
+          <Link href={section.content.cta_url || data.links.blog} className="btn btn-secondary" data-cta="home-blog">
+            {section.content.cta_text || "All articles"} <Icon name="arrow-right" className="size-4" />
           </Link>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -1014,16 +1045,22 @@ async function FinalCta({ section, data }: P) {
             </h2>
             {section.subtitle && <p className="mx-auto mt-3.5 max-w-xl text-lg leading-relaxed text-white/65">{section.subtitle}</p>}
             <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row" data-aos="fade-up" data-aos-delay="150">
-              <button type="button" data-enquiry="final-cta" className="btn btn-light btn-lg group w-full sm:w-auto" data-magnetic="">
-                {section.content.button_text || "Get my free consultation"} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
-              </button>
+              {section.content.button_url && !String(section.content.button_url).endsWith("#enquiry-popup") && section.content.button_url !== "#enquire" ? (
+                <Link href={String(section.content.button_url)} className="btn btn-light btn-lg group w-full sm:w-auto" data-cta="final-cta">
+                  {section.content.button_text || "Get my free consultation"} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
+                </Link>
+              ) : (
+                <button type="button" data-enquiry="final-cta" className="btn btn-light btn-lg group w-full sm:w-auto" data-magnetic="">
+                  {section.content.button_text || "Get my free consultation"} <Icon name="arrow-right" className="size-4 transition group-hover:translate-x-0.5" />
+                </button>
+              )}
               {settings.phone && (
                 <a href={settings.phone_href ?? undefined} className="btn btn-ghost-dark btn-lg w-full sm:w-auto">
                   <Icon name="phone" className="size-4 text-teal-200" /> Call {settings.phone}
                 </a>
               )}
             </div>
-            <p className="mt-4 text-sm text-white/45">Free consultation · Reply within one business day</p>
+            <p className="mt-4 text-sm text-white/45">{section.content.note || "Free consultation · Reply within one business day"}</p>
           </div>
         </div>
       </div>

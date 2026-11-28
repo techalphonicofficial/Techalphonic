@@ -6,21 +6,29 @@ import { Icon } from "@/components/ui/Icon";
 import type { Block } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
+type PricingPlan = {
+  title: string;
+  value: string;
+  suffix?: string;
+  text?: string;
+  features?: string;
+  featured?: boolean;
+  url?: string;
+  cta_text?: string;
+  badge?: string;
+};
+
 export function PricingPlansSection({ pricingBlocks }: { pricingBlocks: Block[] }) {
   const [activeTabIdx, setActiveTabIdx] = useState<number>(0);
 
   if (!pricingBlocks || pricingBlocks.length === 0) return null;
 
   const currentBlock = pricingBlocks[activeTabIdx] || pricingBlocks[0];
-  const plans = (currentBlock?.data?.items ?? []) as Array<{
-    title: string;
-    value: string;
-    suffix?: string;
-    text?: string;
-    features?: string;
-    featured?: boolean;
-    url?: string;
-  }>;
+  const plans = (currentBlock?.data?.items ?? []) as PricingPlan[];
+  const eyebrow = currentBlock?.data?.eyebrow || "Our Pricing Plans";
+  const subheading =
+    currentBlock?.data?.subheading ||
+    "All-inclusive plans with no hidden fees. Switch or cancel anytime. Every package includes a dedicated account manager.";
 
   return (
     <section className="py-8 sm:py-11" id="plans">
@@ -28,15 +36,12 @@ export function PricingPlansSection({ pricingBlocks }: { pricingBlocks: Block[] 
         {/* Section Header */}
         <div className="mx-auto max-w-2xl text-center mb-5">
           <span className="text-xs font-bold uppercase tracking-[0.18em] text-brand">
-            Our Pricing Plans
+            {eyebrow}
           </span>
           <h2 className="mt-1.5 font-display text-2xl sm:text-4xl font-bold tracking-tight text-ink">
             Choose Your <span className="text-brand">Perfect Package</span>
           </h2>
-          <p className="mt-2 text-xs sm:text-sm text-ink-600">
-            All-inclusive plans with no hidden fees. Switch or cancel anytime. Every package includes a dedicated
-            account manager.
-          </p>
+          <p className="mt-2 text-xs sm:text-sm text-ink-600">{subheading}</p>
         </div>
 
         {/* Guarantee Box */}
@@ -82,6 +87,9 @@ export function PricingPlansSection({ pricingBlocks }: { pricingBlocks: Block[] 
           {plans.map((plan, i) => {
             const hot = Boolean(plan.featured);
             const features = String(plan.features ?? "").split(/\r?\n/).filter(Boolean);
+            const ctaLabel = plan.cta_text?.trim() || "Get Started";
+            const ctaHref = plan.url?.trim() || "/contact/";
+            const enquiryId = `pricing-${String(plan.title ?? "plan").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 
             return (
               <div
@@ -95,7 +103,7 @@ export function PricingPlansSection({ pricingBlocks }: { pricingBlocks: Block[] 
               >
                 {hot && (
                   <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-brand px-3.5 py-1 text-[0.7rem] font-bold uppercase tracking-wider text-white shadow-xs">
-                    ⭐ Most Popular
+                    {plan.badge?.trim() || "⭐ Most Popular"}
                   </span>
                 )}
 
@@ -146,13 +154,23 @@ export function PricingPlansSection({ pricingBlocks }: { pricingBlocks: Block[] 
 
                 {/* CTA */}
                 <div className="mt-8 pt-4">
-                  <Link
-                    href="/contact/"
-                    className={cn("btn w-full", hot ? "btn-primary" : "btn-dark")}
-                    data-enquiry={`pricing-${String(plan.title ?? "plan").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
-                  >
-                    Get Started <Icon name="arrow-right" className="size-3.5" />
-                  </Link>
+                  {ctaHref === "#enquiry-popup" ? (
+                    <button
+                      type="button"
+                      className={cn("btn w-full", hot ? "btn-primary" : "btn-dark")}
+                      data-enquiry={enquiryId}
+                    >
+                      {ctaLabel} <Icon name="arrow-right" className="size-3.5" />
+                    </button>
+                  ) : (
+                    <Link
+                      href={ctaHref}
+                      className={cn("btn w-full", hot ? "btn-primary" : "btn-dark")}
+                      data-enquiry={enquiryId}
+                    >
+                      {ctaLabel} <Icon name="arrow-right" className="size-3.5" />
+                    </Link>
+                  )}
                 </div>
               </div>
             );
@@ -166,4 +184,3 @@ export function PricingPlansSection({ pricingBlocks }: { pricingBlocks: Block[] 
     </section>
   );
 }
-

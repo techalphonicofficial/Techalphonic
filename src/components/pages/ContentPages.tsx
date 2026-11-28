@@ -9,7 +9,7 @@ import { LeadForm } from "@/components/forms/LeadForm";
 import { PackagesPage } from "@/components/pages/PackagesPage";
 import { getLayout } from "@/lib/api";
 import type { Block, CategoryData, LandingData, LocationItem, PageData, Seo, ServiceData } from "@/lib/types";
-import { cn, formatDate, itemTitle, lines } from "@/lib/utils";
+import { cn, formatDate, itemTitle, lines, stripTags } from "@/lib/utils";
 
 /* CMS page templates (port of resources/views/frontend/pages/*, services/*, landing/show). */
 
@@ -141,6 +141,20 @@ async function ContactPage({ data, seo }: { data: PageData; seo: Seo }) {
                   </a>
                 </li>
               )}
+              {s.phone_secondary && (
+                <li>
+                  <a href={s.phone_secondary_href ?? `tel:${s.phone_secondary.replace(/[^+\d]/g, "")}`} className={row}>
+                    <span className="icon-tile icon-grad size-11 rounded-xl">
+                      <Icon name="phone" className="size-5" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-xs font-medium text-ink-500">Secondary phone</span>
+                      <span className="block font-semibold text-ink">{s.phone_secondary}</span>
+                    </span>
+                    <Icon name="arrow-up-right" className="size-4 text-ink-500 transition group-hover:text-brand" />
+                  </a>
+                </li>
+              )}
               {wa && (
                 <li>
                   <a href={wa} target="_blank" rel="noopener" className={row}>
@@ -164,6 +178,20 @@ async function ContactPage({ data, seo }: { data: PageData; seo: Seo }) {
                     <span className="min-w-0 flex-1">
                       <span className="block text-xs font-medium text-ink-500">Email</span>
                       <span className="block truncate font-semibold text-ink">{s.email}</span>
+                    </span>
+                    <Icon name="arrow-up-right" className="size-4 text-ink-500 transition group-hover:text-brand" />
+                  </a>
+                </li>
+              )}
+              {s.sales_email && (
+                <li>
+                  <a href={`mailto:${s.sales_email}`} className={row}>
+                    <span className="icon-tile size-11 rounded-xl bg-teal text-white">
+                      <Icon name="mail" className="size-5" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-xs font-medium text-ink-500">Sales email</span>
+                      <span className="block truncate font-semibold text-ink">{s.sales_email}</span>
                     </span>
                     <Icon name="arrow-up-right" className="size-4 text-ink-500 transition group-hover:text-brand" />
                   </a>
@@ -496,7 +524,7 @@ export function CategoryPage({ data, seo }: { data: CategoryData; seo: Seo }) {
   const { category, blocks } = data;
   return (
     <>
-      <PageHero title={category.heading} eyebrow="Services" intro={pIntro(category.short_description)} breadcrumbs={seo.breadcrumbs} image={category.image} layout="centered" />
+      <PageHero title={category.heading} eyebrow="Services" intro={pIntro(category.short_description)} breadcrumbs={seo.breadcrumbs} image={category.image} layout={category.image ? "split" : "centered"} />
       <section className="section">
         <div className="container-x">
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -636,20 +664,45 @@ export function LandingPage({ data, seo }: { data: LandingData; seo: Seo }) {
 
       {blocks.length > 0 && <Blocks blocks={blocks} />}
 
-      {data.local_facts.length > 0 && location && (
+      {(data.local_facts.length > 0 || (location && (location.description || location.address || location.phone || location.email))) && location && (
         <section className="section-sm">
           <div className="container-x">
             <div className="rounded-[2rem] border border-line bg-gradient-to-br from-teal-50 via-white to-amber-50 p-8 sm:p-12" data-reveal="">
               <p className="eyebrow">Local insight</p>
               <h2 className="h-section mt-4">Doing business in {location.name}</h2>
-              <ul className="mt-6 grid gap-4 sm:grid-cols-2" role="list">
-                {data.local_facts.map((fact, i) => (
-                  <li key={i} className="flex gap-3">
-                    <Icon name="map-pin" className="mt-0.5 size-5 shrink-0 text-brand" />
-                    <span>{typeof fact === "string" ? fact : fact.text ?? ""}</span>
-                  </li>
-                ))}
-              </ul>
+              {location.description && <p className="mt-3 max-w-3xl text-ink-600/90">{stripTags(location.description)}</p>}
+              {data.local_facts.length > 0 && (
+                <ul className="mt-6 grid gap-4 sm:grid-cols-2" role="list">
+                  {data.local_facts.map((fact, i) => (
+                    <li key={i} className="flex gap-3">
+                      <Icon name="map-pin" className="mt-0.5 size-5 shrink-0 text-brand" />
+                      <span>{typeof fact === "string" ? fact : fact.text ?? ""}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {(location.address || location.phone || location.email) && (
+                <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 border-t border-line/70 pt-5 text-sm text-ink-600">
+                  {location.address && (
+                    <span className="inline-flex items-center gap-2">
+                      <Icon name="map-pin" className="size-4 text-brand" />
+                      {[location.address, location.postal_code].filter(Boolean).join(", ")}
+                    </span>
+                  )}
+                  {location.phone && (
+                    <a href={`tel:${location.phone.replace(/[^+\d]/g, "")}`} className="inline-flex items-center gap-2 font-medium hover:text-brand">
+                      <Icon name="phone" className="size-4 text-brand" />
+                      {location.phone}
+                    </a>
+                  )}
+                  {location.email && (
+                    <a href={`mailto:${location.email}`} className="inline-flex items-center gap-2 font-medium hover:text-brand">
+                      <Icon name="mail" className="size-4 text-brand" />
+                      {location.email}
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -754,7 +807,7 @@ export function LandingPage({ data, seo }: { data: LandingData; seo: Seo }) {
         <LocationDirectory locations={locationsList} serviceName={service?.name || "SEO & Web Development"} />
       )}
 
-      <EnquirySection heading={data.cta.heading} text={data.cta.text} service={service?.name} location={location?.name} formName="landing-page" />
+      <EnquirySection heading={data.cta.heading} text={data.cta.text} buttonText={data.cta.button_text ?? undefined} service={service?.name} location={location?.name} formName="landing-page" />
       <RelatedLinks groups={data.related} />
     </>
   );
